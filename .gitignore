@@ -1,0 +1,6 @@
+swissparlpy.egg-info
+*.pyc
+*.swp
+.coverage
+pyenv
+.env
