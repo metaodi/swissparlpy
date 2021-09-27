@@ -52,6 +52,92 @@ See the [`examples` directory](/examples) for more scripts.
 ['Bern', 'Neuenburg', 'Genf', 'Wallis', 'Uri', 'Schaffhausen', 'Jura', 'Basel-Stadt', 'St. Gallen', 'Obwalden', 'Appenzell A.-Rh.', 'Solothurn', 'Waadt', 'Zug', 'Aargau', 'Basel-Landschaft', 'Luzern', 'Thurgau', 'Freiburg', 'Appenzell I.-Rh.', 'Schwyz', 'Graubünden', 'Glarus', 'Tessin', 'Zürich', 'Nidwalden']
 ```
 
+The return value of `get_data` is iterable, so you can easily loop over it. Or you can use indices to access elements, e.g. `data[1]` to get the second element, or `data[-1]` to get the last one.
+
+Even [slicing](https://python-reference.readthedocs.io/en/latest/docs/brackets/slicing.html) is supported, so you can do things like only iterate over the first 5 elements using
+
+```python
+for rec in data[:5]:
+   print(rec)
+```
+
+### Use together with `pandas`
+
+To create a pandas DataFrame from `get_data` simply pass the return value to the constructor:
+
+```python
+>>> import swissparlpy as spp
+>>> import pandas as pd
+>>> parties = spp.get_data('Party', Language='DE')
+>>> parties_df = pd.DataFrame(parties)
+>>> parties_df
+      ID Language  PartyNumber  ...                   EndDate                         Modified PartyAbbreviation
+0     12       DE           12  ... 2000-01-01 00:00:00+00:00 2010-12-26 13:05:26.430000+00:00                SP
+1     13       DE           13  ... 2000-01-01 00:00:00+00:00 2010-12-26 13:05:26.430000+00:00               SVP
+2     14       DE           14  ... 2000-01-01 00:00:00+00:00 2010-12-26 13:05:26.430000+00:00               CVP
+3     15       DE           15  ... 2000-01-01 00:00:00+00:00 2010-12-26 13:05:26.430000+00:00      FDP-Liberale
+4     16       DE           16  ... 2000-01-01 00:00:00+00:00 2010-12-26 13:05:26.430000+00:00               LDP
+..   ...      ...          ...  ...                       ...                              ...               ...
+78  1582       DE         1582  ... 2000-01-01 00:00:00+00:00 2015-12-03 08:48:38.250000+00:00             BastA
+79  1583       DE         1583  ... 2000-01-01 00:00:00+00:00 2019-03-07 17:24:15.013000+00:00              CVPO
+80  1584       DE         1584  ... 2000-01-01 00:00:00+00:00 2019-11-08 17:28:43.947000+00:00                Al
+81  1585       DE         1585  ... 2000-01-01 00:00:00+00:00 2019-11-08 17:41:39.513000+00:00               EàG
+82  1586       DE         1586  ... 2000-01-01 00:00:00+00:00 2021-08-12 07:59:22.627000+00:00               M-E
+
+[83 rows x 8 columns]
+```
+
+### Substrings
+
+**`__startswith`**:
+
+```python
+>>> import swissparlpy as spp
+>>> persons = spp.get_data("Person", Language="DE", LastName__startswith='Bal')
+>>> persons.count
+12
+```
+
+**`__contains`**
+```python
+>>> import swissparlpy as spp
+>>> co2_business = spp.get_data("Business", Title__contains="CO2", Language = "DE")
+>>> co2_business.count
+265
+```
+
+### Large queries
+
+```python
+import swissparlpy as spp
+import os
+
+path = os.path.join(__location__, "voting50")
+
+def save_votes_of_session(id):
+    if not os.path.exists(path):
+        os.mkdir(path)
+    data = client.get_data("Voting", Language="DE", IdSession=id)
+    print(f"{data.count} rows loaded.")
+    df = pd.DataFrame(data)
+    pickle_path = os.path.join(path, f'{id}.pks')
+    df.to_pickle(pickle_path)
+    print(f"Saved pickle at {pickle_path}")
+
+
+# get all session of the 50 legislative period
+sessions50 = client.get_data("Session", Language="DE", LegislativePeriodNumber=50)
+sessions50.count
+
+for session in sessions50:
+    print(f"Loading session {session['ID']}")
+    save_votes_of_session(session['ID'])
+
+# Combine to one dataframe
+path = os.path.join(__location__, "voting50")
+df_voting50 = pd.concat([pd.read_pickle(os.path.join(path, x)) for x in os.listdir(path)])
+```
+
 ## Release
 
 To create a new release, follow these steps (please respect [Semantic Versioning](http://semver.org/)):
