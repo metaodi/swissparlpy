@@ -68,4 +68,4 @@ To create a new release, follow these steps (please respect [Semantic Versioning
 [pypi-image]: https://img.shields.io/pypi/v/swissparlpy
 [pypi-url]: https://pypi.org/project/swissparlpy/
 [build-image]: https://github.com/metaodi/swissparlpy/actions/workflows/build.yml/badge.svg
-[build-url]: https://github.com/metaodi/swissparlpy-/actions/workflows/build.yml
+[build-url]: https://github.com/metaodi/swissparlpy/actions/workflows/build.yml
