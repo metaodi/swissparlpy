@@ -1,5 +1,5 @@
 [build-system]
-requires = ["flit_core >=3.2,<4", "setuptools", "requests", "pyodata"]
+requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
@@ -9,6 +9,22 @@ readme = "README.md"
 requires-python = ">=3.7"
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
+dependencies = [
+    "requests",
+    "pyodata",
+]
+
+[project.optional-dependencies]
+test = [
+    "flake8",
+    "mock",
+    "pytest",
+    "pytest-cov",
+]
+dev = [
+    "flit",
+]
+
 
 [project.urls]
 Home = "https://github.com/metaodi/swissparlpy"
