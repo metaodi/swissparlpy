@@ -1,0 +1,15 @@
+[build-system]
+requires = ["flit_core >=3.2,<4", "setuptools", "requests", "pyodata"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "swissparlpy"
+authors = [{name = "Stefan Oderbolz", email = "odi@metaodi.ch"}]
+readme = "README.md"
+description-file = "README.md"
+requires-python = ">=3.7"
+classifiers = ["License :: OSI Approved :: MIT License"]
+dynamic = ["version", "description"]
+
+[project.urls]
+Home = "https://github.com/metaodi/swissparlpy"
