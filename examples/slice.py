@@ -2,7 +2,7 @@ import swissparlpy as spp
 from pprint import pprint
 
 sessions = spp.get_data(
-    table="Session",
+    table="Session"
 )
 
 print(f"Total rows: {len(sessions)}")

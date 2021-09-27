@@ -8,12 +8,14 @@ __location__ = os.path.realpath(
     )
 )
 
+
 def fixture_content(filename):
     path = os.path.join(__location__, 'fixtures', filename)
     if not os.path.exists(path):
         return ""
     with open(path) as f:
         return f.read()
+
 
 @pytest.fixture
 def metadata():

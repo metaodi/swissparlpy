@@ -1,7 +1,6 @@
 from swissparlpy_test import SwissParlTestCase
 from swissparlpy.client import SwissParlClient
 import responses
-import pytest
 
 SERVICE_URL = 'https://ws.parlament.ch/odata.svc'
 
@@ -20,4 +19,3 @@ class TestClient(SwissParlTestCase):
         overview = client.get_overview()
         assert isinstance(overview, dict), "Overview is not a dict"
         assert len(overview) == 44
-

@@ -57,7 +57,6 @@ class SwissParlResponse(object):
         self.data = []
         self._setup_proxies()
 
-    
     def _setup_proxies(self):
         for e in self.entities:
             row = {k: SwissParlDataProxy(e, k) for k in self.variables}
@@ -68,13 +67,13 @@ class SwissParlResponse(object):
 
     def __iter__(self):
         for row in self.data:
-            yield {k: v() for k,v in row.items()}
+            yield {k: v() for k, v in row.items()}
 
     def __getitem__(self, key):
         items = self.data[key]
         if isinstance(key, slice):
-             return [{k: v() for k,v in i.items()} for i in items]
-        return {k: v() for k,v in items.items()}
+            return [{k: v() for k, v in i.items()} for i in items]
+        return {k: v() for k, v in items.items()}
 
 
 class SwissParlDataProxy(object):

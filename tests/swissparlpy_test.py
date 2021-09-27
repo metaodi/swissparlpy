@@ -1,4 +1,3 @@
-import pytest
 import mock
 import os
 from conftest import fixture_content
@@ -22,4 +21,3 @@ class SwissParlTestCase:
 
         content = fixture_content(filename)
         session_mock.return_value.get.return_value = mock.MagicMock(content=content)  # noqa
-
