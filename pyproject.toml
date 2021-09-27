@@ -18,6 +18,7 @@ dependencies = [
 test = [
     "flake8",
     "mock",
+    "responses",
     "pytest",
     "pytest-cov",
 ]
