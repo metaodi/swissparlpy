@@ -1,3 +1,7 @@
+[![PyPI Version][pypi-image]][pypi-url]
+[![Build Status][build-image]][build-url]
+
+
 swissparlpy
 ===========
 
@@ -57,3 +61,11 @@ To create a new release, follow these steps (please respect [Semantic Versioning
 1. Create a [pull request to merge `develop` into `main`](https://github.com/metaodi/swissparlpy/compare/main...develop?expand=1) (make sure the tests pass!)
 1. Create a [new release/tag on GitHub](https://github.com/metaodi/swissparlpy/releases) (on the main branch)
 1. The [publication on PyPI](https://pypi.python.org/pypi/swissparlpy) happens via [GitHub Actions](https://github.com/metaodi/swissparlpy/actions?query=workflow%3A%22Upload+Python+Package%22) on every tagged commit
+
+
+<!-- Badges -->
+
+[pypi-image]: https://img.shields.io/pypi/v/swissparlpy
+[pypi-url]: https://pypi.org/project/swissparlpy/
+[build-image]: https://github.com/metaodi/swissparlpy/actions/workflows/build.yml/badge.svg
+[build-url]: https://github.com/metaodi/swissparlpy-/actions/workflows/build.yml
