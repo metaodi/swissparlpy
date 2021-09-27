@@ -7,8 +7,8 @@ Inspired by the R package [swissparl](https://github.com/zumbov2/swissparl), thi
 
 * [Installation](#installation)
 * [Usage](#usage)
-    * [`search`](#search)
-    * [`fulltext_search`](#fulltext_search)
+    * [ Get tables and their variables](##get-tables-and-their-variables)
+    * [Get data of a table](#get-data-of-a-table)
 * [Release](#release)
 
 ## Installation
