@@ -6,7 +6,6 @@ build-backend = "flit_core.buildapi"
 name = "swissparlpy"
 authors = [{name = "Stefan Oderbolz", email = "odi@metaodi.ch"}]
 readme = "README.md"
-description-file = "README.md"
 requires-python = ">=3.7"
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
