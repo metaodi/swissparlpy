@@ -14,7 +14,7 @@ class SwissParlClient(object):
 
     def get_tables(self):
         if self.cache:
-            return self.cache.keys()
+            return list(self.cache.keys())
         return [es.name for es in self.client.schema.entity_sets]
 
     def get_variables(self, table):

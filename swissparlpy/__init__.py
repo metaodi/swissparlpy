@@ -1,6 +1,6 @@
 """Client for Swiss parliament API"""
 
-__version__ = '0.0.2'
+__version__ = '0.1.0'
 __all__ = ['client', 'errors']
 
 from .errors import SwissParlError  # noqa
@@ -14,7 +14,7 @@ def get_tables():
 
 def get_variables(table):
     client = SwissParlClient()
-    return client.get_variables()
+    return client.get_variables(table)
 
 
 def get_overview():
