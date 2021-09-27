@@ -26,18 +26,18 @@ See the [`examples` directory](/examples) for more scripts.
 ### Get tables and their variables
 
 ```python
->>> import swissparlpy
->>> swissparlpy.get_tables()[:5] # get first 5 tables
+>>> import swissparlpy as spp
+>>> spp.get_tables()[:5] # get first 5 tables
 ['MemberParty', 'Party', 'Person', 'PersonAddress', 'PersonCommunication']
->>> swissparlpy.get_variables('Party') # get variables of table `Party`
+>>> spp.get_variables('Party') # get variables of table `Party`
 ['ID', 'Language', 'PartyNumber', 'PartyName', 'StartDate', 'EndDate', 'Modified', 'PartyAbbreviation']
 ```
 
 ### Get data of a table
 
 ```python
->>> import swissparlpy
->>> data = swissparlpy.get_data('Canton', Language='DE')
+>>> import swissparlpy as spp
+>>> data = spp.get_data('Canton', Language='DE')
 >>> data
 <swissparlpy.client.SwissParlResponse object at 0x7f8e38baa610>
 >>> data.count
