@@ -14,7 +14,7 @@ def get_tables():
 
 def get_variables(table):
     client = SwissParlClient()
-    return client.get_variables()
+    return client.get_variables(table)
 
 
 def get_overview():
