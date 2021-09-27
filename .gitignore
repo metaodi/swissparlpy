@@ -4,3 +4,4 @@ swissparlpy.egg-info
 .coverage
 pyenv
 .env
+dist/
