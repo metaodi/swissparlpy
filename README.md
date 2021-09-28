@@ -5,14 +5,18 @@
 swissparlpy
 ===========
 
-Inspired by the R package [swissparl](https://github.com/zumbov2/swissparl), this module provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss parliament](https://www.parlament.ch/en).
+This module provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss parliament](https://www.parlament.ch/en).
 
 ## Table of Contents
 
 * [Installation](#installation)
 * [Usage](#usage)
-    * [ Get tables and their variables](##get-tables-and-their-variables)
+    * [Get tables and their variables](##get-tables-and-their-variables)
     * [Get data of a table](#get-data-of-a-table)
+    * [Use together with `pandas`](#use-together-with-pandas)
+    * [Substrings](#substrings)
+    * [Large queries][#large-queries]
+* [Credits](#credits)
 * [Release](#release)
 
 ## Installation
@@ -89,6 +93,8 @@ To create a pandas DataFrame from `get_data` simply pass the return value to the
 
 ### Substrings
 
+If you want to query for substrings there are two main operators to use:
+
 **`__startswith`**:
 
 ```python
@@ -106,18 +112,27 @@ To create a pandas DataFrame from `get_data` simply pass the return value to the
 265
 ```
 
+You can suffix any field with those operators to query the data.
+
 ### Large queries
+
+Large queries (especially the tables Voting and Transcripts) may result in server-side errors (500 Internal Server Error). In these cases it is recommended to download the data in smaller batches, save the individual blocks and combine them after the download.
+
+This is an [example script](/examples/download_votes_in_batches.py) to download all votes of the legislative period 50, session by session, and combine them afterwards in one `DataFrame`:
 
 ```python
 import swissparlpy as spp
+import pandas as pd
 import os
 
+__location__ = os.path.realpath(os.getcwd())
 path = os.path.join(__location__, "voting50")
 
-def save_votes_of_session(id):
+# download votes of one session and save as pickled DataFrame
+def save_votes_of_session(id, path):
     if not os.path.exists(path):
         os.mkdir(path)
-    data = client.get_data("Voting", Language="DE", IdSession=id)
+    data = spp.get_data("Voting", Language="DE", IdSession=id)
     print(f"{data.count} rows loaded.")
     df = pd.DataFrame(data)
     pickle_path = os.path.join(path, f'{id}.pks')
@@ -126,17 +141,21 @@ def save_votes_of_session(id):
 
 
 # get all session of the 50 legislative period
-sessions50 = client.get_data("Session", Language="DE", LegislativePeriodNumber=50)
+sessions50 = spp.get_data("Session", Language="DE", LegislativePeriodNumber=50)
 sessions50.count
 
 for session in sessions50:
     print(f"Loading session {session['ID']}")
-    save_votes_of_session(session['ID'])
+    save_votes_of_session(session['ID'], path)
 
 # Combine to one dataframe
-path = os.path.join(__location__, "voting50")
 df_voting50 = pd.concat([pd.read_pickle(os.path.join(path, x)) for x in os.listdir(path)])
 ```
+
+## Credits
+
+This library is inspired by the R package [swissparl](https://github.com/zumbov2/swissparl) of [David Zumbach](https://github.com/zumbov2).
+[Ralph Straumann](https://twitter.com/rastrau) initial [asked about a Python version of `swissparl` on Twitter](https://twitter.com/rastrau/status/1441048778740432902), which led to this project.
 
 ## Release
 
