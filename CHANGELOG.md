@@ -3,7 +3,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project follows [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Jupyter notebook with examples
 
+### Changed
+- Update README with examples
 
 ## [0.1.1] - 2021-09-27
 ### Fixed
