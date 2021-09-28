@@ -2,6 +2,7 @@ import swissparlpy as spp
 import pandas as pd
 import os
 
+
 __location__ = os.path.realpath(os.getcwd())
 path = os.path.join(__location__, "voting50")
 
