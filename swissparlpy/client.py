@@ -5,10 +5,11 @@ SERVICE_URL = 'https://ws.parlament.ch/odata.svc/'
 
 
 class SwissParlClient(object):
-    def __init__(self, session=None):
+    def __init__(self, session=None, url=SERVICE_URL):
         if not session:
             session = requests.Session()
-        self.client = pyodata.Client(SERVICE_URL, session)
+        self.url = url
+        self.client = pyodata.Client(url, session)
         self.cache = {}
         self.get_overview()
 
