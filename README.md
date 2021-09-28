@@ -11,11 +11,11 @@ This module provides easy access to the data of the [OData webservice](https://w
 
 * [Installation](#installation)
 * [Usage](#usage)
-    * [Get tables and their variables](##get-tables-and-their-variables)
+    * [Get tables and their variables](#get-tables-and-their-variables)
     * [Get data of a table](#get-data-of-a-table)
     * [Use together with `pandas`](#use-together-with-pandas)
     * [Substrings](#substrings)
-    * [Large queries][#large-queries]
+    * [Large queries](#large-queries)
 * [Credits](#credits)
 * [Release](#release)
 
