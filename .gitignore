@@ -5,3 +5,5 @@ swissparlpy.egg-info
 pyenv
 .env
 dist/
+examples/voting50/
+examples/.ipynb_checkpoints/
