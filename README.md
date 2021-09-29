@@ -15,6 +15,7 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Get data of a table](#get-data-of-a-table)
     * [Use together with `pandas`](#use-together-with-pandas)
     * [Substrings](#substrings)
+    * [Date ranges](#date-ranges)
     * [Large queries](#large-queries)
 * [Credits](#credits)
 * [Release](#release)
@@ -113,6 +114,30 @@ If you want to query for substrings there are two main operators to use:
 ```
 
 You can suffix any field with those operators to query the data.
+
+### Date ranges
+
+To query for date ranges you can use the operators...
+
+* `__gt` (greater than)
+* `__gte` (greater than or equal)
+* `__lt` (less than)
+* `__lte` (less than or equal)
+
+...in combination with a `datetime` object.
+
+```python
+>>> import swissparlpy as spp
+>>> from datetime import datetime
+>>> business = spp.get_data(
+...     "Business",
+...     Language="DE",
+...     SubmissionDate__gt=datetime.fromisoformat('2019-09-30'),
+...     SubmissionDate__lte=datetime.fromisoformat('2019-10-31')
+... )
+>>> business.count
+22
+```
 
 ### Large queries
 
