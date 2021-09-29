@@ -2,10 +2,10 @@ import swissparlpy as spp
 from pprint import pprint
 import pandas as pd
 
-subjects = spp.get_data(
-    table="SubjectBusiness",
-    filter="BusinessShortNumber eq '05.057'"
+persons = spp.get_data(
+    table="Person",
+    filter="(FirstName eq 'Stefan' or LastName eq 'Seiler') and Language eq 'DE'"
 )
 
-df = pd.DataFrame(subjects)
-print(df)
+df = pd.DataFrame(persons)
+print(df[['FirstName', 'LastName']])
