@@ -142,9 +142,27 @@ To query for date ranges you can use the operators...
 
 ### Advanced filter
 
-You can provide a callable as a filter which allows for more advanved filters like a combination of AND/OR.
+**Text query**
 
-`swissparlpy.filter` provides `_or` and `_and`.
+It's possible to write text queries using operators like `eq` (equals), `ne` (not equals), `lt`/`lte` (less than/less than or equals), `gt`/`gte` (greater than/greater than or equals), 'startswith()` and `contains`:
+
+```python
+import swissparlpy as spp
+import pandas as pd
+   
+persons = spp.get_data(
+   "Person",
+   filter="(startswith(FirstName, 'Ste') or LastName eq 'Seiler') and Language='DE'"
+)
+
+df = pd.DataFrame(persons)
+print(df[['FirstName', 'LastName']])
+```
+**Callable Filter**
+
+You can provide a callable as a filter which allows for more advanved filters.
+
+`swissparlpy.filter` provides `or_` and `and_`.
 
 ```python
 import swissparlpy as spp
@@ -158,21 +176,6 @@ def filter_by_name(ent):
    )
    
 persons = spp.get_data("Person", filter=filter_by_name, Language='DE')
-
-df = pd.DataFrame(persons)
-print(df[['FirstName', 'LastName']])
-```
-
-Alternatively it's possible to write text queries:
-
-```python
-import swissparlpy as spp
-import pandas as pd
-   
-persons = spp.get_data(
-   "Person",
-   filter="(FirstName eq 'Stefan' or LastName eq 'Seiler') and Language='DE'"
-)
 
 df = pd.DataFrame(persons)
 print(df[['FirstName', 'LastName']])
