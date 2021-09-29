@@ -1,5 +1,4 @@
 import swissparlpy as spp
-from pprint import pprint
 import pandas as pd
 
 persons = spp.get_data(
