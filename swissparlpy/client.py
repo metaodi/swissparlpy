@@ -5,10 +5,11 @@ SERVICE_URL = 'https://ws.parlament.ch/odata.svc/'
 
 
 class SwissParlClient(object):
-    def __init__(self, session=None):
+    def __init__(self, session=None, url=SERVICE_URL):
         if not session:
             session = requests.Session()
-        self.client = pyodata.Client(SERVICE_URL, session)
+        self.url = url
+        self.client = pyodata.Client(url, session)
         self.cache = {}
         self.get_overview()
 
@@ -37,10 +38,17 @@ class SwissParlClient(object):
             self.get_variables(table)
         )
 
-    def get_data(self, table, **kwargs):
+    def get_data(self, table, filter=None, **kwargs):
         entities = self._get_entities(table)
+        if filter and callable(filter):
+            entities = entities.filter(filter(entities))
+        elif filter:
+            entities = entities.filter(filter)
+
+        if kwargs:
+            entities = entities.filter(**kwargs)
         return SwissParlResponse(
-            entities.count(inline=True).filter(**kwargs),
+            entities.count(inline=True),
             self.get_variables(table)
         )
 
