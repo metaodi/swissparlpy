@@ -16,6 +16,7 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Use together with `pandas`](#use-together-with-pandas)
     * [Substrings](#substrings)
     * [Date ranges](#date-ranges)
+    * [Advanced filter](#advanced-filter)
     * [Large queries](#large-queries)
 * [Credits](#credits)
 * [Release](#release)
@@ -137,6 +138,47 @@ To query for date ranges you can use the operators...
 ... )
 >>> business.count
 22
+```
+
+### Advanced filter
+
+**Text query**
+
+It's possible to write text queries using operators like `eq` (equals), `ne` (not equals), `lt`/`lte` (less than/less than or equals), `gt`/`gte` (greater than/greater than or equals), 'startswith()` and `contains`:
+
+```python
+import swissparlpy as spp
+import pandas as pd
+   
+persons = spp.get_data(
+   "Person",
+   filter="(startswith(FirstName, 'Ste') or LastName eq 'Seiler') and Language='DE'"
+)
+
+df = pd.DataFrame(persons)
+print(df[['FirstName', 'LastName']])
+```
+**Callable Filter**
+
+You can provide a callable as a filter which allows for more advanved filters.
+
+`swissparlpy.filter` provides `or_` and `and_`.
+
+```python
+import swissparlpy as spp
+import pandas as pd
+
+# filter by FirstName = 'Stefan' OR LastName == 'Seiler'
+def filter_by_name(ent):
+   return spp.filter.or_(
+      ent.FirstName == 'Stefan',
+      ent.LastName == 'Seiler'
+   )
+   
+persons = spp.get_data("Person", filter=filter_by_name, Language='DE')
+
+df = pd.DataFrame(persons)
+print(df[['FirstName', 'LastName']])
 ```
 
 ### Large queries

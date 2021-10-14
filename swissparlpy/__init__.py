@@ -5,6 +5,7 @@ __all__ = ['client', 'errors']
 
 from .errors import SwissParlError  # noqa
 from .client import SwissParlClient
+from pyodata.v2.service import GetEntitySetFilter as filter # noqa
 
 
 def get_tables():
@@ -27,6 +28,6 @@ def get_glimpse(table, rows=5):
     return client.get_glimpse(table, rows)
 
 
-def get_data(table, **kwargs):
+def get_data(table, filter=None, **kwargs):  # noqa
     client = SwissParlClient()
-    return client.get_data(table, **kwargs)
+    return client.get_data(table, filter, **kwargs)
