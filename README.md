@@ -152,7 +152,7 @@ import pandas as pd
    
 persons = spp.get_data(
    "Person",
-   filter="(startswith(FirstName, 'Ste') or LastName eq 'Seiler') and Language='DE'"
+   filter="(startswith(FirstName, 'Ste') or LastName eq 'Seiler') and Language eq 'DE'"
 )
 
 df = pd.DataFrame(persons)
