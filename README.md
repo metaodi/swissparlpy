@@ -144,7 +144,7 @@ To query for date ranges you can use the operators...
 
 **Text query**
 
-It's possible to write text queries using operators like `eq` (equals), `ne` (not equals), `lt`/`lte` (less than/less than or equals), `gt`/`gte` (greater than/greater than or equals), 'startswith()` and `contains`:
+It's possible to write text queries using operators like `eq` (equals), `ne` (not equals), `lt`/`lte` (less than/less than or equals), `gt` / `gte` (greater than/greater than or equals), `startswith()` and `contains`:
 
 ```python
 import swissparlpy as spp
@@ -158,6 +158,7 @@ persons = spp.get_data(
 df = pd.DataFrame(persons)
 print(df[['FirstName', 'LastName']])
 ```
+
 **Callable Filter**
 
 You can provide a callable as a filter which allows for more advanced filters.
