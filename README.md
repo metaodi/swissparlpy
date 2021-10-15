@@ -160,7 +160,7 @@ print(df[['FirstName', 'LastName']])
 ```
 **Callable Filter**
 
-You can provide a callable as a filter which allows for more advanved filters.
+You can provide a callable as a filter which allows for more advanced filters.
 
 `swissparlpy.filter` provides `or_` and `and_`.
 
