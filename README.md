@@ -225,6 +225,15 @@ df_voting50 = pd.concat([pd.read_pickle(os.path.join(path, x)) for x in os.listd
 This library is inspired by the R package [swissparl](https://github.com/zumbov2/swissparl) of [David Zumbach](https://github.com/zumbov2).
 [Ralph Straumann](https://twitter.com/rastrau) initial [asked about a Python version of `swissparl` on Twitter](https://twitter.com/rastrau/status/1441048778740432902), which led to this project.
 
+## Development
+
+To develop on this project, install `flit`:
+
+```
+pip install flit
+flit install -s
+```
+
 ## Release
 
 To create a new release, follow these steps (please respect [Semantic Versioning](http://semver.org/)):
