@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project follows [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- In order to fix issue #17 a bug in pyodata had to be fixed. pyodata 1.9.0 contains the bugfix and is now specified as the minimum version.
 
 ## [0.2.0] - 2021-10-14
 ### Added
