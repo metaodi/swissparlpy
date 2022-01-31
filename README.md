@@ -19,6 +19,7 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Advanced filter](#advanced-filter)
     * [Large queries](#large-queries)
 * [Credits](#credits)
+* [Development](#development)
 * [Release](#release)
 
 ## Installation
@@ -144,7 +145,7 @@ To query for date ranges you can use the operators...
 
 **Text query**
 
-It's possible to write text queries using operators like `eq` (equals), `ne` (not equals), `lt`/`lte` (less than/less than or equals), `gt`/`gte` (greater than/greater than or equals), 'startswith()` and `contains`:
+It's possible to write text queries using operators like `eq` (equals), `ne` (not equals), `lt`/`lte` (less than/less than or equals), `gt` / `gte` (greater than/greater than or equals), `startswith()` and `contains`:
 
 ```python
 import swissparlpy as spp
@@ -152,15 +153,16 @@ import pandas as pd
    
 persons = spp.get_data(
    "Person",
-   filter="(startswith(FirstName, 'Ste') or LastName eq 'Seiler') and Language='DE'"
+   filter="(startswith(FirstName, 'Ste') or LastName eq 'Seiler') and Language eq 'DE'"
 )
 
 df = pd.DataFrame(persons)
 print(df[['FirstName', 'LastName']])
 ```
+
 **Callable Filter**
 
-You can provide a callable as a filter which allows for more advanved filters.
+You can provide a callable as a filter which allows for more advanced filters.
 
 `swissparlpy.filter` provides `or_` and `and_`.
 
@@ -223,6 +225,15 @@ df_voting50 = pd.concat([pd.read_pickle(os.path.join(path, x)) for x in os.listd
 
 This library is inspired by the R package [swissparl](https://github.com/zumbov2/swissparl) of [David Zumbach](https://github.com/zumbov2).
 [Ralph Straumann](https://twitter.com/rastrau) initial [asked about a Python version of `swissparl` on Twitter](https://twitter.com/rastrau/status/1441048778740432902), which led to this project.
+
+## Development
+
+To develop on this project, install `flit`:
+
+```
+pip install flit
+flit install -s
+```
 
 ## Release
 
