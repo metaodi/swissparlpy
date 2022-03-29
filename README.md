@@ -18,6 +18,7 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Date ranges](#date-ranges)
     * [Advanced filter](#advanced-filter)
     * [Large queries](#large-queries)
+    * [API documentation](#documentation)
 * [Credits](#credits)
 * [Development](#development)
 * [Release](#release)
@@ -220,6 +221,15 @@ for session in sessions50:
 # Combine to one dataframe
 df_voting50 = pd.concat([pd.read_pickle(os.path.join(path, x)) for x in os.listdir(path)])
 ```
+
+### Documentation
+
+The referencing table has been created and is available [here](docs/swissparAPY_diagram.pdf). It contains the dependency diagram between all of the tables as well, some exhaustive descriptions as well as the code needed to generate such interactive documentation.
+The documentation can indeed be recreated using [dbdiagram.io](https://dbdiagram.io/home).
+
+Below is a first look of what the dependencies are between the tables contained in the API:
+
+![db diagram of swiss parliament API](/docs/swissparAPY_diagram.png "db diagram of swiss parliament API")
 
 ## Credits
 
