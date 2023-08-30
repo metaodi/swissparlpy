@@ -21,3 +21,13 @@ def fixture_content(filename):
 def metadata():
     """OData metadata fixture"""
     return fixture_content("metadata.xml")
+
+@pytest.fixture
+def business_page1():
+    """OData business data fixture"""
+    return fixture_content("business_1.json")
+
+@pytest.fixture
+def business_page2():
+    """OData business data fixture"""
+    return fixture_content("business_2.json")

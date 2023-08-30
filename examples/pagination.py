@@ -1,7 +1,6 @@
 import swissparlpy
 from pprint import pprint
 
-
 business = swissparlpy.get_data("Business", Language="DE")
 
 print(f"Count: {business.count})")
