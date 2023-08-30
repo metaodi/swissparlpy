@@ -1,9 +1,12 @@
+import logging
+from pprint import pformat
 import warnings
 import requests
 import pyodata
 from . import errors
 
 SERVICE_URL = 'https://ws.parlament.ch/odata.svc/'
+log = logging.getLogger(__name__)
 
 
 class SwissParlClient(object):
@@ -26,6 +29,7 @@ class SwissParlClient(object):
         return [p.name for p in self.client.schema.entity_type(table).proprties()]
 
     def get_overview(self):
+        log.debug("Load tables and variables from OData...")
         if self.cache:
             return self.cache
         self.cache = {}
@@ -67,6 +71,7 @@ class SwissParlResponse(object):
         self._parse_data(entities)
 
     def load(self, next_url=None):
+        log.debug(f"Load data, next_url={next_url}")
         if next_url:
             entities = self.entity_request.next_url(next_url).execute()
         else:
@@ -83,9 +88,11 @@ class SwissParlResponse(object):
 		""",
 		errors.ResultVeryLargeWarning,
 	    )
+        log.debug(f"Load new data, limit={limit}")
         while limit >= len(self.data):
             try:
                 self._load_new_data()
+                log.debug(f"New data loaded, limit={limit}, len(data)={len(self.data)}, count={self.count}")
             except errors.NoMoreRecordsError:
                 break
 

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project follows [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Support for server-side pagination (transparent to the user)
+- `ResultVeryLargeWarning` to warn developers about very large queries
+- Logging to help with debugging
 
 ## [0.2.1] - 2022-01-31
 ### Fixed
