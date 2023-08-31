@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Support for server-side pagination (transparent to the user)
 - `ResultVeryLargeWarning` to warn developers about very large queries
 - Logging to help with debugging
+- Add pre-commit configuration
+
+### Changed
+- Use `black` code style
 
 ## [0.2.1] - 2022-01-31
 ### Fixed
