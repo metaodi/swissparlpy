@@ -8,8 +8,11 @@ function cleanup {
 
 trap "cleanup" EXIT
 
+# Check black code style
+python -m black --check --diff swissparlpy examples tests *.py
+
 # Check PEP-8 code style and McCabe complexity
-flake8 . --count --show-source --statistics 
+python -m flake8 --count --show-source --statistics .
 
 # run tests with test coverage
-pytest tests/
+python -m pytest tests/

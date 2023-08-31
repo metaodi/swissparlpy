@@ -26,6 +26,8 @@ dev = [
     "flit",
     "jupyter",
     "pandas",
+    "black",
+    "pre-commit",
 ]
 
 
