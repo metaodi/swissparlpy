@@ -1,11 +1,10 @@
 import logging
-from pprint import pformat
 import warnings
 import requests
 import pyodata
 from . import errors
 
-SERVICE_URL = 'https://ws.parlament.ch/odata.svc/'
+SERVICE_URL = "https://ws.parlament.ch/odata.svc/"
 log = logging.getLogger(__name__)
 
 
@@ -40,8 +39,7 @@ class SwissParlClient(object):
     def get_glimpse(self, table, rows=5):
         entities = self._get_entities(table)
         return SwissParlResponse(
-            entities.top(rows).count(inline=True),
-            self.get_variables(table)
+            entities.top(rows).count(inline=True), self.get_variables(table)
         )
 
     def get_data(self, table, filter=None, **kwargs):
@@ -53,10 +51,7 @@ class SwissParlClient(object):
 
         if kwargs:
             entities = entities.filter(**kwargs)
-        return SwissParlResponse(
-            entities.count(inline=True),
-            self.get_variables(table)
-        )
+        return SwissParlResponse(entities.count(inline=True), self.get_variables(table))
 
     def _get_entities(self, table):
         return getattr(self.client.entity_sets, table).get_entities()
@@ -82,17 +77,24 @@ class SwissParlResponse(object):
     def _load_new_data_until(self, limit):
         if limit >= 10000:
             warnings.warn(
-		f"""
+                """
                 More than 10'000 items are loaded, this will use a lot of memory.
                 Consider to query a subset of the data to improve performance.
-		""",
-		errors.ResultVeryLargeWarning,
-	    )
+                """,
+                errors.ResultVeryLargeWarning,
+            )
         log.debug(f"Load new data, limit={limit}")
         while limit >= len(self.data):
             try:
                 self._load_new_data()
-                log.debug(f"New data loaded, limit={limit}, len(data)={len(self.data)}, count={self.count}")
+                log.debug(
+                    f"""
+                    New data loaded:
+                    - limit={limit}
+                    - len(data)={len(self.data)}
+                    - count={self.count}
+                    """
+                )
             except errors.NoMoreRecordsError:
                 break
 
@@ -106,7 +108,7 @@ class SwissParlResponse(object):
         self.count = entities.total_count
         self._setup_proxies(entities)
         self.next_url = entities.next_url
-            
+
     def _setup_proxies(self, entities):
         for e in entities:
             self.data.append(SwissParlDataProxy(e))
@@ -132,7 +134,10 @@ class SwissParlResponse(object):
             limit = max(key.start or 0, key.stop or self.count)
             self._load_new_data_until(limit)
             count = len(self.data)
-            return [{k: self.data[i](k) for k in self.variables} for i in range(*key.indices(count))]
+            return [
+                {k: self.data[i](k) for k in self.variables}
+                for i in range(*key.indices(count))
+            ]
 
         if not isinstance(key, int):
             raise TypeError("Index must be an integer or slice")

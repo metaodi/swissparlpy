@@ -4,12 +4,12 @@ from pprint import pprint
 
 
 # setup logger to see debug messages from swissparlpy
-spp_logger = logging.getLogger('swissparlpy.client')
+spp_logger = logging.getLogger("swissparlpy.client")
 spp_logger.setLevel(logging.DEBUG)
 
 logging.basicConfig(
-    format='%(asctime)s  %(levelname)-10s %(name)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    format="%(asctime)s  %(levelname)-10s %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 logging.captureWarnings(True)
 

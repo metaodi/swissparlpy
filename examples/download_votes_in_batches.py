@@ -14,7 +14,7 @@ def save_votes_of_session(id, path):
     data = spp.get_data("Voting", Language="DE", IdSession=id)
     print(f"{data.count} rows loaded.")
     df = pd.DataFrame(data)
-    pickle_path = os.path.join(path, f'{id}.pks')
+    pickle_path = os.path.join(path, f"{id}.pks")
     df.to_pickle(pickle_path)
     print(f"Saved pickle at {pickle_path}")
 
@@ -25,7 +25,9 @@ sessions50.count
 
 for session in sessions50:
     print(f"Loading session {session['ID']}")
-    save_votes_of_session(session['ID'], path)
+    save_votes_of_session(session["ID"], path)
 
 # Combine to one dataframe
-df_voting50 = pd.concat([pd.read_pickle(os.path.join(path, x)) for x in os.listdir(path)])
+df_voting50 = pd.concat(
+    [pd.read_pickle(os.path.join(path, x)) for x in os.listdir(path)]
+)
