@@ -2,12 +2,7 @@ import mock
 import os
 from conftest import fixture_content
 
-__location__ = os.path.realpath(
-    os.path.join(
-        os.getcwd(),
-        os.path.dirname(__file__)
-    )
-)
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
 class SwissParlTestCase:
@@ -20,4 +15,6 @@ class SwissParlTestCase:
             filename = self._testMethodName + ".json"
 
         content = fixture_content(filename)
-        session_mock.return_value.get.return_value = mock.MagicMock(content=content)  # noqa
+        session_mock.return_value.get.return_value = mock.MagicMock(
+            content=content
+        )  # noqa

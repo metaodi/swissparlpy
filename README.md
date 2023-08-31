@@ -1,5 +1,7 @@
 [![PyPI Version][pypi-image]][pypi-url]
 [![Build Status][build-image]][build-url]
+[![Code style: black][black-image]][black-url]
+[![pre-commit][pre-commit-image]][pre-commit-url]
 
 
 swissparlpy
@@ -18,6 +20,7 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Date ranges](#date-ranges)
     * [Advanced filter](#advanced-filter)
     * [Large queries](#large-queries)
+    * [API documentation](#documentation)
 * [Credits](#credits)
 * [Development](#development)
 * [Release](#release)
@@ -221,6 +224,15 @@ for session in sessions50:
 df_voting50 = pd.concat([pd.read_pickle(os.path.join(path, x)) for x in os.listdir(path)])
 ```
 
+### Documentation
+
+The referencing table has been created and is available [here](docs/swissparAPY_diagram.pdf). It contains the dependency diagram between all of the tables as well, some exhaustive descriptions as well as the code needed to generate such interactive documentation.
+The documentation can indeed be recreated using [dbdiagram.io](https://dbdiagram.io/home).
+
+Below is a first look of what the dependencies are between the tables contained in the API:
+
+![db diagram of swiss parliament API](/docs/swissparAPY_diagram.png "db diagram of swiss parliament API")
+
 ## Credits
 
 This library is inspired by the R package [swissparl](https://github.com/zumbov2/swissparl) of [David Zumbach](https://github.com/zumbov2).
@@ -251,3 +263,7 @@ To create a new release, follow these steps (please respect [Semantic Versioning
 [pypi-url]: https://pypi.org/project/swissparlpy/
 [build-image]: https://github.com/metaodi/swissparlpy/actions/workflows/build.yml/badge.svg
 [build-url]: https://github.com/metaodi/swissparlpy/actions/workflows/build.yml
+[black-image]: https://img.shields.io/badge/code%20style-black-000000.svg
+[black-url]: https://github.com/psf/black
+[pre-commit-image]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit
+[pre-commit-url]: https://github.com/pre-commit/pre-commit

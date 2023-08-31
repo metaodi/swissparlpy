@@ -4,6 +4,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [0.3.0] - 2023-08-31
+### Added
+- Support for server-side pagination (transparent to the user)
+- `ResultVeryLargeWarning` to warn developers about very large queries
+- Logging to help with debugging
+- Add pre-commit configuration
+
+### Changed
+- Use `black` code style
+
 ## [0.2.1] - 2022-01-31
 ### Fixed
 - In order to fix issue #17 a bug in pyodata had to be fixed. pyodata 1.9.0 contains the bugfix and is now specified as the minimum version.
@@ -53,7 +63,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `Fixed` for any bug fixes.
 - `Security` to invite users to upgrade in case of vulnerabilities.
 
-[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/metaodi/swissparlpy/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/metaodi/swissparlpy/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/metaodi/swissparlpy/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/metaodi/swissparlpy/compare/v0.1.0...v0.1.1
