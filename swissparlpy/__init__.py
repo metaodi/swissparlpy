@@ -1,11 +1,11 @@
 """Client for Swiss parliament API"""
 
-__version__ = '0.2.1'
-__all__ = ['client', 'errors']
+__version__ = "0.2.1"
+__all__ = ["client", "errors"]
 
 from .errors import SwissParlError  # noqa
 from .client import SwissParlClient
-from pyodata.v2.service import GetEntitySetFilter as filter # noqa
+from pyodata.v2.service import GetEntitySetFilter as filter  # noqa
 
 
 def get_tables():

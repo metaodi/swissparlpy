@@ -1,0 +1,1007 @@
+{
+    "d": {
+        "results": [
+            {
+                "__metadata": {
+                    "id": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')",
+                    "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')",
+                    "type": "itsystems.Pd.DataServices.DataModel.Business"
+                },
+                "BusinessResponsibilities": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/BusinessResponsibilities"
+                    }
+                },
+                "RelatedBusinesses": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/RelatedBusinesses"
+                    }
+                },
+                "BusinessRoles": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/BusinessRoles"
+                    }
+                },
+                "Publications": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/Publications"
+                    }
+                },
+                "LegislativePeriods": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/LegislativePeriods"
+                    }
+                },
+                "Sessions": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/Sessions"
+                    }
+                },
+                "Preconsultations": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/Preconsultations"
+                    }
+                },
+                "Bills": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/Bills"
+                    }
+                },
+                "Councils": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/Councils"
+                    }
+                },
+                "BusinessTypes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/BusinessTypes"
+                    }
+                },
+                "Votes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/Votes"
+                    }
+                },
+                "SubjectsBusiness": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/SubjectsBusiness"
+                    }
+                },
+                "BusinessStates": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/BusinessStates"
+                    }
+                },
+                "Council": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/Council"
+                    }
+                },
+                "Transcripts": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943084,Language='DE')/Transcripts"
+                    }
+                },
+                "ID": 19943084,
+                "Language": "DE",
+                "BusinessShortNumber": "94.3084",
+                "BusinessType": 8,
+                "BusinessTypeName": "Interpellation",
+                "BusinessTypeAbbreviation": "Ip.",
+                "Title": "Vernehmlassungsverfahren",
+                "Description": null,
+                "InitialSituation": null,
+                "Proceedings": null,
+                "DraftText": null,
+                "SubmittedText": "<text><p>Ich frage den Bundesrat, ob er für Vorhaben von erheblicher Tragweite nicht neue Formen der Vernehmlassung, namentlich bei den Kantonen, prüfen und beschliessen könnte.</p><p>Das geltende Verfahren, das auf schriftlichen Stellungnahmen beruht, gestattet keine aktive Präsentation derselben durch die Kantone und verunmöglicht somit die Kenntnisnahme seitens der anderen Kantone.</p><p>Diese Mängel könnten mit einem Anhörungsverfahren (Hearing) oder mit einer gemeinsamen Stellungnahme der Kantone, in welcher übereinstimmende sowie abweichende Standpunkte gekennzeichnet würden, beseitigt werden.</p><p>Der Vorschlag eines Kantons könnte somit auch die Zustimmung anderer Kantone finden, etwas, das bisher eher unwahrscheinlich scheint. Eine Zusammenstellung der Ergebnisse, jedoch nicht in einer tabellarischen Form, die die Interpretation der Verwaltung widerspiegelt, könnte für das Parlament und vor allem für seine Kommissionen von grossem Nutzen sein.</p><p>Hearings mit Simultanübersetzung von den und in die drei Landessprachen könnten das gegenseitige Verständnis fördern und würden ausserdem die Kantone in vermehrtem Mass in die politische Entscheidfindung auf Bundesebene einbeziehen.</p></text>",
+                "ReasonText": null,
+                "DocumentationText": null,
+                "MotionText": null,
+                "FederalCouncilResponseText": null,
+                "FederalCouncilProposal": null,
+                "FederalCouncilProposalText": null,
+                "FederalCouncilProposalDate": null,
+                "SubmittedBy": "Camponovo Geo",
+                "BusinessStatus": 229,
+                "BusinessStatusText": "Erledigt",
+                "BusinessStatusDate": "/Date(762998400000)/",
+                "ResponsibleDepartment": 10,
+                "ResponsibleDepartmentName": "Bundeskanzlei",
+                "ResponsibleDepartmentAbbreviation": "BK",
+                "IsLeadingDepartment": true,
+                "Tags": null,
+                "Category": null,
+                "Modified": "/Date(1688206412070)/",
+                "SubmissionDate": "/Date(762998400000)/",
+                "SubmissionCouncil": 1,
+                "SubmissionCouncilName": "Nationalrat",
+                "SubmissionCouncilAbbreviation": "NR",
+                "SubmissionSession": 4413,
+                "SubmissionLegislativePeriod": 44,
+                "FirstCouncil1": 1,
+                "FirstCouncil1Name": "Nationalrat",
+                "FirstCouncil1Abbreviation": "NR",
+                "FirstCouncil2": null,
+                "FirstCouncil2Name": null,
+                "FirstCouncil2Abbreviation": null,
+                "TagNames": null
+            },
+            {
+                "__metadata": {
+                    "id": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')",
+                    "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')",
+                    "type": "itsystems.Pd.DataServices.DataModel.Business"
+                },
+                "BusinessResponsibilities": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/BusinessResponsibilities"
+                    }
+                },
+                "RelatedBusinesses": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/RelatedBusinesses"
+                    }
+                },
+                "BusinessRoles": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/BusinessRoles"
+                    }
+                },
+                "Publications": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/Publications"
+                    }
+                },
+                "LegislativePeriods": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/LegislativePeriods"
+                    }
+                },
+                "Sessions": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/Sessions"
+                    }
+                },
+                "Preconsultations": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/Preconsultations"
+                    }
+                },
+                "Bills": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/Bills"
+                    }
+                },
+                "Councils": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/Councils"
+                    }
+                },
+                "BusinessTypes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/BusinessTypes"
+                    }
+                },
+                "Votes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/Votes"
+                    }
+                },
+                "SubjectsBusiness": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/SubjectsBusiness"
+                    }
+                },
+                "BusinessStates": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/BusinessStates"
+                    }
+                },
+                "Council": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/Council"
+                    }
+                },
+                "Transcripts": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943085,Language='DE')/Transcripts"
+                    }
+                },
+                "ID": 19943085,
+                "Language": "DE",
+                "BusinessShortNumber": "94.3085",
+                "BusinessType": 8,
+                "BusinessTypeName": "Interpellation",
+                "BusinessTypeAbbreviation": "Ip.",
+                "Title": "Intensivierung des Eisenbahnverkehrs Schweiz-Italien",
+                "Description": null,
+                "InitialSituation": null,
+                "Proceedings": null,
+                "DraftText": null,
+                "SubmittedText": "<p>Eine Koordinierung der Entwicklung zwischen Norditalien und der Schweiz im allgemeinen und zwischen der Lombardei und dem Kanton Tessin im besonderen ist für unsere Wirtschaft und unsere Umwelt von sehr grossem Interesse.</p><p>Der Wirtschaftsraum Norditalien gehört zu den technologisch fortschrittlichsten und dynamischsten Regionen in Europa.</p><p>Die Annahme der Alpen-Initiative zwingt die Schweiz, die Bemühungen zur Lösung der Probleme im Bereich der Bahntransporte und des multimodalen Verkehrs zwischen den beiden Ländern fortzusetzen. Die Entwicklung unserer Nachbarregionen kann durch Absatzschwierigkeiten gefährdet und unser Einbezug in die Entwicklungsdynamik, wie sie die Lombardei, Bayern und die Region Lyon kennen, gebremst werden, wenn nicht neue Lösungen gefunden werden.</p><p>Ich ersuche darum den Bundesrat um Auskunft auf die folgenden Fragen:</p><p>- Beabsichtigt er, die Kontakte mit Rom zu verstärken, um die Politik zur Entwicklung des Bahnverkehrs zu intensivieren?</p><p>- Gedenkt er den Kanton Tessin in den Bemühungen zur Konkretisierung seiner grenzübergreifenden Politik zu unterstützen?</p><p>- Ist er bereit, die Realisierung der \"Regione Insubrica\" (Insubrische Region, die den Kanton Tessin und die Provinzen Como, Varese und Novara umfasst) zu unterstützen?</p><p>- Will er nicht umgehend eine Lösung zur Weiterführung der Eisenbahnschnellverbindung durch den Gotthard bis zur italienischen Grenze mit Anschluss an die italienischen Bahnstrukturen und Einrichtungen für den multimodalen Verkehr vorschlagen?</p>",
+                "ReasonText": null,
+                "DocumentationText": null,
+                "MotionText": null,
+                "FederalCouncilResponseText": null,
+                "FederalCouncilProposal": null,
+                "FederalCouncilProposalText": null,
+                "FederalCouncilProposalDate": null,
+                "SubmittedBy": "Camponovo Geo",
+                "BusinessStatus": 229,
+                "BusinessStatusText": "Erledigt",
+                "BusinessStatusDate": "/Date(762998400000)/",
+                "ResponsibleDepartment": 9,
+                "ResponsibleDepartmentName": "Departement für Umwelt, Verkehr, Energie und Kommunikation",
+                "ResponsibleDepartmentAbbreviation": "UVEK",
+                "IsLeadingDepartment": true,
+                "Tags": null,
+                "Category": null,
+                "Modified": "/Date(1690529341910)/",
+                "SubmissionDate": "/Date(762998400000)/",
+                "SubmissionCouncil": 1,
+                "SubmissionCouncilName": "Nationalrat",
+                "SubmissionCouncilAbbreviation": "NR",
+                "SubmissionSession": 4413,
+                "SubmissionLegislativePeriod": 44,
+                "FirstCouncil1": 1,
+                "FirstCouncil1Name": "Nationalrat",
+                "FirstCouncil1Abbreviation": "NR",
+                "FirstCouncil2": null,
+                "FirstCouncil2Name": null,
+                "FirstCouncil2Abbreviation": null,
+                "TagNames": null
+            },
+            {
+                "__metadata": {
+                    "id": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')",
+                    "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')",
+                    "type": "itsystems.Pd.DataServices.DataModel.Business"
+                },
+                "BusinessResponsibilities": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/BusinessResponsibilities"
+                    }
+                },
+                "RelatedBusinesses": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/RelatedBusinesses"
+                    }
+                },
+                "BusinessRoles": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/BusinessRoles"
+                    }
+                },
+                "Publications": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/Publications"
+                    }
+                },
+                "LegislativePeriods": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/LegislativePeriods"
+                    }
+                },
+                "Sessions": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/Sessions"
+                    }
+                },
+                "Preconsultations": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/Preconsultations"
+                    }
+                },
+                "Bills": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/Bills"
+                    }
+                },
+                "Councils": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/Councils"
+                    }
+                },
+                "BusinessTypes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/BusinessTypes"
+                    }
+                },
+                "Votes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/Votes"
+                    }
+                },
+                "SubjectsBusiness": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/SubjectsBusiness"
+                    }
+                },
+                "BusinessStates": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/BusinessStates"
+                    }
+                },
+                "Council": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/Council"
+                    }
+                },
+                "Transcripts": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943086,Language='DE')/Transcripts"
+                    }
+                },
+                "ID": 19943086,
+                "Language": "DE",
+                "BusinessShortNumber": "94.3086",
+                "BusinessType": 8,
+                "BusinessTypeName": "Interpellation",
+                "BusinessTypeAbbreviation": "Ip.",
+                "Title": "Eidg. Alkoholverwaltung",
+                "Description": null,
+                "InitialSituation": null,
+                "Proceedings": null,
+                "DraftText": null,
+                "SubmittedText": "<p>Die Finanzkommission des Ständerates hat dem Bundesrat die drei folgenden Empfehlungen übermittelt:</p><p>\"1. Bei der Alkoholverwaltung fallen für die brennlose Verwertung von Obst und Kartoffeln Kosten von jährlich ungefähr 100 Millionen Franken an. Zur unverzüglichen Senkung dieser Kosten sind die garantierten Preise für Obst und Kartoffeln aufzuheben und durch Richtpreise zu ersetzen, die nach der Grösse der Ernte bestimmt werden.</p><p>2. Der Bundesrat wird eingeladen, in das nächste Sanierungsprogramm eine Änderung von Artikel 32bis Absatz 2 der Bundesverfassung sowie des Artikels 25 des Alkoholgesetzes aufzunehmen mit dem Ziel, den Aufkauf der Brennapparate einzustellen.</p><p>3. Der Bundesrat wird eingeladen, das Alkoholmonopol auf seine Berechtigung hin zu überprüfen und die finanzielle Unterstützung der brennlosen Verwertung von Obst und Kartoffeln zu streichen sowie die verfassungsrechtlichen und gesetzlichen Grundlagen entsprechend zu ändern. Nötigenfalls sieht er vor, dass die Alkoholverwaltung in die allgemeine Bundesverwaltung eingegliedert und rationalisiert wird.\"</p><p>Ich frage den Bundesrat:</p><p>1. ob er bei der Prüfung dieser Empfehlungen nur die Meinung der Alkoholverwaltung berücksichtigen wird oder ob er vor hat, auch die Meinung eines aussenstehenden Sachverständigengremiums einzuholen;</p><p>2. bis wann und wie er zu diesen Empfehlungen Stellung zu nehmen gedenkt.</p>",
+                "ReasonText": null,
+                "DocumentationText": null,
+                "MotionText": null,
+                "FederalCouncilResponseText": null,
+                "FederalCouncilProposal": null,
+                "FederalCouncilProposalText": null,
+                "FederalCouncilProposalDate": null,
+                "SubmittedBy": "Camponovo Geo",
+                "BusinessStatus": 229,
+                "BusinessStatusText": "Erledigt",
+                "BusinessStatusDate": "/Date(762998400000)/",
+                "ResponsibleDepartment": 7,
+                "ResponsibleDepartmentName": "Finanzdepartement",
+                "ResponsibleDepartmentAbbreviation": "EFD",
+                "IsLeadingDepartment": true,
+                "Tags": null,
+                "Category": null,
+                "Modified": "/Date(1690530850383)/",
+                "SubmissionDate": "/Date(762998400000)/",
+                "SubmissionCouncil": 1,
+                "SubmissionCouncilName": "Nationalrat",
+                "SubmissionCouncilAbbreviation": "NR",
+                "SubmissionSession": 4413,
+                "SubmissionLegislativePeriod": 44,
+                "FirstCouncil1": 1,
+                "FirstCouncil1Name": "Nationalrat",
+                "FirstCouncil1Abbreviation": "NR",
+                "FirstCouncil2": null,
+                "FirstCouncil2Name": null,
+                "FirstCouncil2Abbreviation": null,
+                "TagNames": null
+            },
+            {
+                "__metadata": {
+                    "id": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')",
+                    "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')",
+                    "type": "itsystems.Pd.DataServices.DataModel.Business"
+                },
+                "BusinessResponsibilities": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/BusinessResponsibilities"
+                    }
+                },
+                "RelatedBusinesses": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/RelatedBusinesses"
+                    }
+                },
+                "BusinessRoles": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/BusinessRoles"
+                    }
+                },
+                "Publications": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/Publications"
+                    }
+                },
+                "LegislativePeriods": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/LegislativePeriods"
+                    }
+                },
+                "Sessions": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/Sessions"
+                    }
+                },
+                "Preconsultations": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/Preconsultations"
+                    }
+                },
+                "Bills": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/Bills"
+                    }
+                },
+                "Councils": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/Councils"
+                    }
+                },
+                "BusinessTypes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/BusinessTypes"
+                    }
+                },
+                "Votes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/Votes"
+                    }
+                },
+                "SubjectsBusiness": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/SubjectsBusiness"
+                    }
+                },
+                "BusinessStates": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/BusinessStates"
+                    }
+                },
+                "Council": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/Council"
+                    }
+                },
+                "Transcripts": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943087,Language='DE')/Transcripts"
+                    }
+                },
+                "ID": 19943087,
+                "Language": "DE",
+                "BusinessShortNumber": "94.3087",
+                "BusinessType": 5,
+                "BusinessTypeName": "Motion",
+                "BusinessTypeAbbreviation": "Mo.",
+                "Title": "Ausführungsbestimmungen zu Art. 36sexies BV. Nationalstrassengesetzgebung",
+                "Description": null,
+                "InitialSituation": null,
+                "Proceedings": null,
+                "DraftText": null,
+                "SubmittedText": "<p>Die ganzheitliche Verkehrspolitik des Bundesrates und des Parlamentes erfährt nach der Annahme der Volksinitiative \"zum Schutz des Alpengebietes vor dem Transitverkehr\" durch das Volk und die Stände zwangsläufig eine bedeutende Neuorientierung.</p><p>Aufgrund dieser offensichtlichen Sachverhalte laden wir den Bundesrat ein, unter Bezugnahme auf die schriftlich hinterlegten Eingaben von Ständerat Bloetzer sowie der Nationalräte Comby, Epiney und Schmidhalter, im Rahmen der Ausarbeitung der Ausführungsbestimmungen zu Artikel 36sexies der Bundesverfassung alle Vorkehrungen zu treffen, damit</p><p>- die Rhonetalstrasse zwischen Siders und Brig nicht als Transitstrasse klassiert wird und somit die Realisierung der dringend notwendigen Autobahn im Oberwallis ermöglicht wird.</p><p>In zweiter Priorität ersuchen wir den Bundesrat zu veranlassen,</p><p>- die heute in Kraft stehende Nationalstrassengesetzgebung dahingehend zu ändern, dass in Landesteilen und Regionen, die nicht über ein Nationalstrassennetz verfügen, die Finanzierungsmöglichkeiten für die Hauptstrassenachsen denjenigen der Nationalstrassen gleichgestellt werden. Dies im Sinne eines gerechten Ausgleichs, der es auch benachteiligten Regionen ermöglicht, die dringenden Verkehrsprobleme zu lösen.</p>",
+                "ReasonText": "<p>Bereits im Vorfeld des Urnenganges zur Alpen-Initiative wurde von verschiedener Seite auf die Schwierigkeiten bei der Interpretation des Initiativtextes hingewiesen. Bundesrat und Parlament stehen nun vor der heiklen Aufgabe, zu definieren, welche Strassen im Alpengebiet im Sinne der Alpeninitiative als Transitachsen zu bezeichnen sind.</p><p>Zuhanden des Bundesrates, namentlich des zuständigen Eidgenössischen Verkehrs- und Energiedepartementes, möchten wir zum Ausdruck bringen, dass der Transitverkehr zwischen Siders und Brig äusserst bescheiden ist. Dieses Strassenteilstück dient in allererster Linie dem Regional- und Lokalverkehr. Sehr zuverlässige Verkehrszählungen belegen diese Tatsachen.</p><p>Nur aufgrund der hier aufgezeigten Entscheide bzw. Massnahmen können regionale Ungerechtigkeiten verhindert werden, die letztlich auch garantieren, dass in den Bergkantonen zeitgemässe Strassen überhaupt zu realisieren sind, die eine wirtschaftliche und touristische Weiterentwicklung ermöglichen.</p>",
+                "DocumentationText": null,
+                "MotionText": null,
+                "FederalCouncilResponseText": "Der Bundesrat beantragt, Teil 1 als erledigt abzuschreiben und Teil 2 in ein Postulat umzuwandeln.",
+                "FederalCouncilProposal": null,
+                "FederalCouncilProposalText": "Der Bundesrat beantragt, Teil 1 als erledigt abzuschreiben und Teil 2 in ein Postulat umzuwandeln.",
+                "FederalCouncilProposalDate": "/Date(783734400000)/",
+                "SubmittedBy": "Hildbrand Franz-Joseph",
+                "BusinessStatus": 229,
+                "BusinessStatusText": "Erledigt",
+                "BusinessStatusDate": "/Date(819504000000)/",
+                "ResponsibleDepartment": 9,
+                "ResponsibleDepartmentName": "Departement für Umwelt, Verkehr, Energie und Kommunikation",
+                "ResponsibleDepartmentAbbreviation": "UVEK",
+                "IsLeadingDepartment": true,
+                "Tags": null,
+                "Category": null,
+                "Modified": "/Date(1690521283527)/",
+                "SubmissionDate": "/Date(763084800000)/",
+                "SubmissionCouncil": 1,
+                "SubmissionCouncilName": "Nationalrat",
+                "SubmissionCouncilAbbreviation": "NR",
+                "SubmissionSession": 4413,
+                "SubmissionLegislativePeriod": 44,
+                "FirstCouncil1": 1,
+                "FirstCouncil1Name": "Nationalrat",
+                "FirstCouncil1Abbreviation": "NR",
+                "FirstCouncil2": null,
+                "FirstCouncil2Name": null,
+                "FirstCouncil2Abbreviation": null,
+                "TagNames": null
+            },
+            {
+                "__metadata": {
+                    "id": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')",
+                    "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')",
+                    "type": "itsystems.Pd.DataServices.DataModel.Business"
+                },
+                "BusinessResponsibilities": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/BusinessResponsibilities"
+                    }
+                },
+                "RelatedBusinesses": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/RelatedBusinesses"
+                    }
+                },
+                "BusinessRoles": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/BusinessRoles"
+                    }
+                },
+                "Publications": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/Publications"
+                    }
+                },
+                "LegislativePeriods": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/LegislativePeriods"
+                    }
+                },
+                "Sessions": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/Sessions"
+                    }
+                },
+                "Preconsultations": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/Preconsultations"
+                    }
+                },
+                "Bills": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/Bills"
+                    }
+                },
+                "Councils": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/Councils"
+                    }
+                },
+                "BusinessTypes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/BusinessTypes"
+                    }
+                },
+                "Votes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/Votes"
+                    }
+                },
+                "SubjectsBusiness": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/SubjectsBusiness"
+                    }
+                },
+                "BusinessStates": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/BusinessStates"
+                    }
+                },
+                "Council": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/Council"
+                    }
+                },
+                "Transcripts": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943088,Language='DE')/Transcripts"
+                    }
+                },
+                "ID": 19943088,
+                "Language": "DE",
+                "BusinessShortNumber": "94.3088",
+                "BusinessType": 5,
+                "BusinessTypeName": "Motion",
+                "BusinessTypeAbbreviation": "Mo.",
+                "Title": "Korrektur der aussenpolitischen Ausrichtung",
+                "Description": null,
+                "InitialSituation": null,
+                "Proceedings": null,
+                "DraftText": null,
+                "SubmittedText": "<p>Der Bundesrat wird beauftragt, seine aussenpolitische Strategie im Interesse unseres Landes vermehrt auf die weltweite Zusammenarbeit auszurichten und diese innenpolitisch abzustimmen.</p><p>In den Beziehungen mit der EU und den europäischen Staaten ist eine umfassende Kooperation auf der Basis von Solidarität und Gegenseitigkeit anzustreben. Dies bedeutet insbesondere:</p><p>- die Fortsetzung der Zusammenarbeit mit der EU ohne das strategische Ziel eines Beitritts;</p><p>- die Intensivierung der bilateralen Verhandlungen;</p><p>- die Offenhaltung des aussenpolitischen Handlungsspielraumes für die Zukunft, insbesondere auch gegenüber der EU;</p><p>- das Festhalten an der dauernden, bewaffneten Neutralität als aussenpolitischem Mittel zur Wahrung der Unabhängigkeit und Sicherheit unseres Landes.</p>",
+                "ReasonText": null,
+                "DocumentationText": null,
+                "MotionText": null,
+                "FederalCouncilResponseText": "<p>In seinem Bericht vom 29. November 1993 über die Aussenpolitik der Schweiz in den neunziger Jahren teilt der Bundesrat die Ansichten der Urheber der Motion hinsichtlich der Zielsetzung einer weltweiten, auf Solidarität und Gegenseitigkeit basierenden Zusammenarbeit.</p><p>Was die weltweite Zusammenarbeit angeht, so misst der Bundesrat dieser wie die Fraktion der Schweizerischen Volkspartei grosses Gewicht bei. Er unterscheidet indes zwischen dem europäischen und dem globalen Umfeld und verweist darauf, dass die geographische Lage eines jeden Landes bei der Verwirklichung von dessen aussenpolitischen Zielen einen bedeutenden Faktor darstellt.</p><p>Der Bundesrat ist ebenfalls der Ansicht, es bedürfe einer Harmonie zwischen Aussen- und Innenpolitik. In seinem Bericht widmet er diesem Aspekt ein Kapitel und unterstreicht dabei die Wichtigkeit, die er der besseren Information der Bevölkerung und der Verstärkung des Dialoges mit dem Parlament und den Kantonen beimisst.</p><p>Was die Beziehungen zwischen der Schweiz und der Europäischen Union angeht, so ist der Bundesrat um ein auf Solidarität und Gegenseitigkeit gestütztes Vorgehen bemüht. Er geht, wie die Motionäre, von der Notwendigkeit aus, einerseits die Zusammenarbeit mit der EU fortzusetzen und die bilateralen Verhandlungen zu intensivieren, andererseits aber den aussenpolitischen Handlungsspielraum zu bewahren sowie die dauernde und bewaffnete Neutralität beizubehalten.</p><p>Die Motionäre werden festgestellt haben, dass der Bundesrat seit Januar 1993 alles unternommen hat, um den bilateralen sektoriellen Verhandlungsprozess in Gang zu bringen. Dem Erfolg dieser Verhandlungen gilt sein ganzer Einsatz.</p><p>Der Bundesrat hält am EU-Beitritt als dem strategischen Ziel der Integrationspolitik fest. Die Gründe für diese Zielsetzung sind im Bericht über die Aussenpolitik der Schweiz in den neunziger Jahren enthalten, der im Parlament ausführlich diskutiert wurde.</p>  Der Bundesrat beantragt, die Motion in ein Postulat umzuwandeln.",
+                "FederalCouncilProposal": 2,
+                "FederalCouncilProposalText": "Der Bundesrat beantragt, die Motion in ein Postulat umzuwandeln.",
+                "FederalCouncilProposalDate": "/Date(790387200000)/",
+                "SubmittedBy": "Fraktion der Schweizerischen Volkspartei",
+                "BusinessStatus": 209,
+                "BusinessStatusText": "Überwiesen an den Bundesrat",
+                "BusinessStatusDate": "/Date(827280000000)/",
+                "ResponsibleDepartment": 3,
+                "ResponsibleDepartmentName": "Departement für auswärtige Angelegenheiten",
+                "ResponsibleDepartmentAbbreviation": "EDA",
+                "IsLeadingDepartment": true,
+                "Tags": null,
+                "Category": null,
+                "Modified": "/Date(1690539249113)/",
+                "SubmissionDate": "/Date(763171200000)/",
+                "SubmissionCouncil": 1,
+                "SubmissionCouncilName": "Nationalrat",
+                "SubmissionCouncilAbbreviation": "NR",
+                "SubmissionSession": 4413,
+                "SubmissionLegislativePeriod": 44,
+                "FirstCouncil1": 1,
+                "FirstCouncil1Name": "Nationalrat",
+                "FirstCouncil1Abbreviation": "NR",
+                "FirstCouncil2": null,
+                "FirstCouncil2Name": null,
+                "FirstCouncil2Abbreviation": null,
+                "TagNames": null
+            },
+            {
+                "__metadata": {
+                    "id": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')",
+                    "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')",
+                    "type": "itsystems.Pd.DataServices.DataModel.Business"
+                },
+                "BusinessResponsibilities": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/BusinessResponsibilities"
+                    }
+                },
+                "RelatedBusinesses": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/RelatedBusinesses"
+                    }
+                },
+                "BusinessRoles": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/BusinessRoles"
+                    }
+                },
+                "Publications": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/Publications"
+                    }
+                },
+                "LegislativePeriods": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/LegislativePeriods"
+                    }
+                },
+                "Sessions": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/Sessions"
+                    }
+                },
+                "Preconsultations": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/Preconsultations"
+                    }
+                },
+                "Bills": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/Bills"
+                    }
+                },
+                "Councils": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/Councils"
+                    }
+                },
+                "BusinessTypes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/BusinessTypes"
+                    }
+                },
+                "Votes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/Votes"
+                    }
+                },
+                "SubjectsBusiness": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/SubjectsBusiness"
+                    }
+                },
+                "BusinessStates": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/BusinessStates"
+                    }
+                },
+                "Council": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/Council"
+                    }
+                },
+                "Transcripts": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943089,Language='DE')/Transcripts"
+                    }
+                },
+                "ID": 19943089,
+                "Language": "DE",
+                "BusinessShortNumber": "94.3089",
+                "BusinessType": 5,
+                "BusinessTypeName": "Motion",
+                "BusinessTypeAbbreviation": "Mo.",
+                "Title": "Kläranlagen. Befreiung von der Anschlusspflicht bei Wegfall der Bundessubventionen",
+                "Description": null,
+                "InitialSituation": null,
+                "Proceedings": null,
+                "DraftText": null,
+                "SubmittedText": "<p>In den Bergkantonen wird jeder Einwohner mit brutto 105 Franken im Jahr durch die Abwasserreinigung belastet - im Mittelland sind es 64 Franken. Ende 1993 waren im Schweizer Berggebiet noch 311 Gemeinden keiner Kläranlage angeschlossen - insgesamt sind rund 200 000 Einwohner ohne Anschluss. Praktisch alle nicht an Kläranlagen angeschlossenen Bewohner leben in dünnbesiedelten Gebieten. Nach Wegfall der Bundessubventionen werden in diesen Regionen die Kosten je Einwohner für einen Anschluss überdurchschnittlich hoch ausfallen und stehen in einem Missverhältnis zum bescheidenen ökologischen Nutzen.</p><p>Der Bundesrat wird deshalb beauftragt, dem Parlament die gesetzlichen Massnahmen vorzuschlagen, um die Bewohner der nicht an eine Kläranlage angeschlossenen Gebiete von der Anschlusspflicht zu befreien. Die Befreiung von der Anschlusspflicht soll gleichzeitig mit dem Wegfall der Bundessubventionen in Kraft treten.</p>",
+                "ReasonText": null,
+                "DocumentationText": null,
+                "MotionText": null,
+                "FederalCouncilResponseText": "<p>Nach Artikel 10 Absatz 1 des Gewässerschutzgesetzes vom 24. Januar 1991 (GSchG) sorgen die Kantone für die Erstellung öffentlicher Kanalisationen und zentraler Anlagen zur Reinigung von verschmutztem Abwasser. Artikel 10 Absatz 2 GSchG relativiert diese generelle Regelung: Danach können die Kantone in abgelegenen oder in dünnbesiedelten Gebieten das verschmutzte Abwasser durch andere Systeme als durch zentrale Abwasserreinigungsanlagen behandeln lassen, wenn damit der Schutz der ober- und unterirdischen Gewässer gewährleistet ist. In Frage kommen dabei namentlich Einzel- oder Gruppenreinigungsanlagen wie Dreikammergruben, Bodenfiltrationen, Abwasserteiche und Ableitungen des Abwassers in Güllebehälter.</p><p>Das Anliegen der Motion, in abgelegenen, dünnbesiedelten, vorab ländlichen Gebieten auf eine generelle Anschlusspflicht an zentrale Abwasserreinigungsanlagen zu verzichten, wird damit von der bestehenden Gesetzgebung bereits erfüllt. Die Anwendung von Artikel 10 Absatz 2 GSchG liegt bei den Kantonen. An ihnen liegt es, bei der Anwendung dieser Bestimmung geeignete Lösungen zu finden. Die Formulierung \"in abgelegenen oder in dünnbesiedelten Gebieten\" belässt den Kantonen einen hinreichenden Beurteilungs- und Entscheidungsspielraum, um die örtlichen Gegebenheiten, wie die Grösse und die Struktur der Siedlung, den Zustand der Gewässer und die finanzielle Tragbarkeit einer dezentralen Lösung, zu berücksichtigen.</p><p>Der Bundesrat hat davon Kenntnis genommen, dass einige Kantone Artikel 10 Absatz 2 GSchG in der Vergangenheit sehr eng interpretiert haben. Da das Gewässerschutzgesetz den Kantonen aber grundsätzlich die Möglichkeit bietet, das Anliegen der Motion zu erfüllen, erachtet es der Bundesrat als unzweckmässig, das erst seit kurzer Zeit geltende Gesetz zu ändern und die Voraussetzungen für die Befreiung von der Anschlusspflicht an zentrale Abwasserreinigungsanlagen auf Gesetzesstufe neu und näher zu konkretisieren.</p><p>Nach der Motion soll die Befreiung von der Anschlusspflicht gleichzeitig mit dem Wegfall der Bundessubventionen in Kraft treten. Mit der schnellen Behandlung der Sparmassnahmen 1993 hat das Parlament den Willen zum Ausdruck gebracht, diese Massnahmen rasch in Kraft zu setzen. Der Bundesrat will mit der Inkraftsetzung der Sparmassnahmen aber nicht so lange zuwarten, bis eine allfällige Änderung des Gewässerschutzgesetzes abgeschlossen ist. Auch aus diesem Grund lehnt er eine Gesetzesänderung ab.</p>",
+                "FederalCouncilProposal": null,
+                "FederalCouncilProposalText": null,
+                "FederalCouncilProposalDate": null,
+                "SubmittedBy": "Schnider Theodor",
+                "BusinessStatus": 229,
+                "BusinessStatusText": "Erledigt",
+                "BusinessStatusDate": "/Date(763171200000)/",
+                "ResponsibleDepartment": 4,
+                "ResponsibleDepartmentName": "Departement des Innern",
+                "ResponsibleDepartmentAbbreviation": "EDI",
+                "IsLeadingDepartment": true,
+                "Tags": null,
+                "Category": null,
+                "Modified": "/Date(1690539266890)/",
+                "SubmissionDate": "/Date(763171200000)/",
+                "SubmissionCouncil": 1,
+                "SubmissionCouncilName": "Nationalrat",
+                "SubmissionCouncilAbbreviation": "NR",
+                "SubmissionSession": 4413,
+                "SubmissionLegislativePeriod": 44,
+                "FirstCouncil1": 1,
+                "FirstCouncil1Name": "Nationalrat",
+                "FirstCouncil1Abbreviation": "NR",
+                "FirstCouncil2": null,
+                "FirstCouncil2Name": null,
+                "FirstCouncil2Abbreviation": null,
+                "TagNames": null
+            },
+            {
+                "__metadata": {
+                    "id": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')",
+                    "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')",
+                    "type": "itsystems.Pd.DataServices.DataModel.Business"
+                },
+                "BusinessResponsibilities": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/BusinessResponsibilities"
+                    }
+                },
+                "RelatedBusinesses": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/RelatedBusinesses"
+                    }
+                },
+                "BusinessRoles": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/BusinessRoles"
+                    }
+                },
+                "Publications": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/Publications"
+                    }
+                },
+                "LegislativePeriods": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/LegislativePeriods"
+                    }
+                },
+                "Sessions": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/Sessions"
+                    }
+                },
+                "Preconsultations": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/Preconsultations"
+                    }
+                },
+                "Bills": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/Bills"
+                    }
+                },
+                "Councils": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/Councils"
+                    }
+                },
+                "BusinessTypes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/BusinessTypes"
+                    }
+                },
+                "Votes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/Votes"
+                    }
+                },
+                "SubjectsBusiness": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/SubjectsBusiness"
+                    }
+                },
+                "BusinessStates": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/BusinessStates"
+                    }
+                },
+                "Council": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/Council"
+                    }
+                },
+                "Transcripts": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943090,Language='DE')/Transcripts"
+                    }
+                },
+                "ID": 19943090,
+                "Language": "DE",
+                "BusinessShortNumber": "94.3090",
+                "BusinessType": 8,
+                "BusinessTypeName": "Interpellation",
+                "BusinessTypeAbbreviation": "Ip.",
+                "Title": "Künstlich aufgeblähte Teuerung",
+                "Description": null,
+                "InitialSituation": null,
+                "Proceedings": null,
+                "DraftText": null,
+                "SubmittedText": "<p>1. Will der Bundesrat es dulden, dass den Arbeitnehmern weiterhin eine künstliche Teuerung vorgerechnet wird, obwohl viele von ihnen überhaupt keinen Teuerungsausgleich erhalten haben?</p><p>2. Ist der Bundesrat nicht auch der Meinung, dass in der politisch brisanten Mietzinsfrage nur tatsächliche Preisveränderungen ausgewiesen werden sollten und dass jede auf fragwürdigen theoretischen Annahmen beruhende Aufblähung zu unterbleiben hat?</p>",
+                "ReasonText": "<p>Gemäss Mitteilung des Bundesamtes für Statistik ist das Mietpreisniveau zwischen November 1993 und Februar 1994 praktisch stabil geblieben. Trotzdem erhöhte sich der Mietpreisindex infolge der Berechnungsweise um 0,9 Prozent.</p><p>Aufgrund des grossen Gewichtes der Wohnungsmiete im Warenkorb (etwa 25 Prozent) bedeutet dies, dass der Landesindex der Konsumentenpreise automatisch um rund 0,2 Prozentpunkte steigt, obwohl sich die Mietpreise nicht verändert haben, wie das Bundesamt für Statistik selber feststellt.</p><p>Das Bundesamt begründet dies damit, dass die altersbedingte Wertminderung des Wohnungsbestandes künstlich ausgeglichen werden müsse. Die Altersentwertung übersteige den Einfluss wertvermehrender baulicher Massnahmen.</p><p>Diese Behauptung widerspricht jeder Erfahrung. In der Schweiz kann in keiner Weise von der Verslummung des Wohnungsbestandes die Rede sein. Vielmehr befinden sich die Schweizer Mietliegenschaften aufgrund der gewaltigen Anstrengungen der vorwiegend privaten Eigentümer in bezug auf Renovationen und Modernisierungen in einem - im weltweiten Vergleich - exzellenten Zustand.</p>",
+                "DocumentationText": null,
+                "MotionText": null,
+                "FederalCouncilResponseText": "<p>Die im Rahmen des Landesindexes der Konsumentenpreise ausgewiesene Teuerung wird nach international anerkannten Methoden sowie nach von der vormaligen Kommission für Konjunktur- und Sozialstatistik (Kokos) erarbeiteten und vom Bundesrat gutgeheissenen Grundsätzen berechnet.</p><p>Damit im Landesindex die reine Preisentwicklung gemessen werden kann, müssen die einbezogenen Waren und Dienstleistungen im Zeitablauf qualitativ vergleichbar sein, denn Qualitätsveränderungen sind \"versteckte\" Preisänderungen, die bei der Indexberechnung nicht ausser acht gelassen werden dürfen. Dieser Grundsatz der Indexberechnung gilt für alle im Landesindex einbezogenen Waren und Dienstleistungen.</p><p>Der als Teil des Landesindexes berechnete Mietpreisindex soll die Entwicklung des gesamtschweizerischen Mietpreisniveaus messen. Diese Entwicklung wird einerseits beeinflusst durch Mietzinsanpassungen bei den bestehenden Wohnungen, anderseits durch das kostenbedingt veränderte Niveau der Anfangsmieten von neuerstellten Wohnungen. Neben diesen beiden Einflussfaktoren ist auch allfälligen Qualitätsveränderungen Rechnung zu tragen.</p><p>Bei den meisten im Index-Warenkorb enthaltenen, gekauften Gütern handelt es sich um neuwertige und damit qualitativ vergleichbare Produkte. Die Qualität von (gemieteten) Wohnungen indessen ist einer ständigen Veränderung unterworfen. Einerseits nimmt sie in Folge fortschreitender Alterung ab, andererseits wird sie durch Renovationen, Um- und Neubauten verbessert.</p><p>Um den Einflüssen der sich verändernden Anfangsmieten von neuerstellten Wohnungen und der altersbedingten Wertverminderung Rechnung zu tragen, werden im Zeitablauf nicht die Mieten der einzelnen Wohnungen, sondern von Wohnungen gleicher Grösse und gleichen Alters verglichen. Einmal im Jahr, jeweils am Jahresanfang, werden die Wohnungen den Altersgruppen neu zugeteilt. Mit dieser Neuzuteilung werden die Einflüsse der im Zeitablauf sich verändernden Anfangsmieten und der im jeweils vergangenen Jahr aufgelaufenen Qualitätsverminderungen indexwirksam. Das hat dazu geführt, dass der Mietindex im Februar 1994 um 0,9 Prozent angestiegen ist, obschon die Situation bezüglich expliziten Mietzinsanpassungen praktisch stabil war. Aufgrund der Tatsache, dass sich die Anfangsmieten für neue Wohnungen wegen steigender Erstellungs- und Unterhaltskosten in den letzten Jahren stets erhöht haben (Anstieg des allgemeinen Mietpreisniveaus), wird dieser Effekt noch einige Zeit eine indexerhöhende Wirkung haben. In Perioden mit sinkenden Kosten und entsprechend tieferen Anfangsmieten wird sich eine indexsenkende Wirkung einstellen.</p><p>Wertvermehrende bauliche Massnahmen werden im Index ebenfalls berücksichtigt, indem die Mieten solcher Wohnungen mit Mieten von Wohnungen neuerer Baujahre verglichen werden, was in der Regel mit einem Indexrückgang verbunden ist.</p><p>Das Bundesamt für Statistik hat sich in diesem Zusammenhang nie dahin gehend geäussert, dass die Altersentwertung den \"Einfluss wertvermehrender baulicher Massnahmen\" übersteige, wie in der Begründung der Interpellation ausgeführt wird. Auch ist dem für die Berechnung angewandten methodischen Ansatz keine solche Annahme unterstellt, da Qualitätsveränderungen in beide Richtungen berücksichtigt werden.</p><p>In diesem Sinne lassen sich die beiden Fragen der Interpellation wie folgt beantworten:</p><p>1. Die Messung und die Bekanntgabe der Teuerung durch das Bundesamt für Statistik erfolgen nach den geltenden, vom Bundesrat gutgeheissenen Methoden und Grundsätzen. Sie sind unabhängig davon, ob die Arbeitnehmer einen Teuerungsausgleich erhalten haben oder nicht. Es soll nichts Künstliches vorgemacht, aber auch nichts Tatsächliches verschwiegen werden. Das Messinstrument \"Landesindex\" darf nicht aus politischen Motiven verändert oder gar manipuliert werden, weil damit der objektive Charakter verlorenginge. Aus diesem Grunde sind die Messung der Teuerung (Berechnung des Landesindexes) und die Anwendung des Indexes, welche im Verantwortungsbereich der jeweiligen Vertragspartner liegt, streng auseinanderzuhalten.</p><p>2. Die Berechnung des \"alten\" Mietpreisindexes (gültig bis Mai 1993) ist in der Vergangenheit wiederholt kritisiert worden. Es wurde unter anderem beanstandet, dass die angewandte Berechnungsmethode für den Einbezug neuerstellter Wohnungen sowie die methodische Behandlung von Qualitätsunterschieden bzw. Qualitätsveränderungen Mängel aufweisen und die tatsächlichen Verhältnisse nicht wirklichkeitsgetreu wiedergeben würden. Wegen der erheblichen politischen Bedeutung der Mietpreise und ihrer Entwicklung wurde deshalb der Verbesserung der Berechnungsmethode für den Mietpreisindex im Rahmen der kürzlich abgeschlossenen Indexrevision grosse Beachtung geschenkt. Der erarbeitete Lösungsvorschlag wurde von der Kokos gutgeheissen und dem Bundesrat zur Annahme empfohlen.</p><p>Es ist ein methodischer Ansatz gefunden worden, der gleichzeitig für den Einbezug neuerstellter Wohnungen wie für die Behandlung von Qualitätsveränderungen eine Lösung anbietet. Dabei ist unbestritten, dass es sich hier nicht um den einzig richtigen und idealen, sondern um einen bestmöglichen und praktikablen Ansatz handelt. Eine auch in der Erhebungspraxis anwendbare Methode zur wissenschaftlich exakten Quantifizierung von Qualitätsunterschieden bei Wohnungen steht leider zurzeit nicht zur Verfügung.</p><p>Dass nicht nur die bei bestehenden Wohnungen vorgenommenen Mietzinsanpassungen, sondern auch die sich verändernden Anfangsmieten und die Qualitätsveränderungen einen Einfluss auf den berechneten Mietpreisindex haben, entspricht der erklärten Zielsetzung, die Entwicklung des gesamtschweizerischen Mietpreisniveaus zu messen. Die verwendete Methode entspricht auch den allgemeinen Berechnungsgrundsätzen des Landesindexes.</p>",
+                "FederalCouncilProposal": null,
+                "FederalCouncilProposalText": null,
+                "FederalCouncilProposalDate": null,
+                "SubmittedBy": "Gysin Hans Rudolf",
+                "BusinessStatus": 229,
+                "BusinessStatusText": "Erledigt",
+                "BusinessStatusDate": "/Date(763257600000)/",
+                "ResponsibleDepartment": 4,
+                "ResponsibleDepartmentName": "Departement des Innern",
+                "ResponsibleDepartmentAbbreviation": "EDI",
+                "IsLeadingDepartment": true,
+                "Tags": null,
+                "Category": null,
+                "Modified": "/Date(1690489751197)/",
+                "SubmissionDate": "/Date(763257600000)/",
+                "SubmissionCouncil": 1,
+                "SubmissionCouncilName": "Nationalrat",
+                "SubmissionCouncilAbbreviation": "NR",
+                "SubmissionSession": 4413,
+                "SubmissionLegislativePeriod": 44,
+                "FirstCouncil1": 1,
+                "FirstCouncil1Name": "Nationalrat",
+                "FirstCouncil1Abbreviation": "NR",
+                "FirstCouncil2": null,
+                "FirstCouncil2Name": null,
+                "FirstCouncil2Abbreviation": null,
+                "TagNames": null
+            },
+            {
+                "__metadata": {
+                    "id": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')",
+                    "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')",
+                    "type": "itsystems.Pd.DataServices.DataModel.Business"
+                },
+                "BusinessResponsibilities": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/BusinessResponsibilities"
+                    }
+                },
+                "RelatedBusinesses": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/RelatedBusinesses"
+                    }
+                },
+                "BusinessRoles": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/BusinessRoles"
+                    }
+                },
+                "Publications": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/Publications"
+                    }
+                },
+                "LegislativePeriods": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/LegislativePeriods"
+                    }
+                },
+                "Sessions": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/Sessions"
+                    }
+                },
+                "Preconsultations": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/Preconsultations"
+                    }
+                },
+                "Bills": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/Bills"
+                    }
+                },
+                "Councils": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/Councils"
+                    }
+                },
+                "BusinessTypes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/BusinessTypes"
+                    }
+                },
+                "Votes": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/Votes"
+                    }
+                },
+                "SubjectsBusiness": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/SubjectsBusiness"
+                    }
+                },
+                "BusinessStates": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/BusinessStates"
+                    }
+                },
+                "Council": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/Council"
+                    }
+                },
+                "Transcripts": {
+                    "__deferred": {
+                        "uri": "https://ws.parlament.ch/OData.svc/Business(ID=19943091,Language='DE')/Transcripts"
+                    }
+                },
+                "ID": 19943091,
+                "Language": "DE",
+                "BusinessShortNumber": "94.3091",
+                "BusinessType": 5,
+                "BusinessTypeName": "Motion",
+                "BusinessTypeAbbreviation": "Mo.",
+                "Title": "Ausdruck der Abstimmungsergebnisse",
+                "Description": null,
+                "InitialSituation": null,
+                "Proceedings": null,
+                "DraftText": null,
+                "SubmittedText": "<text><p>Nachdem im Nationalrat die elektronische Abstimmung eingeführt worden ist, wird das Büro beauftragt, Artikel 81a des Ratsreglementes wie folgt zu ändern:</p><p>Grundsätzlich sind alle Abstimmungsergebnisse zu veröffentlichen.</p></text>",
+                "ReasonText": "<text><p>Die Einführung der elektronischen Abstimmung erlaubt eine rasche Feststellung des Abstimmungsergebnisses. Zur Herstellung völliger Transparenz ist es richtig, wenn die Abstimmungslisten nicht nur selektiv aufgrund des Verlangens von 30 Ratsmitgliedern erstellt werden, sondern grundsätzlich das Ergebnis jeder Abstimmung ausgedruckt wird.</p></text>",
+                "DocumentationText": null,
+                "MotionText": null,
+                "FederalCouncilResponseText": null,
+                "FederalCouncilProposal": null,
+                "FederalCouncilProposalText": null,
+                "FederalCouncilProposalDate": null,
+                "SubmittedBy": "Nabholz Lili",
+                "BusinessStatus": 210,
+                "BusinessStatusText": "Überwiesen an das Ratsbüro",
+                "BusinessStatusDate": "/Date(763171200000)/",
+                "ResponsibleDepartment": 1,
+                "ResponsibleDepartmentName": "Parlament",
+                "ResponsibleDepartmentAbbreviation": "Parl",
+                "IsLeadingDepartment": true,
+                "Tags": null,
+                "Category": null,
+                "Modified": "/Date(1688206412070)/",
+                "SubmissionDate": "/Date(763171200000)/",
+                "SubmissionCouncil": 1,
+                "SubmissionCouncilName": "Nationalrat",
+                "SubmissionCouncilAbbreviation": "NR",
+                "SubmissionSession": 4413,
+                "SubmissionLegislativePeriod": 44,
+                "FirstCouncil1": 1,
+                "FirstCouncil1Name": "Nationalrat",
+                "FirstCouncil1Abbreviation": "NR",
+                "FirstCouncil2": null,
+                "FirstCouncil2Name": null,
+                "FirstCouncil2Abbreviation": null,
+                "TagNames": null
+            }
+        ],
+        "__count": "52"
+    }
+}

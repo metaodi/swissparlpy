@@ -1,5 +1,7 @@
 [![PyPI Version][pypi-image]][pypi-url]
 [![Build Status][build-image]][build-url]
+[![Code style: black][black-image]][black-url]
+[![pre-commit][pre-commit-image]][pre-commit-url]
 
 
 swissparlpy
@@ -261,3 +263,7 @@ To create a new release, follow these steps (please respect [Semantic Versioning
 [pypi-url]: https://pypi.org/project/swissparlpy/
 [build-image]: https://github.com/metaodi/swissparlpy/actions/workflows/build.yml/badge.svg
 [build-url]: https://github.com/metaodi/swissparlpy/actions/workflows/build.yml
+[black-image]: https://img.shields.io/badge/code%20style-black-000000.svg
+[black-url]: https://github.com/psf/black
+[pre-commit-image]: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit
+[pre-commit-url]: https://github.com/pre-commit/pre-commit
