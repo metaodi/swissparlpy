@@ -21,6 +21,7 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Advanced filter](#advanced-filter)
     * [Large queries](#large-queries)
     * [API documentation](#documentation)
+    * [Similar libraries for other languages](#similar-libraries-for-other-languages)
 * [Credits](#credits)
 * [Development](#development)
 * [Release](#release)
