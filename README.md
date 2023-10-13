@@ -233,6 +233,11 @@ Below is a first look of what the dependencies are between the tables contained 
 
 ![db diagram of swiss parliament API](/docs/swissparAPY_diagram.png "db diagram of swiss parliament API")
 
+### Similar libraries for other languages
+
+* R: [zumbov2/swissparl](https://github.com/zumbov2/swissparl)
+* JavaScript: [michaelschoenbaechler/swissparl](https://github.com/michaelschoenbaechler/swissparl)
+
 ## Credits
 
 This library is inspired by the R package [swissparl](https://github.com/zumbov2/swissparl) of [David Zumbach](https://github.com/zumbov2).
