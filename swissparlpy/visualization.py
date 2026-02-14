@@ -124,8 +124,11 @@ def plot_voting(  # noqa: C901
             "Install it with: pip install matplotlib"
         )
 
-    # Convert votes to DataFrame if it's a list
+    # Convert votes to DataFrame if it's a list or SwissParlResponse
     if isinstance(votes, list):
+        votes = pd.DataFrame(votes)
+    elif hasattr(votes, "__iter__") and not isinstance(votes, pd.DataFrame):
+        # Handle SwissParlResponse or other iterable types
         votes = pd.DataFrame(votes)
 
     # Check required columns in votes
@@ -148,6 +151,9 @@ def plot_voting(  # noqa: C901
                 "Please provide seats parameter explicitly."
             )
     elif isinstance(seats, list):
+        seats = pd.DataFrame(seats)
+    elif hasattr(seats, "__iter__") and not isinstance(seats, pd.DataFrame):
+        # Handle SwissParlResponse or other iterable types
         seats = pd.DataFrame(seats)
 
     # Check required columns in seats
