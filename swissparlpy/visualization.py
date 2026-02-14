@@ -218,6 +218,15 @@ def plot_voting(  # noqa: C901
     if result:
         _add_results(data, ax, theme_config, result_size, highlight is not None)
 
+    # Set axis limits before aspect ratio to avoid massive image size
+    # Calculate data range with small padding
+    x_min, x_max = data["x"].min(), data["x"].max()
+    y_min, y_max = data["y"].min(), data["y"].max()
+    x_padding = (x_max - x_min) * 0.05
+    y_padding = (y_max - y_min) * 0.05
+    ax.set_xlim(x_min - x_padding, x_max + x_padding)
+    ax.set_ylim(y_min - y_padding, y_max + y_padding)
+
     # Configure axes
     ax.set_aspect("equal")
     ax.axis("off")
