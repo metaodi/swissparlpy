@@ -21,6 +21,8 @@ test = [
     "responses",
     "pytest",
     "pytest-cov",
+    "black",
+    "black[jupyter]",
 ]
 dev = [
     "flit",
