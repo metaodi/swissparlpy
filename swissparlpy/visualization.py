@@ -38,7 +38,7 @@ def _load_seating_plan():
     return pd.read_csv(seating_plan_path)
 
 
-def plot_voting(
+def plot_voting(  # noqa: C901
     votes,
     seats=None,
     highlight=None,
