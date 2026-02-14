@@ -21,14 +21,14 @@ test = [
     "responses",
     "pytest",
     "pytest-cov",
-    "black",
-    "black[jupyter]",
+    "black>=24.0.0,<25.0.0",
+    "black[jupyter]>=24.0.0,<25.0.0",
 ]
 dev = [
     "flit",
     "jupyter",
     "pandas",
-    "black",
+    "black>=24.0.0,<25.0.0",
     "pre-commit",
 ]
 visualization = [
