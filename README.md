@@ -295,18 +295,24 @@ This library is inspired by the R package [swissparl](https://github.com/zumbov2
 
 ## Development
 
-To develop on this project, install `flit`:
+To develop on this project, install `uv`:
 
 ```
-pip install flit
-flit install -s
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv pip install -e ".[dev,test]"
+```
+
+Alternatively, use the provided setup script:
+
+```
+./dev_setup.sh
 ```
 
 ## Release
 
 To create a new release, follow these steps (please respect [Semantic Versioning](http://semver.org/)):
 
-1. Adapt the version number in `swissparlpy/__init__.py`
+1. Adapt the version number in `pyproject.toml`
 1. Update the CHANGELOG with the version
 1. Create a [pull request to merge `develop` into `main`](https://github.com/metaodi/swissparlpy/compare/main...develop?expand=1) (make sure the tests pass!)
 1. Create a [new release/tag on GitHub](https://github.com/metaodi/swissparlpy/releases) (on the main branch)
