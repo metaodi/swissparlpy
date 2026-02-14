@@ -29,6 +29,10 @@ dev = [
     "black",
     "pre-commit",
 ]
+visualization = [
+    "matplotlib>=3.0.0",
+    "pandas",
+]
 
 
 [project.urls]

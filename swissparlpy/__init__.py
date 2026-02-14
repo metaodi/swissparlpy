@@ -1,11 +1,18 @@
 """Client for Swiss parliament API"""
 
 __version__ = "0.3.0"
-__all__ = ["client", "errors"]
+__all__ = ["client", "errors", "visualization"]
 
 from .errors import SwissParlError  # noqa
 from .client import SwissParlClient
 from pyodata.v2.service import GetEntitySetFilter as filter  # noqa
+
+# Import visualization function if matplotlib is available
+try:
+    from .visualization import plot_voting  # noqa
+except ImportError:
+    # matplotlib not installed, plot_voting will not be available
+    pass
 
 
 def get_tables():
