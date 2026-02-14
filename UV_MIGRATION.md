@@ -66,7 +66,7 @@ python -m pytest tests/
 
 **Version Updates:**
 - **Before**: Update version in `swissparlpy/__init__.py`
-- **After**: Update version in `pyproject.toml` (also update `__init__.py` to keep them in sync)
+- **After**: Update version in `swissparlpy/__init__.py` (hatchling reads it from there via pyproject.toml configuration)
 
 **Publishing to PyPI:**
 - **Before**: Used `flit publish` with username/password
