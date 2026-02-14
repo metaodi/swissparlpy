@@ -113,20 +113,17 @@ The `plot_voting` function allows you to visualize voting results of the Swiss N
 
 ```python
 >>> import swissparlpy as spp
->>> import pandas as pd
->>> from swissparlpy import plot_voting
 >>> import matplotlib.pyplot as plt
 >>> 
 >>> # Get voting data for a specific vote
 >>> votes = spp.get_data("Voting", Language="DE", IdVote=23458)
->>> votes_df = pd.DataFrame(votes)
 >>> 
 >>> # Create visualization with default scoreboard theme
->>> fig = plot_voting(votes_df, theme='scoreboard', result=True)
+>>> fig = spp.plot_voting(votes, theme='scoreboard', result=True)
 >>> plt.show()
 ```
 
-![Voting visualization example](https://github.com/user-attachments/assets/eab7bb2f-02d9-4449-9c48-3769f50d674f)
+![Voting visualization example with scoreboard](https://github.com/user-attachments/assets/314c178c-e281-43b0-84ac-d5da501e218b)
 
 The function supports different themes:
 - `scoreboard`: Imitates the council hall scoreboard (neon colors on black background)
@@ -137,14 +134,16 @@ You can also highlight specific parliamentary groups:
 
 ```python
 >>> # Highlight a parliamentary group
->>> fig = plot_voting(
+>>> fig = spp.plot_voting(
 ...     votes_df, 
-...     theme='poly2',
-...     highlight={'ParlGroupNumber': [2]},
+...     theme='poly1',
+...     highlight={'ParlGroupCode': ["S"]},
 ...     result=True
 ... )
 >>> plt.show()
 ```
+
+![Voting visualization example with poly1 and a highlighted group](https://github.com/user-attachments/assets/a11ecf2b-a966-4e21-b5ec-e99e60f06c89)
 
 See the [visualization example](/examples/visualize_voting.py) for more details.
 
