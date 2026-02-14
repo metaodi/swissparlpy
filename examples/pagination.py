@@ -2,7 +2,6 @@ import logging
 import swissparlpy
 from pprint import pprint
 
-
 # setup logger to see debug messages from swissparlpy
 spp_logger = logging.getLogger("swissparlpy.client")
 spp_logger.setLevel(logging.DEBUG)

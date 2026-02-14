@@ -16,6 +16,7 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Get tables and their variables](#get-tables-and-their-variables)
     * [Get data of a table](#get-data-of-a-table)
     * [Use together with `pandas`](#use-together-with-pandas)
+    * [Visualize voting results](#visualize-voting-results)
     * [Substrings](#substrings)
     * [Date ranges](#date-ranges)
     * [Advanced filter](#advanced-filter)
@@ -32,6 +33,12 @@ This module provides easy access to the data of the [OData webservice](https://w
 
 ```
 $ pip install swissparlpy
+```
+
+To install with visualization support (for plotting voting results):
+
+```
+$ pip install swissparlpy[visualization]
 ```
 
 ## Usage
@@ -97,6 +104,49 @@ To create a pandas DataFrame from `get_data` simply pass the return value to the
 
 [83 rows x 8 columns]
 ```
+
+### Visualize voting results
+
+The `plot_voting` function allows you to visualize voting results of the Swiss National Council according to the seating order, similar to the `ggswissparl` function from the R package.
+
+**Note**: This feature requires matplotlib. Install with: `pip install swissparlpy[visualization]`
+
+```python
+>>> import swissparlpy as spp
+>>> import pandas as pd
+>>> from swissparlpy import plot_voting
+>>> import matplotlib.pyplot as plt
+>>> 
+>>> # Get voting data for a specific vote
+>>> votes = spp.get_data("Voting", Language="DE", IdVote=23458)
+>>> votes_df = pd.DataFrame(votes)
+>>> 
+>>> # Create visualization with default scoreboard theme
+>>> fig = plot_voting(votes_df, theme='scoreboard', result=True)
+>>> plt.show()
+```
+
+![Voting visualization example](https://github.com/user-attachments/assets/eab7bb2f-02d9-4449-9c48-3769f50d674f)
+
+The function supports different themes:
+- `scoreboard`: Imitates the council hall scoreboard (neon colors on black background)
+- `sym1`, `sym2`: Colored symbols on light background
+- `poly1`, `poly2`, `poly3`: Color-filled polygons with different edge styles
+
+You can also highlight specific parliamentary groups:
+
+```python
+>>> # Highlight a parliamentary group
+>>> fig = plot_voting(
+...     votes_df, 
+...     theme='poly2',
+...     highlight={'ParlGroupNumber': [2]},
+...     result=True
+... )
+>>> plt.show()
+```
+
+See the [visualization example](/examples/visualize_voting.py) for more details.
 
 ### Substrings
 
