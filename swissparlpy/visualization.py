@@ -172,8 +172,8 @@ def plot_voting(  # noqa: C901
     data["Decision"] = data["Decision"].fillna(8)
     data["DecisionText"] = data["DecisionText"].fillna("Missing")
 
-    # Initialize highlight column
-    data["highlight"] = 1
+    # Initialize highlight column (0 = show normally, 1 = fade out)
+    data["highlight"] = 0
 
     # Apply highlighting if specified
     if highlight is not None:
@@ -188,7 +188,9 @@ def plot_voting(  # noqa: C901
         if highlight_col not in data.columns:
             raise ValueError(f"Highlight column '{highlight_col}' not found in data")
 
-        # Set highlight to 0 for selected councillors
+        # Fade out all items first
+        data["highlight"] = 1
+        # Then show highlighted items normally
         data.loc[data[highlight_col].isin(highlight_vals), "highlight"] = 0
 
     # Create figure if ax not provided
