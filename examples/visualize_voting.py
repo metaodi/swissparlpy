@@ -4,6 +4,7 @@ Example script demonstrating the plot_voting visualization function.
 This script shows how to visualize voting results from the Swiss National Council
 using different themes and options.
 """
+
 # flake8: noqa: F841
 
 import swissparlpy as spp
