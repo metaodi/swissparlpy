@@ -130,6 +130,7 @@ The package is fully compatible with standard pip installation.
 
 ## References
 
-- [UV Documentation](https://github.com/astral-sh/uv)
+- [UV Documentation](https://docs.astral.sh/uv/)
+- [UV GitHub Repository](https://github.com/astral-sh/uv)
 - [Hatchling Documentation](https://hatch.pypa.io/latest/)
 - [Python Packaging Guide](https://packaging.python.org/)
