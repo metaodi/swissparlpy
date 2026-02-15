@@ -26,6 +26,6 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv pip install --system -e ".[dev,test]"
+        uv pip install --system -e ".[dev,test,visualization]"
 
     - run: ./validate.sh
