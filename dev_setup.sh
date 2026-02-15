@@ -13,7 +13,7 @@ uv venv
 source .venv/bin/activate
 
 # Install the project in development mode with all dependencies
-uv pip install -e ".[dev,test]"
+uv pip install -e ".[dev,test,visualization]"
 
 # Install pre-commit hooks
 pre-commit install

@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "swissparlpy"
 authors = [{name = "Stefan Oderbolz", email = "odi@metaodi.ch"}]
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version"]
 description = "Client for Swiss parliament API"
