@@ -12,6 +12,10 @@ This document describes the migration from `flit` to `uv` for package management
 - **Before**: Used `flit` for development installation and publishing
 - **After**: Uses `uv` for all package operations
 
+### Dependencies
+- **Removed**: `flit` from dev dependencies
+- **Added**: `black[jupyter]` for Jupyter notebook formatting support (replacing plain `black`)
+
 ### Version Management
 - **Before**: Version was dynamically read from `swissparlpy/__init__.py` by flit
 - **After**: Version is still read from `swissparlpy/__init__.py`, now via hatchling configuration in `pyproject.toml`
