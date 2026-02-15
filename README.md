@@ -295,11 +295,17 @@ This library is inspired by the R package [swissparl](https://github.com/zumbov2
 
 ## Development
 
-To develop on this project, install `flit`:
+To develop on this project, install `uv`:
 
 ```
-pip install flit
-flit install -s
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv pip install -e ".[dev,test]"
+```
+
+Alternatively, use the provided setup script:
+
+```
+./dev_setup.sh
 ```
 
 ## Release

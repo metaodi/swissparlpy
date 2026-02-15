@@ -491,9 +491,9 @@ def _add_results(data, ax, theme_config, result_size, has_highlight):
 
             if has_highlight:
                 highlight_count = row["highlight_count"]
-                label = f"{int(highlight_count):03d} / {int(count):03d} {decision_text}"
+                label = f"{int(highlight_count)} / {int(count)} {decision_text}"
             else:
-                label = f"{int(count):03d} {decision_text}"
+                label = f"{int(count)} {decision_text}"
 
             ax.text(
                 result_x,
