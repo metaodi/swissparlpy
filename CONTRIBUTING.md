@@ -12,7 +12,7 @@ Install the dependencies using `uv`:
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
-uv pip install -e ".[dev,test]"
+uv pip install -e ".[dev,test,visualization]"
 ```
 
 Or use the provided setup script:
@@ -24,13 +24,13 @@ Or use the provided setup script:
 Make sure the tests pass:
 
 ```bash
-pytest
+uv run pytest
 ```
 
 To ensure a good quality of the code use `flake8` to check the code style:
 
 ```bash
-flake8 --install-hook git
+uv run flake8 --install-hook git
 ```
 
 ## Create a pull request
