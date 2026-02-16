@@ -109,7 +109,7 @@ To create a pandas DataFrame from `get_data` simply pass the return value to the
 
 The `plot_voting` function allows you to visualize voting results of the Swiss National Council according to the seating order, similar to the `ggswissparl` function from the R package.
 
-NOTE: the mapping from seats to persons is currently not historized, so "older" votes might not be displayed correctly. You can provide your own mapping with the `seat` parameter.
+NOTE: the mapping from seats to persons is currently not historized, so "older" votes might not be displayed correctly. You can provide your own mapping with the `seats` parameter.
 
 **Note**: This feature requires matplotlib. Install with: `pip install swissparlpy[visualization]`
 
