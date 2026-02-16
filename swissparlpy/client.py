@@ -162,6 +162,15 @@ class SwissParlResponse(object):
         self._load_new_data_until(limit)
         return {k: self.data[key](k) for k in self.variables}
 
+    def to_dataframe(self) -> "pd.DataFrame":
+        try:
+            import pandas as pd
+        except ImportError:
+            raise ImportError("pandas is required to use to_dataframe()")
+
+        self._load_new_data_until(self.count)
+        return pd.DataFrame(list(self))
+
 
 class SwissParlDataProxy(object):
     def __init__(self, proxy: object) -> None:

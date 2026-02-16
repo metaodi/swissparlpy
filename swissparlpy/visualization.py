@@ -10,6 +10,7 @@ import warnings
 from pathlib import Path
 
 from . import SwissParlResponse
+from . import SwissParlClient
 from typing import Union, Optional, cast
 
 
@@ -68,6 +69,7 @@ def plot_voting(  # noqa: C901
     point_size: int = 50,
     theme: str = "scoreboard",
     ax: Optional["matplotlib.axes.Axes"] = None,
+    client: Optional["SwissParlClient"] = None,
 ) -> Union["matplotlib.figure.Figure", "matplotlib.figure.SubFigure"]:
     """
     Plot voting results of the Swiss National Council.
@@ -134,6 +136,9 @@ def plot_voting(  # noqa: C901
     >>> plt.show()
     """
 
+    if not client:
+        client = SwissParlClient()
+
     if not MATPLOTLIB_AVAILABLE:
         raise ImportError(
             "matplotlib is required for visualization. "
@@ -145,11 +150,12 @@ def plot_voting(  # noqa: C901
         votes_df = votes
     elif isinstance(votes, list):
         votes_df = pd.DataFrame(votes)
-    elif hasattr(votes, "__iter__") and not isinstance(votes, pd.DataFrame):
-        # Handle SwissParlResponse or other iterable types
-        votes_df = pd.DataFrame(votes)
+    elif isinstance(votes, SwissParlResponse):
+        votes_df = votes.to_dataframe()
     else:
-        raise ValueError("votes must be a pandas DataFrame, list of dicts, or SwissParlResponse")
+        raise ValueError(
+            "votes must be a pandas DataFrame, list of dicts, or SwissParlResponse"
+        )
 
     # Check required columns in votes
     required_vote_cols = ["PersonNumber", "Decision", "DecisionText"]
@@ -161,15 +167,26 @@ def plot_voting(  # noqa: C901
     if seats is None:
         # Try to import and get seats data
         try:
-            from . import get_data
-
-            seats_data = get_data("SeatOrganisationNr", filter="Language eq 'DE'")
-            seats = pd.DataFrame(seats_data)
+            seats = client.get_data(
+                "SeatOrganisationNr", filter="Language eq 'DE'"
+            ).to_dataframe()
         except Exception as e:
             raise ValueError(
                 f"Could not retrieve seating data automatically: {e}. "
                 "Please provide seats parameter explicitly."
             )
+        # check if the data is from the current legislative period, if not warn the user that seating data might not be available
+        if "IdLegislativePeriod" in votes_df.columns:
+            legis = client.get_data("LegislativePeriod", filter="Language eq 'DE'").to_dataframe()
+            current_legis_id = int(
+                legis.sort_values(by="EndDate", ascending=False).iloc[0]["ID"]
+            )
+            if votes_df["IdLegislativePeriod"].iloc[0] != current_legis_id:
+                warnings.warn(
+                    "The voting data is not from the current legislative period. "
+                    "Seating data mightnot be up-to-date. "
+                    "Consider providing seating data explicitly for the correct legislative period."
+                )
     else:
         seats = pd.DataFrame(seats)
 
@@ -188,8 +205,8 @@ def plot_voting(  # noqa: C901
         seats[["SeatNumber", "PersonNumber"]], on="SeatNumber", how="left"
     )
 
-    # Then merge with votes
-    data = data.merge(votes_df, on="PersonNumber", how="left")
+    # Then merge with votes (keep all votes -> right join)
+    data = data.merge(votes_df, on="PersonNumber", how="right")
 
     # Fill missing decisions (councillors not present) with 8
     data["Decision"] = data["Decision"].fillna(8)
