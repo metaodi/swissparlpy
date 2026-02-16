@@ -47,12 +47,6 @@ def _load_seating_plan() -> "pd.DataFrame":
             "Install it with: pip install pandas"
         )
 
-    if not MATPLOTLIB_AVAILABLE:
-        raise ImportError(
-            "pandas is required for visualization. "
-            "Install it with: pip install pandas"
-        )
-
     return pd.read_csv(seating_plan_path)
 
 
