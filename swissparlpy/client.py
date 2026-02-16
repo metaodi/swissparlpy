@@ -30,7 +30,7 @@ class SwissParlClient(object):
         if self.cache and table in self.cache:
             return self.cache[table]
         entity_type = self.client.schema.entity_type(table)
-        return [p.name for p in entity_type.properties()]
+        return [p.name for p in entity_type.proprties()]
 
     def get_overview(self) -> dict[str, list[str]]:
         log.debug("Load tables and variables from OData...")
@@ -60,7 +60,7 @@ class SwissParlClient(object):
         if kwargs:
             entities = entities.filter(**kwargs)  # type: ignore
         return SwissParlResponse(
-            entities.count(inline=True).get_entities(),  # type: ignore
+            entities.count(inline=True),  # type: ignore
             self.get_variables(table),
         )
 

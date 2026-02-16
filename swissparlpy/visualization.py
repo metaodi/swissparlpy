@@ -141,11 +141,15 @@ def plot_voting(  # noqa: C901
         )
 
     # Convert votes to DataFrame if it's a list or SwissParlResponse
-    if isinstance(votes, list):
+    if isinstance(votes, pd.DataFrame):
+        votes_df = votes
+    elif isinstance(votes, list):
         votes_df = pd.DataFrame(votes)
     elif hasattr(votes, "__iter__") and not isinstance(votes, pd.DataFrame):
         # Handle SwissParlResponse or other iterable types
         votes_df = pd.DataFrame(votes)
+    else:
+        raise ValueError("votes must be a pandas DataFrame, list of dicts, or SwissParlResponse")
 
     # Check required columns in votes
     required_vote_cols = ["PersonNumber", "Decision", "DecisionText"]
