@@ -1,8 +1,9 @@
 """
 Visualization module for Swiss Parliament voting data.
 
-This module provides functionality to create visualizations of voting results
-in the Swiss National Council, similar to the ggswissparl function from the R package `swissparl`.
+This module provides functionality to create visualizations of voting
+results in the Swiss National Council, similar to the ggswissparl
+function from the R package `swissparl`.
 """
 
 import warnings

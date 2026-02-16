@@ -217,7 +217,7 @@ print(df[['FirstName', 'LastName']])
 
 You can provide a callable as a filter which allows for more advanced filters.
 
-`swissparlpy.filter` provides `or_` and `and_`.
+`swissparlpy.Filter` provides `or_` and `and_`.
 
 ```python
 import swissparlpy as spp
@@ -225,7 +225,7 @@ import pandas as pd
 
 # filter by FirstName = 'Stefan' OR LastName == 'Seiler'
 def filter_by_name(ent):
-   return spp.filter.or_(
+   return spp.Filter.or_(
       ent.FirstName == 'Stefan',
       ent.LastName == 'Seiler'
    )

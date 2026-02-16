@@ -6,7 +6,7 @@ __all__ = ["client", "errors", "visualization"]
 from .errors import SwissParlError  # noqa
 from .client import SwissParlClient  # noqa
 from .client import SwissParlResponse  # noqa
-from pyodata.v2.service import GetEntitySetFilter as filter  # noqa
+from pyodata.v2.service import GetEntitySetFilter as Filter  # noqa
 from typing import Callable, Union
 
 # Import visualization function if matplotlib is available

@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ## [Unreleased]
 ### Changed
 - BC-Break: Python 3.9 is now required
+- BC-Break: Renamed the callable filter from `swissparlpy.filter` to `swissparlpy.Filter` (see )
 - Switched from `flit` to `uv` to install dependencies, build and publish the package
 
 ### Added

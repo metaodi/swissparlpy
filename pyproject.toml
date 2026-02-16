@@ -43,16 +43,6 @@ Home = "https://github.com/metaodi/swissparlpy"
 [tool.hatch.version]
 path = "swissparlpy/__init__.py"
 
-[tool.flake8]
-max-complexity = 10
-exclude = ".git,__pycache__,pyenv,.pytest_cache"
-# set to true to check all ignored errors
-disable_noqa = false
-
-# adaptions for black
-max-line-length = 88
-extend-ignore = "E203,W503"
-
 [tool.pytest.ini_options]
 addopts = "--cov=swissparlpy"
 

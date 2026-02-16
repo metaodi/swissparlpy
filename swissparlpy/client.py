@@ -44,7 +44,8 @@ class SwissParlClient(object):
     def get_glimpse(self, table: str, rows: int = 5) -> "SwissParlResponse":
         entities = self._get_entities(table)
         return SwissParlResponse(
-            entities.top(rows).count(inline=True), self.get_variables(table)  # type: ignore
+            entities.top(rows).count(inline=True),  # type: ignore
+            self.get_variables(table),
         )
 
     def get_data(
