@@ -6,6 +6,18 @@ from . import errors
 from typing import Optional, Union, Callable, Iterator
 
 
+try:
+    import pandas as pd
+
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+    warnings.warn(
+        "pandas is not installed. Install it with "
+        "'pip install pandas' to use to_dataframe().",
+        ImportWarning,
+    )
+
 SERVICE_URL = "https://ws.parlament.ch/odata.svc/"
 log = logging.getLogger(__name__)
 
@@ -163,9 +175,7 @@ class SwissParlResponse(object):
         return {k: self.data[key](k) for k in self.variables}
 
     def to_dataframe(self) -> "pd.DataFrame":
-        try:
-            import pandas as pd
-        except ImportError:
+        if not PANDAS_AVAILABLE:
             raise ImportError("pandas is required to use to_dataframe()")
 
         self._load_new_data_until(self.count)

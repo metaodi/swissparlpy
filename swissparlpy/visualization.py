@@ -175,9 +175,12 @@ def plot_voting(  # noqa: C901
                 f"Could not retrieve seating data automatically: {e}. "
                 "Please provide seats parameter explicitly."
             )
-        # check if the data is from the current legislative period, if not warn the user that seating data might not be available
+        # check if the data is from the current legislative period, if not
+        # warn the user that seating data might not be available
         if "IdLegislativePeriod" in votes_df.columns:
-            legis = client.get_data("LegislativePeriod", filter="Language eq 'DE'").to_dataframe()
+            legis = client.get_data(
+                "LegislativePeriod", filter="Language eq 'DE'"
+            ).to_dataframe()
             current_legis_id = int(
                 legis.sort_values(by="EndDate", ascending=False).iloc[0]["ID"]
             )
@@ -185,7 +188,8 @@ def plot_voting(  # noqa: C901
                 warnings.warn(
                     "The voting data is not from the current legislative period. "
                     "Seating data mightnot be up-to-date. "
-                    "Consider providing seating data explicitly for the correct legislative period."
+                    "Consider providing seating data explicitly for "
+                    "the correct legislative period."
                 )
     else:
         seats = pd.DataFrame(seats)
