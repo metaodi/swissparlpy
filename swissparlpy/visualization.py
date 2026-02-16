@@ -30,21 +30,6 @@ try:
 except ImportError:
     MATPLOTLIB_AVAILABLE = False
 
-# Warn if either dependency is missing
-if not PANDAS_AVAILABLE or not MATPLOTLIB_AVAILABLE:
-    missing = []
-    if not PANDAS_AVAILABLE:
-        missing.append("pandas")
-    if not MATPLOTLIB_AVAILABLE:
-        missing.append("matplotlib")
-    is_are = "is" if len(missing) == 1 else "are"
-    warnings.warn(
-        f"{' and '.join(missing)} {is_are} not installed. "
-        f"Install with 'pip install {' '.join(missing)}' "
-        "to use visualization features.",
-        ImportWarning,
-    )
-
 
 def _load_seating_plan() -> "pd.DataFrame":
     """Load the seating plan data from the package data directory."""
