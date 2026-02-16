@@ -1,15 +1,17 @@
+
 import logging
 import warnings
 import requests
 import pyodata
 from . import errors
 
+
 SERVICE_URL = "https://ws.parlament.ch/odata.svc/"
 log = logging.getLogger(__name__)
 
 
 class SwissParlClient(object):
-    def __init__(self, session=None, url=SERVICE_URL):
+    def __init__(self, session: Optional[requests.Session] = None, url: str = SERVICE_URL) -> None:
         if not session:
             session = requests.Session()
         self.url = url
@@ -17,17 +19,17 @@ class SwissParlClient(object):
         self.cache = {}
         self.get_overview()
 
-    def get_tables(self):
+    def get_tables(self) -> list[str]:
         if self.cache:
             return list(self.cache.keys())
         return [es.name for es in self.client.schema.entity_sets]
 
-    def get_variables(self, table):
+    def get_variables(self, table: str) -> list[str]:
         if self.cache and table in self.cache:
             return self.cache[table]
         return [p.name for p in self.client.schema.entity_type(table).proprties()]
 
-    def get_overview(self):
+    def get_overview(self) -> dict[str, list[str]]:
         log.debug("Load tables and variables from OData...")
         if self.cache:
             return self.cache
@@ -36,13 +38,18 @@ class SwissParlClient(object):
             self.cache[t] = self.get_variables(t)
         return self.cache
 
-    def get_glimpse(self, table, rows=5):
+    def get_glimpse(self, table: str, rows: int = 5) -> 'SwissParlResponse':
         entities = self._get_entities(table)
         return SwissParlResponse(
             entities.top(rows).count(inline=True), self.get_variables(table)
         )
 
-    def get_data(self, table, filter=None, **kwargs):
+    def get_data(
+        self,
+        table: str,
+        filter: str | callable | None = None,
+        **kwargs
+    ) -> 'SwissParlResponse':
         entities = self._get_entities(table)
         if filter and callable(filter):
             entities = entities.filter(filter(entities))
@@ -53,19 +60,19 @@ class SwissParlClient(object):
             entities = entities.filter(**kwargs)
         return SwissParlResponse(entities.count(inline=True), self.get_variables(table))
 
-    def _get_entities(self, table):
+    def _get_entities(self, table: str) -> object:
         return getattr(self.client.entity_sets, table).get_entities()
 
 
 class SwissParlResponse(object):
-    def __init__(self, entity_request, variables):
+    def __init__(self, entity_request: object, variables: list[str]) -> None:
         self.variables = variables
         self.data = []
         self.entity_request = entity_request
         entities = self.load()
         self._parse_data(entities)
 
-    def load(self, next_url=None):
+    def load(self, next_url: str | None = None) -> object:
         log.debug(f"Load data, next_url={next_url}")
         if next_url:
             entities = self.entity_request.next_url(next_url).execute()
@@ -74,7 +81,7 @@ class SwissParlResponse(object):
 
         return entities
 
-    def _load_new_data_until(self, limit):
+    def _load_new_data_until(self, limit: int) -> None:
         if limit >= 10000:
             warnings.warn(
                 """
@@ -98,22 +105,22 @@ class SwissParlResponse(object):
             except errors.NoMoreRecordsError:
                 break
 
-    def _load_new_data(self):
+    def _load_new_data(self) -> None:
         if self.next_url is None:
             raise errors.NoMoreRecordsError()
         entities = self.load(next_url=self.next_url)
         self._parse_data(entities)
 
-    def _parse_data(self, entities):
+    def _parse_data(self, entities: object) -> None:
         self.count = entities.total_count
         self._setup_proxies(entities)
         self.next_url = entities.next_url
 
-    def _setup_proxies(self, entities):
+    def _setup_proxies(self, entities: object) -> None:
         for e in entities:
             self.data.append(SwissParlDataProxy(e))
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self.count
 
     def __iter__(self):
@@ -129,7 +136,7 @@ class SwissParlResponse(object):
             yield {k: self.data[i](k) for k in self.variables}
             i += 1
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: int | slice) -> object:
         if isinstance(key, slice):
             limit = max(key.start or 0, key.stop or self.count)
             self._load_new_data_until(limit)
@@ -151,8 +158,8 @@ class SwissParlResponse(object):
 
 
 class SwissParlDataProxy(object):
-    def __init__(self, proxy):
+    def __init__(self, proxy: object) -> None:
         self.proxy = proxy
 
-    def __call__(self, attribute):
+    def __call__(self, attribute: str) -> object:
         return getattr(self.proxy, attribute)

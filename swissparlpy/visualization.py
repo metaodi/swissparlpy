@@ -5,8 +5,10 @@ This module provides functionality to create visualizations of voting results
 in the Swiss National Council, similar to the ggswissparl function from the R package.
 """
 
+
 import warnings
 from pathlib import Path
+
 
 try:
     import matplotlib.pyplot as plt
@@ -22,7 +24,7 @@ except ImportError:
     )
 
 
-def _load_seating_plan():
+def _load_seating_plan() -> 'pd.DataFrame':
     """Load the seating plan data from the package data directory."""
     import pandas as pd
 
@@ -38,17 +40,16 @@ def _load_seating_plan():
     return pd.read_csv(seating_plan_path)
 
 
-def plot_voting(  # noqa: C901
-    votes,
-    seats=None,
-    highlight=None,
-    result=False,
-    result_size=12,
-    point_shape="o",
-    point_size=50,
-    theme="scoreboard",
-    ax=None,
-):
+    votes: 'pd.DataFrame' | list[dict[str, object]] | object,
+    seats: 'pd.DataFrame' | list[dict[str, object]] | object | None = None,
+    highlight: dict[str, list[object]] | None = None,
+    result: bool = False,
+    result_size: int = 12,
+    point_shape: str = "o",
+    point_size: int = 50,
+    theme: str = "scoreboard",
+    ax: object | None = None,
+) -> object:
     """
     Plot voting results of the Swiss National Council.
 
@@ -105,15 +106,12 @@ def plot_voting(  # noqa: C901
     >>> import swissparlpy as spp
     >>> # Get voting data for a specific vote
     >>> votes = spp.get_data("Voting", Language="DE", IdVote=23458)
-    >>> # Convert to DataFrame
-    >>> import pandas as pd
-    >>> votes_df = pd.DataFrame(votes)
     >>> # Create visualization
-    >>> fig = spp.plot_voting(votes_df, theme='scoreboard')
+    >>> fig = spp.plot_voting(votes, theme="scoreboard")
     >>> plt.show()
 
     >>> # Highlight a parliamentary group
-    >>> fig = spp.plot_voting(votes_df, highlight={'ParlGroupNumber': [2]})
+    >>> fig = spp.plot_voting(votes, highlight={'ParlGroupCode': ["S"]}, theme="poly1")
     >>> plt.show()
     """
     import pandas as pd
@@ -244,7 +242,7 @@ def plot_voting(  # noqa: C901
     return fig
 
 
-def _get_theme_config(theme):
+def _get_theme_config(theme: str) -> dict[str, object]:
     """Get configuration for a specific theme."""
     configs = {
         "scoreboard": {
@@ -377,7 +375,13 @@ def _get_theme_config(theme):
     return configs[theme]
 
 
-def _plot_point_theme(data, ax, theme_config, point_shape, point_size):
+def _plot_point_theme(
+    data: 'pd.DataFrame',
+    ax: object,
+    theme_config: dict[str, object],
+    point_shape: str,
+    point_size: int
+) -> None:
     """Plot visualization using points/markers."""
     import pandas as pd
 
@@ -416,7 +420,11 @@ def _plot_point_theme(data, ax, theme_config, point_shape, point_size):
             )
 
 
-def _plot_polygon_theme(data, ax, theme_config):
+def _plot_polygon_theme(
+    data: 'pd.DataFrame',
+    ax: object,
+    theme_config: dict[str, object]
+) -> None:
     """Plot visualization using filled polygons."""
     import pandas as pd
 
@@ -447,7 +455,13 @@ def _plot_polygon_theme(data, ax, theme_config):
                 ax.add_patch(polygon)
 
 
-def _add_results(data, ax, theme_config, result_size, has_highlight):
+def _add_results(
+    data: 'pd.DataFrame',
+    ax: object,
+    theme_config: dict[str, object],
+    result_size: int,
+    has_highlight: bool
+) -> None:
     """Add voting result annotations to the plot."""
     # Get unique persons (one per seat)
     unique_persons = data.groupby("PersonNumber").first().reset_index()

@@ -15,26 +15,32 @@ except ImportError:
     pass
 
 
-def get_tables():
+
+
+def get_tables() -> list[str]:
     client = SwissParlClient()
     return client.get_tables()
 
 
-def get_variables(table):
+def get_variables(table: str) -> list[str]:
     client = SwissParlClient()
     return client.get_variables(table)
 
 
-def get_overview():
+def get_overview() -> dict[str, list[str]]:
     client = SwissParlClient()
     return client.get_overview()
 
 
-def get_glimpse(table, rows=5):
+def get_glimpse(table: str, rows: int = 5) -> object:
     client = SwissParlClient()
     return client.get_glimpse(table, rows)
 
 
-def get_data(table, filter=None, **kwargs):  # noqa
+def get_data(
+    table: str,
+    filter: str | callable | None = None,
+    **kwargs
+) -> object:
     client = SwissParlClient()
     return client.get_data(table, filter, **kwargs)
