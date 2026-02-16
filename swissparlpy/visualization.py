@@ -2,32 +2,35 @@
 Visualization module for Swiss Parliament voting data.
 
 This module provides functionality to create visualizations of voting results
-in the Swiss National Council, similar to the ggswissparl function from the R package.
+in the Swiss National Council, similar to the ggswissparl function from the R package `swissparl`.
 """
-
 
 import warnings
 from pathlib import Path
 
+from . import SwissParlResponse
+from typing import Union, Optional, cast
+
 
 try:
+    import pandas as pd
     import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
+    import matplotlib.axes
+    import matplotlib.figure
 
     MATPLOTLIB_AVAILABLE = True
 except ImportError:
     MATPLOTLIB_AVAILABLE = False
     warnings.warn(
-        "matplotlib is not installed. Install it with "
-        "'pip install matplotlib' to use visualization features.",
+        "matplotlib and/or pandas is not installed. Install them with "
+        "'pip install matplotlib pandas' to use visualization features.",
         ImportWarning,
     )
 
 
-def _load_seating_plan() -> 'pd.DataFrame':
+def _load_seating_plan() -> "pd.DataFrame":
     """Load the seating plan data from the package data directory."""
-    import pandas as pd
-
     data_dir = Path(__file__).parent / "data"
     seating_plan_path = data_dir / "seating_plan.csv"
 
@@ -37,19 +40,34 @@ def _load_seating_plan() -> 'pd.DataFrame':
             "Please ensure the package is properly installed."
         )
 
+    if not MATPLOTLIB_AVAILABLE:
+        raise ImportError(
+            "pandas is required for visualization. "
+            "Install it with: pip install pandas"
+        )
+
+    if not MATPLOTLIB_AVAILABLE:
+        raise ImportError(
+            "pandas is required for visualization. "
+            "Install it with: pip install pandas"
+        )
+
     return pd.read_csv(seating_plan_path)
 
 
-    votes: 'pd.DataFrame' | list[dict[str, object]] | object,
-    seats: 'pd.DataFrame' | list[dict[str, object]] | object | None = None,
-    highlight: dict[str, list[object]] | None = None,
+def plot_voting(  # noqa: C901
+    votes: Union["pd.DataFrame", list[dict[str, object]], "SwissParlResponse"],
+    seats: Optional[
+        Union["pd.DataFrame", list[dict[str, object]], "SwissParlResponse"]
+    ] = None,
+    highlight: Optional[dict[str, list[object]]] = None,
     result: bool = False,
     result_size: int = 12,
     point_shape: str = "o",
     point_size: int = 50,
     theme: str = "scoreboard",
-    ax: object | None = None,
-) -> object:
+    ax: Optional["matplotlib.axes.Axes"] = None,
+) -> Union["matplotlib.figure.Figure", "matplotlib.figure.SubFigure"]:
     """
     Plot voting results of the Swiss National Council.
 
@@ -91,13 +109,13 @@ def _load_seating_plan() -> 'pd.DataFrame':
 
     Returns
     -------
-    matplotlib.figure.Figure
+    matplotlib.figure.Figure or matplotlib.figure.SubFigure
         The figure containing the visualization.
 
     Raises
     ------
     ImportError
-        If matplotlib is not installed.
+        If matplotlib or pandas is not installed.
     ValueError
         If required columns are missing from the data.
 
@@ -114,7 +132,6 @@ def _load_seating_plan() -> 'pd.DataFrame':
     >>> fig = spp.plot_voting(votes, highlight={'ParlGroupCode': ["S"]}, theme="poly1")
     >>> plt.show()
     """
-    import pandas as pd
 
     if not MATPLOTLIB_AVAILABLE:
         raise ImportError(
@@ -124,14 +141,14 @@ def _load_seating_plan() -> 'pd.DataFrame':
 
     # Convert votes to DataFrame if it's a list or SwissParlResponse
     if isinstance(votes, list):
-        votes = pd.DataFrame(votes)
+        votes_df = pd.DataFrame(votes)
     elif hasattr(votes, "__iter__") and not isinstance(votes, pd.DataFrame):
         # Handle SwissParlResponse or other iterable types
-        votes = pd.DataFrame(votes)
+        votes_df = pd.DataFrame(votes)
 
     # Check required columns in votes
     required_vote_cols = ["PersonNumber", "Decision", "DecisionText"]
-    missing_cols = [col for col in required_vote_cols if col not in votes.columns]
+    missing_cols = [col for col in required_vote_cols if col not in votes_df.columns]
     if missing_cols:
         raise ValueError(f"Missing required columns in votes: {missing_cols}")
 
@@ -141,17 +158,14 @@ def _load_seating_plan() -> 'pd.DataFrame':
         try:
             from . import get_data
 
-            seats_data = get_data("SeatOrganisationNr", Language="DE")
+            seats_data = get_data("SeatOrganisationNr", filter="Language eq 'DE'")
             seats = pd.DataFrame(seats_data)
         except Exception as e:
             raise ValueError(
                 f"Could not retrieve seating data automatically: {e}. "
                 "Please provide seats parameter explicitly."
             )
-    elif isinstance(seats, list):
-        seats = pd.DataFrame(seats)
-    elif hasattr(seats, "__iter__") and not isinstance(seats, pd.DataFrame):
-        # Handle SwissParlResponse or other iterable types
+    else:
         seats = pd.DataFrame(seats)
 
     # Check required columns in seats
@@ -170,7 +184,7 @@ def _load_seating_plan() -> 'pd.DataFrame':
     )
 
     # Then merge with votes
-    data = data.merge(votes, on="PersonNumber", how="left")
+    data = data.merge(votes_df, on="PersonNumber", how="left")
 
     # Fill missing decisions (councillors not present) with 8
     data["Decision"] = data["Decision"].fillna(8)
@@ -198,10 +212,16 @@ def _load_seating_plan() -> 'pd.DataFrame':
         data.loc[data[highlight_col].isin(highlight_vals), "highlight"] = 0
 
     # Create figure if ax not provided
+    fig: Optional[Union["matplotlib.figure.Figure", "matplotlib.figure.SubFigure"]] = (
+        None
+    )
     if ax is None:
         fig, ax = plt.subplots(figsize=(10, 8))
     else:
         fig = ax.get_figure()
+
+    if fig is None:
+        raise ValueError("Provided axes must be attached to a figure")
 
     # Define theme settings
     theme_config = _get_theme_config(theme)
@@ -244,7 +264,7 @@ def _load_seating_plan() -> 'pd.DataFrame':
 
 def _get_theme_config(theme: str) -> dict[str, object]:
     """Get configuration for a specific theme."""
-    configs = {
+    configs: dict[str, dict[str, object]] = {
         "scoreboard": {
             "colors": {
                 1: "#00ff00",  # Neon green for yes
@@ -376,11 +396,11 @@ def _get_theme_config(theme: str) -> dict[str, object]:
 
 
 def _plot_point_theme(
-    data: 'pd.DataFrame',
-    ax: object,
+    data: "pd.DataFrame",
+    ax: "matplotlib.axes.Axes",
     theme_config: dict[str, object],
     point_shape: str,
-    point_size: int
+    point_size: int,
 ) -> None:
     """Plot visualization using points/markers."""
     import pandas as pd
@@ -406,7 +426,7 @@ def _plot_point_theme(
     for _, row in unique_decisions.iterrows():
         if pd.notna(row["Decision"]):
             decision = int(row["Decision"])
-            color = theme_config["colors"].get(decision, "white")
+            color = theme_config["colors"].get(decision, "white")  # type: ignore
             alpha = 0.1 if row["highlight"] == 1 else 1.0
 
             ax.scatter(
@@ -421,9 +441,7 @@ def _plot_point_theme(
 
 
 def _plot_polygon_theme(
-    data: 'pd.DataFrame',
-    ax: object,
-    theme_config: dict[str, object]
+    data: "pd.DataFrame", ax: "matplotlib.axes.Axes", theme_config: dict[str, object]
 ) -> None:
     """Plot visualization using filled polygons."""
     import pandas as pd
@@ -437,7 +455,7 @@ def _plot_polygon_theme(
             decision = seat_data["Decision"].iloc[0]
             if pd.notna(decision):
                 decision = int(decision)
-                color = theme_config["colors"].get(decision, "#f0f0f0")
+                color = theme_config["colors"].get(decision, "#f0f0f0")  # type: ignore
 
                 # Apply alpha based on highlight
                 alpha = 0.1 if seat_data["highlight"].iloc[0] == 1 else 1.0
@@ -456,11 +474,11 @@ def _plot_polygon_theme(
 
 
 def _add_results(
-    data: 'pd.DataFrame',
-    ax: object,
+    data: "pd.DataFrame",
+    ax: "matplotlib.axes.Axes",
     theme_config: dict[str, object],
     result_size: int,
-    has_highlight: bool
+    has_highlight: bool,
 ) -> None:
     """Add voting result annotations to the plot."""
     # Get unique persons (one per seat)
@@ -493,15 +511,15 @@ def _add_results(
         )
 
     # Add annotations for each decision type
-    result_x = theme_config["result_x"]
-    result_y = theme_config["result_y"]
+    result_x = cast(float, theme_config["result_x"])
+    result_y = cast(list, theme_config["result_y"])
 
     for idx, decision in enumerate([1, 2, 3]):
         if decision in vote_counts["Decision"].values:
             row = vote_counts[vote_counts["Decision"] == decision].iloc[0]
             count = row["count"]
             decision_text = row["DecisionText"]
-            color = theme_config["colors"][decision]
+            color = theme_config["colors"][decision]  # type: ignore
 
             if has_highlight:
                 highlight_count = row["highlight_count"]
