@@ -4,11 +4,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 ### Changed
-- BC-Break: Python 3.8 is now required
+- BC-Break: Python 3.9 is now required
 - Switched from `flit` to `uv` to install dependencies, build and publish the package
 
 ### Added
 - Added the plotting functionality from [`ggswissparl`](https://github.com/zumbov2/swissparl#ggswissparl) (Issue #9)
+- Added type hints in the library
 
 ## [0.3.0] - 2023-08-31
 ### Added
