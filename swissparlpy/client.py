@@ -5,7 +5,6 @@ import pyodata
 from . import errors
 from typing import Optional, Union, Callable, Iterator
 
-
 try:
     import pandas as pd
 
@@ -112,14 +111,12 @@ class SwissParlResponse(object):
         while limit >= len(self.data):
             try:
                 self._load_new_data()
-                log.debug(
-                    f"""
+                log.debug(f"""
                     New data loaded:
                     - limit={limit}
                     - len(data)={len(self.data)}
                     - count={self.count}
-                    """
-                )
+                    """)
             except errors.NoMoreRecordsError:
                 break
 
