@@ -6,12 +6,12 @@ build-backend = "flit_core.buildapi"
 name = "swissparlpy"
 authors = [{name = "Stefan Oderbolz", email = "odi@metaodi.ch"}]
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
     "requests",
-    "pyodata>=1.10.0",
+    "pyodata>=1.11.1",
 ]
 
 [project.optional-dependencies]
