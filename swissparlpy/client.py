@@ -11,11 +11,6 @@ try:
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
-    warnings.warn(
-        "pandas is not installed. Install it with "
-        "'pip install pandas' to use to_dataframe().",
-        ImportWarning,
-    )
 
 SERVICE_URL = "https://ws.parlament.ch/odata.svc/"
 log = logging.getLogger(__name__)
@@ -175,7 +170,10 @@ class SwissParlResponse(object):
 
     def to_dataframe(self) -> "pd.DataFrame":
         if not PANDAS_AVAILABLE:
-            raise ImportError("pandas is required to use to_dataframe()")
+            raise ImportError(
+                "pandas is not installed. Install it with "
+                "'pip install pandas' to use to_dataframe()."
+            )
 
         self._load_new_data_until(self.count)
         return pd.DataFrame(list(self))

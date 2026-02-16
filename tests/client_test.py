@@ -140,9 +140,7 @@ class TestClient(SwissParlTestCase):
                 client_module.PANDAS_AVAILABLE = False
 
                 # Attempt to call to_dataframe() should raise ImportError
-                with pytest.raises(
-                    ImportError, match="pandas is required to use to_dataframe"
-                ):
+                with pytest.raises(ImportError, match="pandas is not installed"):
                     business.to_dataframe()
             finally:
                 # Restore original value
