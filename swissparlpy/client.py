@@ -91,7 +91,7 @@ class SwissParlResponse(object):
             else:
                 entities = self.entity_request.execute()
         except pyodata.exceptions.HttpError as e:
-            if "Execution Timeout Expired." in e.response.content.decode('utf-8'):
+            if "Execution Timeout Expired." in e.response.content.decode("utf-8"):
                 raise errors.TimeoutError("The server returned a timeout error") from e
             raise errors.SwissParlError("The server returned a HTTP error") from e
 
@@ -111,14 +111,12 @@ class SwissParlResponse(object):
         while limit >= len(self.data):
             try:
                 self._load_new_data()
-                log.debug(
-                    f"""
+                log.debug(f"""
                     New data loaded:
                     - limit={limit}
                     - len(data)={len(self.data)}
                     - count={self.count}
-                    """
-                )
+                    """)
             except errors.NoMoreRecordsError:
                 break
 
