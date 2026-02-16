@@ -87,7 +87,9 @@ class SwissParlResponse(object):
         log.debug(f"Load data, next_url={next_url}")
         try:
             if next_url:
-                entities = self.entity_request.next_url(next_url).execute()  # type: ignore[attr-defined]
+                entities = self.entity_request.next_url(  # type: ignore[attr-defined]
+                    next_url
+                ).execute()
             else:
                 entities = self.entity_request.execute()  # type: ignore[attr-defined]
         except pyodata.exceptions.HttpError as e:
