@@ -8,7 +8,7 @@ from .client import SwissParlClient  # noqa
 from .client import SwissParlResponse  # noqa
 from .visualization import plot_voting  # noqa
 from pyodata.v2.service import GetEntitySetFilter as Filter  # noqa
-from typing import Callable, Union
+from typing import Callable, Union, Any
 
 
 def get_tables() -> list[str]:
@@ -32,7 +32,7 @@ def get_glimpse(table: str, rows: int = 5) -> object:
 
 
 def get_data(
-    table: str, filter: Union[str, Callable, None] = None, **kwargs: dict
+    table: str, filter: Union[str, Callable, None] = None, **kwargs: Any
 ) -> "SwissParlResponse":
     client = SwissParlClient()
     return client.get_data(table, filter, **kwargs)

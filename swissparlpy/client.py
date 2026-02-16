@@ -3,7 +3,7 @@ import warnings
 import requests
 import pyodata
 from . import errors
-from typing import Optional, Union, Callable, Iterator
+from typing import Optional, Union, Callable, Iterator, Any
 
 try:
     import pandas as pd
@@ -60,7 +60,7 @@ class SwissParlClient(object):
         )
 
     def get_data(
-        self, table: str, filter: Union[str, Callable, None] = None, **kwargs: dict
+        self, table: str, filter: Union[str, Callable, None] = None, **kwargs: Any
     ) -> "SwissParlResponse":
         entities = self._get_entities(table)
         if filter and callable(filter):
