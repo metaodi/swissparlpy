@@ -15,6 +15,12 @@ from typing import Union, Optional, cast
 
 try:
     import pandas as pd
+
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+
+try:
     import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
     import matplotlib.axes
@@ -23,9 +29,19 @@ try:
     MATPLOTLIB_AVAILABLE = True
 except ImportError:
     MATPLOTLIB_AVAILABLE = False
+
+# Warn if either dependency is missing
+if not PANDAS_AVAILABLE or not MATPLOTLIB_AVAILABLE:
+    missing = []
+    if not PANDAS_AVAILABLE:
+        missing.append("pandas")
+    if not MATPLOTLIB_AVAILABLE:
+        missing.append("matplotlib")
+    is_are = "is" if len(missing) == 1 else "are"
     warnings.warn(
-        "matplotlib and/or pandas is not installed. Install them with "
-        "'pip install matplotlib pandas' to use visualization features.",
+        f"{' and '.join(missing)} {is_are} not installed. "
+        f"Install with 'pip install {' '.join(missing)}' "
+        "to use visualization features.",
         ImportWarning,
     )
 
@@ -41,7 +57,7 @@ def _load_seating_plan() -> "pd.DataFrame":
             "Please ensure the package is properly installed."
         )
 
-    if not MATPLOTLIB_AVAILABLE:
+    if not PANDAS_AVAILABLE:
         raise ImportError(
             "pandas is required for visualization. "
             "Install it with: pip install pandas"
@@ -132,10 +148,16 @@ def plot_voting(  # noqa: C901
     if not client:
         client = SwissParlClient()
 
-    if not MATPLOTLIB_AVAILABLE:
+    if not PANDAS_AVAILABLE or not MATPLOTLIB_AVAILABLE:
+        missing = []
+        if not PANDAS_AVAILABLE:
+            missing.append("pandas")
+        if not MATPLOTLIB_AVAILABLE:
+            missing.append("matplotlib")
+        is_are = "is" if len(missing) == 1 else "are"
         raise ImportError(
-            "matplotlib is required for visualization. "
-            "Install it with: pip install matplotlib"
+            f"{' and '.join(missing)} {is_are} required for visualization. "
+            f"Install with: pip install {' '.join(missing)}"
         )
 
     # Convert votes to DataFrame if it's a list or SwissParlResponse
