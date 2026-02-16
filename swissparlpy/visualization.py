@@ -202,7 +202,7 @@ def plot_voting(  # noqa: C901
             if votes_df["IdLegislativePeriod"].iloc[0] != current_legis_id:
                 warnings.warn(
                     "The voting data is not from the current legislative period. "
-                    "Seating data mightnot be up-to-date. "
+                    "Seating data might not be up-to-date. "
                     "Consider providing seating data explicitly for "
                     "the correct legislative period."
                 )
