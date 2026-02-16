@@ -32,7 +32,7 @@ def get_overview() -> dict[str, list[str]]:
     return client.get_overview()
 
 
-def get_glimpse(table: str, rows: int = 5) -> object:
+def get_glimpse(table: str, rows: int = 5) -> "SwissParlResponse":
     client = SwissParlClient()
     return client.get_glimpse(table, rows)
 
