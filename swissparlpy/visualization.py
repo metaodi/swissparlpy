@@ -13,7 +13,6 @@ from . import SwissParlResponse
 from . import SwissParlClient
 from typing import Union, Optional, cast
 
-
 try:
     import pandas as pd
     import matplotlib.pyplot as plt

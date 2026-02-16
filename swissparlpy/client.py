@@ -5,7 +5,6 @@ import pyodata
 from . import errors
 from typing import Optional, Union, Callable, Iterator
 
-
 try:
     import pandas as pd
 
