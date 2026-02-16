@@ -281,8 +281,8 @@ def plot_voting(  # noqa: C901
     # Configure axes
     ax.set_aspect("equal")
     ax.axis("off")
-    ax.set_facecolor(theme_config["bg_color"])
-    fig.patch.set_facecolor(theme_config["bg_color"])
+    ax.set_facecolor(cast(str, theme_config["bg_color"]))
+    fig.patch.set_facecolor(cast(str, theme_config["bg_color"]))
 
     return fig
 
@@ -514,7 +514,7 @@ def _add_results(
         unique_persons[unique_persons["Decision"].isin([1, 2, 3])]
         .groupby(["Decision", "DecisionText"])
         .size()
-        .reset_index(name="count")
+        .reset_index(name="count")  # type: ignore[call-overload]
     )
 
     # If highlighting, also count highlighted votes
@@ -526,7 +526,7 @@ def _add_results(
             ]
             .groupby(["Decision", "DecisionText"])
             .size()
-            .reset_index(name="highlight_count")
+            .reset_index(name="highlight_count")  # type: ignore[call-overload]
         )
         vote_counts = vote_counts.merge(
             highlighted_counts, on=["Decision", "DecisionText"], how="left"
