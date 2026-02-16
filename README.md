@@ -16,6 +16,7 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Get tables and their variables](#get-tables-and-their-variables)
     * [Get data of a table](#get-data-of-a-table)
     * [Use together with `pandas`](#use-together-with-pandas)
+    * [Visualize voting results](#visualize-voting-results)
     * [Substrings](#substrings)
     * [Date ranges](#date-ranges)
     * [Advanced filter](#advanced-filter)
@@ -32,6 +33,12 @@ This module provides easy access to the data of the [OData webservice](https://w
 
 ```
 $ pip install swissparlpy
+```
+
+To install with visualization support (for plotting voting results):
+
+```
+$ pip install swissparlpy[visualization]
 ```
 
 ## Usage
@@ -97,6 +104,48 @@ To create a pandas DataFrame from `get_data` simply pass the return value to the
 
 [83 rows x 8 columns]
 ```
+
+### Visualize voting results
+
+The `plot_voting` function allows you to visualize voting results of the Swiss National Council according to the seating order, similar to the `ggswissparl` function from the R package.
+
+**Note**: This feature requires matplotlib. Install with: `pip install swissparlpy[visualization]`
+
+```python
+>>> import swissparlpy as spp
+>>> import matplotlib.pyplot as plt
+>>> 
+>>> # Get voting data for a specific vote
+>>> votes = spp.get_data("Voting", Language="DE", IdVote=23458)
+>>> 
+>>> # Create visualization with default scoreboard theme
+>>> fig = spp.plot_voting(votes, theme='scoreboard', result=True)
+>>> plt.show()
+```
+
+![Voting visualization example with scoreboard](https://github.com/user-attachments/assets/314c178c-e281-43b0-84ac-d5da501e218b)
+
+The function supports different themes:
+- `scoreboard`: Imitates the council hall scoreboard (neon colors on black background)
+- `sym1`, `sym2`: Colored symbols on light background
+- `poly1`, `poly2`, `poly3`: Color-filled polygons with different edge styles
+
+You can also highlight specific parliamentary groups:
+
+```python
+>>> # Highlight a parliamentary group
+>>> fig = spp.plot_voting(
+...     votes_df, 
+...     theme='poly1',
+...     highlight={'ParlGroupCode': ["S"]},
+...     result=True
+... )
+>>> plt.show()
+```
+
+![Voting visualization example with poly1 and a highlighted group](https://github.com/user-attachments/assets/a11ecf2b-a966-4e21-b5ec-e99e60f06c89)
+
+See the [visualization example](/examples/visualize_voting.py) for more details.
 
 ### Substrings
 
@@ -246,11 +295,17 @@ This library is inspired by the R package [swissparl](https://github.com/zumbov2
 
 ## Development
 
-To develop on this project, install `flit`:
+To develop on this project, install `uv`:
 
 ```
-pip install flit
-flit install -s
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv pip install -e ".[dev,test]"
+```
+
+Alternatively, use the provided setup script:
+
+```
+./dev_setup.sh
 ```
 
 ## Release

@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project follows [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- BC-Break: Python 3.8 is now required
+- Switched from `flit` to `uv` to install dependencies, build and publish the package
+
+### Added
+- Added the plotting functionality from [`ggswissparl`](https://github.com/zumbov2/swissparl#ggswissparl) (Issue #9)
 
 ## [0.3.0] - 2023-08-31
 ### Added

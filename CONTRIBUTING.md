@@ -8,23 +8,29 @@ Fork and clone this repository:
 git clone git@github.com:your-username/swissparlpy.git
 ```
 
-Install the dependencies using `flit`:
+Install the dependencies using `uv`:
 
 ```bash
-pip install flit
-flit install -s
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv pip install -e ".[dev,test,visualization]"
+```
+
+Or use the provided setup script:
+
+```bash
+./dev_setup.sh
 ```
 
 Make sure the tests pass:
 
 ```bash
-pytest
+uv run pytest
 ```
 
 To ensure a good quality of the code use `flake8` to check the code style:
 
 ```bash
-flake8 --install-hook git
+uv run flake8 --install-hook git
 ```
 
 ## Create a pull request
