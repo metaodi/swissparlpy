@@ -3,7 +3,6 @@ on:
     push:
         branches: [main, develop]
     pull_request:
-        branches: [main, develop]
     workflow_dispatch:
 jobs:
   build_python:
@@ -11,7 +10,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v2

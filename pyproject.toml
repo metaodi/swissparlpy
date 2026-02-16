@@ -1,12 +1,8 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
 name = "swissparlpy"
 authors = [{name = "Stefan Oderbolz", email = "odi@metaodi.ch"}]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version"]
 description = "Client for Swiss parliament API"
@@ -26,18 +22,35 @@ test = [
 ]
 dev = [
     "jupyter",
-    "pandas",
     "black[jupyter]>=24.0.0,<25.0.0",
     "pre-commit",
+    "mypy",
+    "types-requests",
+    "pandas-stubs",
 ]
 visualization = [
     "matplotlib>=3.0.0",
     "pandas",
 ]
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project.urls]
 Home = "https://github.com/metaodi/swissparlpy"
 
 [tool.hatch.version]
 path = "swissparlpy/__init__.py"
+
+[tool.pytest.ini_options]
+addopts = "--cov=swissparlpy"
+
+[tool.mypy]
+python_version = "3.9"
+ignore_missing_imports = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_return_any = true
+show_error_codes = true
+pretty = true
