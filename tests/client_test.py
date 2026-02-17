@@ -4,7 +4,7 @@ from swissparlpy.client import SwissParlResponse
 from swissparlpy import errors
 import responses
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 import pyodata.exceptions
 
 SERVICE_URL = "https://ws.parlament.ch/odata.svc"

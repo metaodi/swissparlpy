@@ -103,7 +103,7 @@ class SwissParlResponse(object):
                 else:
                     content = getattr(response, "content", b"")
                     if isinstance(content, str):
-                        content_bytes = content.encode("utf-8", errors="ignore")
+                        content_bytes = content.encode("utf-8", errors="replace")
                     else:
                         content_bytes = content or b""
                     if b"Execution Timeout Expired." in content_bytes:
