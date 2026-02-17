@@ -109,7 +109,8 @@ class SwissParlResponse(object):
                     if b"Execution Timeout Expired." in content_bytes:
                         is_timeout = True
             if is_timeout:
-                raise errors.TimeoutError("The server returned a timeout error") from e
+                raise errors.SwissParlTimeoutError("The server returned a timeout error") from e
+
             raise errors.SwissParlError("The server returned a HTTP error") from e
 
         return entities
