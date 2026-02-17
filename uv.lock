@@ -4693,7 +4693,7 @@ requires-dist = [
     { name = "pandas", marker = "extra == 'visualization'" },
     { name = "pandas-stubs", marker = "extra == 'dev'" },
     { name = "pre-commit", marker = "extra == 'dev'" },
-    { name = "pyodata", specifier = ">=1.10.0" },
+    { name = "pyodata", specifier = ">=1.11.1" },
     { name = "pytest", marker = "extra == 'test'" },
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "requests" },
