@@ -164,7 +164,7 @@ class TestClient(SwissParlTestCase):
 
         # Create a SwissParlResponse with the mock request
         with pytest.raises(
-            errors.TimeoutError, match="The server returned a timeout error"
+            errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
             SwissParlResponse(mock_request, ["ID", "Title"])
 
@@ -183,7 +183,7 @@ class TestClient(SwissParlTestCase):
 
         # Create a SwissParlResponse with the mock request
         with pytest.raises(
-            errors.TimeoutError, match="The server returned a timeout error"
+            errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
             SwissParlResponse(mock_request, ["ID", "Title"])
 
@@ -204,7 +204,7 @@ class TestClient(SwissParlTestCase):
 
         # Create a SwissParlResponse with the mock request
         with pytest.raises(
-            errors.TimeoutError, match="The server returned a timeout error"
+            errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
             SwissParlResponse(mock_request, ["ID", "Title"])
 
@@ -241,7 +241,7 @@ class TestClient(SwissParlTestCase):
 
         # Create a SwissParlResponse with the mock request
         with pytest.raises(
-            errors.TimeoutError, match="The server returned a timeout error"
+            errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
             SwissParlResponse(mock_request, ["ID", "Title"])
 
