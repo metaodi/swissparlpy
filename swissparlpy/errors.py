@@ -10,7 +10,7 @@ class NoMoreRecordsError(SwissParlError):
     """
 
 
-class TimeoutError(SwissParlError):
+class SwissParlTimeoutError(SwissParlError):
     """
     Error to indicate, that the server returned a timeout error.
     """
