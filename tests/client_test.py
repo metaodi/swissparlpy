@@ -1,8 +1,11 @@
 from swissparlpy_test import SwissParlTestCase
 from swissparlpy.client import SwissParlClient
 from swissparlpy.client import SwissParlResponse
+from swissparlpy import errors
 import responses
 import pytest
+from unittest.mock import Mock
+import pyodata.exceptions
 
 SERVICE_URL = "https://ws.parlament.ch/odata.svc"
 
@@ -145,3 +148,119 @@ class TestClient(SwissParlTestCase):
             finally:
                 # Restore original value
                 client_module.PANDAS_AVAILABLE = original_pandas_available
+
+    def test_timeout_http_status_408(self):
+        """Test that HTTP 408 status code is treated as a timeout"""
+        # Create a mock entity request
+        mock_request = Mock()
+
+        # Create a mock HttpError with status code 408
+        mock_response = Mock()
+        mock_response.status_code = 408
+        mock_response.content = b"Request Timeout"
+
+        http_error = pyodata.exceptions.HttpError("Request Timeout", mock_response)
+        mock_request.execute.side_effect = http_error
+
+        # Create a SwissParlResponse with the mock request
+        with pytest.raises(
+            errors.SwissParlTimeoutError, match="The server returned a timeout error"
+        ):
+            SwissParlResponse(mock_request, ["ID", "Title"])
+
+    def test_timeout_http_status_504(self):
+        """Test that HTTP 504 status code is treated as a timeout"""
+        # Create a mock entity request
+        mock_request = Mock()
+
+        # Create a mock HttpError with status code 504
+        mock_response = Mock()
+        mock_response.status_code = 504
+        mock_response.content = b"Gateway Timeout"
+
+        http_error = pyodata.exceptions.HttpError("Gateway Timeout", mock_response)
+        mock_request.execute.side_effect = http_error
+
+        # Create a SwissParlResponse with the mock request
+        with pytest.raises(
+            errors.SwissParlTimeoutError, match="The server returned a timeout error"
+        ):
+            SwissParlResponse(mock_request, ["ID", "Title"])
+
+    def test_timeout_execution_timeout_message(self):
+        """Test that 'Execution Timeout Expired.' message is detected as timeout"""
+        # Create a mock entity request
+        mock_request = Mock()
+
+        # Create a mock HttpError with the timeout message
+        mock_response = Mock()
+        mock_response.status_code = 500
+        mock_response.content = b"Error: Execution Timeout Expired. Please try again."
+
+        http_error = pyodata.exceptions.HttpError(
+            "Internal Server Error", mock_response
+        )
+        mock_request.execute.side_effect = http_error
+
+        # Create a SwissParlResponse with the mock request
+        with pytest.raises(
+            errors.SwissParlTimeoutError, match="The server returned a timeout error"
+        ):
+            SwissParlResponse(mock_request, ["ID", "Title"])
+
+    def test_timeout_no_response_object(self):
+        """Test that HttpError without response object is handled correctly"""
+        # Create a mock entity request
+        mock_request = Mock()
+
+        # Create a HttpError without a response attribute
+        http_error = pyodata.exceptions.HttpError("Network error", None)
+        mock_request.execute.side_effect = http_error
+
+        # Create a SwissParlResponse with the mock request
+        # Should raise SwissParlError, not TimeoutError
+        with pytest.raises(
+            errors.SwissParlError, match="The server returned a HTTP error"
+        ):
+            SwissParlResponse(mock_request, ["ID", "Title"])
+
+    def test_timeout_string_content(self):
+        """Test that string content is handled correctly"""
+        # Create a mock entity request
+        mock_request = Mock()
+
+        # Create a mock HttpError with string content
+        mock_response = Mock()
+        mock_response.status_code = 500
+        mock_response.content = "Error: Execution Timeout Expired. Please try again."
+
+        http_error = pyodata.exceptions.HttpError(
+            "Internal Server Error", mock_response
+        )
+        mock_request.execute.side_effect = http_error
+
+        # Create a SwissParlResponse with the mock request
+        with pytest.raises(
+            errors.SwissParlTimeoutError, match="The server returned a timeout error"
+        ):
+            SwissParlResponse(mock_request, ["ID", "Title"])
+
+    def test_non_timeout_http_error(self):
+        """Test that non-timeout HTTP errors are handled correctly"""
+        # Create a mock entity request
+        mock_request = Mock()
+
+        # Create a mock HttpError with a non-timeout error
+        mock_response = Mock()
+        mock_response.status_code = 404
+        mock_response.content = b"Not Found"
+
+        http_error = pyodata.exceptions.HttpError("Not Found", mock_response)
+        mock_request.execute.side_effect = http_error
+
+        # Create a SwissParlResponse with the mock request
+        # Should raise SwissParlError, not TimeoutError
+        with pytest.raises(
+            errors.SwissParlError, match="The server returned a HTTP error"
+        ):
+            SwissParlResponse(mock_request, ["ID", "Title"])

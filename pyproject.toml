@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "Client for Swiss parliament API"
 dependencies = [
     "requests",
-    "pyodata>=1.10.0",
+    "pyodata>=1.11.1",
 ]
 
 [project.optional-dependencies]

@@ -10,6 +10,12 @@ class NoMoreRecordsError(SwissParlError):
     """
 
 
+class SwissParlTimeoutError(SwissParlError):
+    """
+    Error to indicate, that the server returned a timeout error.
+    """
+
+
 class SwissParlWarning(Warning):
     """
     General SwissParl warning class to provide a superclass for all warnings

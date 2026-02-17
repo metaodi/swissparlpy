@@ -85,10 +85,35 @@ class SwissParlResponse(object):
 
     def load(self, next_url: Union[str, None] = None) -> object:
         log.debug(f"Load data, next_url={next_url}")
-        if next_url:
-            entities = self.entity_request.next_url(next_url).execute()  # type: ignore
-        else:
-            entities = self.entity_request.execute()  # type: ignore
+        try:
+            if next_url:
+                entities = self.entity_request.next_url(  # type: ignore[attr-defined]
+                    next_url
+                ).execute()
+            else:
+                entities = self.entity_request.execute()  # type: ignore[attr-defined]
+        except pyodata.exceptions.HttpError as e:
+            is_timeout = False
+            response = getattr(e, "response", None)
+            if response is not None:
+                status_code = getattr(response, "status_code", None)
+                # Treat common HTTP timeout / gateway timeout status codes as timeouts.
+                if status_code in (408, 504):
+                    is_timeout = True
+                else:
+                    content = getattr(response, "content", b"")
+                    if isinstance(content, str):
+                        content_bytes = content.encode("utf-8", errors="replace")
+                    else:
+                        content_bytes = content or b""
+                    if b"Execution Timeout Expired." in content_bytes:
+                        is_timeout = True
+            if is_timeout:
+                raise errors.SwissParlTimeoutError(
+                    "The server returned a timeout error"
+                ) from e
+
+            raise errors.SwissParlError("The server returned a HTTP error") from e
 
         return entities
 
