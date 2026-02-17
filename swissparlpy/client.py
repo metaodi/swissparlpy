@@ -93,7 +93,7 @@ class SwissParlResponse(object):
             else:
                 entities = self.entity_request.execute()  # type: ignore[attr-defined]
         except pyodata.exceptions.HttpError as e:
-            if "Execution Timeout Expired." in e.response.content.decode("utf-8"):
+            if "Execution Timeout Expired." in e.response.content.decode("utf-8", errors="replace"):
                 raise errors.TimeoutError("The server returned a timeout error") from e
             raise errors.SwissParlError("The server returned a HTTP error") from e
 
