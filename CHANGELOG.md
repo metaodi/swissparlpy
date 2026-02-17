@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added the plotting functionality from [`ggswissparl`](https://github.com/zumbov2/swissparl#ggswissparl) (Issue #9)
 - Added type hints in the library
 - Add to_dataframe() convenience method to SwissParlResponse to directly transform a result to a DataFrame
+- Detect server timeout and raise `SwissParlTimeoutError` if necessary
 
 ## [0.3.0] - 2023-08-31
 ### Added
