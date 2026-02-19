@@ -1,6 +1,7 @@
 from swissparlpy_test import SwissParlTestCase
 from swissparlpy.client import SwissParlClient
 from swissparlpy.client import SwissParlResponse
+from swissparlpy.backends.odata import ODataResponse
 from swissparlpy import errors
 import responses
 import pytest
@@ -162,11 +163,11 @@ class TestClient(SwissParlTestCase):
         http_error = pyodata.exceptions.HttpError("Request Timeout", mock_response)
         mock_request.execute.side_effect = http_error
 
-        # Create a SwissParlResponse with the mock request
+        # Create an ODataResponse with the mock request
         with pytest.raises(
             errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
-            SwissParlResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, ["ID", "Title"])
 
     def test_timeout_http_status_504(self):
         """Test that HTTP 504 status code is treated as a timeout"""
@@ -181,11 +182,11 @@ class TestClient(SwissParlTestCase):
         http_error = pyodata.exceptions.HttpError("Gateway Timeout", mock_response)
         mock_request.execute.side_effect = http_error
 
-        # Create a SwissParlResponse with the mock request
+        # Create an ODataResponse with the mock request
         with pytest.raises(
             errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
-            SwissParlResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, ["ID", "Title"])
 
     def test_timeout_execution_timeout_message(self):
         """Test that 'Execution Timeout Expired.' message is detected as timeout"""
@@ -202,11 +203,11 @@ class TestClient(SwissParlTestCase):
         )
         mock_request.execute.side_effect = http_error
 
-        # Create a SwissParlResponse with the mock request
+        # Create an ODataResponse with the mock request
         with pytest.raises(
             errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
-            SwissParlResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, ["ID", "Title"])
 
     def test_timeout_no_response_object(self):
         """Test that HttpError without response object is handled correctly"""
@@ -217,12 +218,12 @@ class TestClient(SwissParlTestCase):
         http_error = pyodata.exceptions.HttpError("Network error", None)
         mock_request.execute.side_effect = http_error
 
-        # Create a SwissParlResponse with the mock request
+        # Create an ODataResponse with the mock request
         # Should raise SwissParlError, not TimeoutError
         with pytest.raises(
             errors.SwissParlError, match="The server returned a HTTP error"
         ):
-            SwissParlResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, ["ID", "Title"])
 
     def test_timeout_string_content(self):
         """Test that string content is handled correctly"""
@@ -239,11 +240,11 @@ class TestClient(SwissParlTestCase):
         )
         mock_request.execute.side_effect = http_error
 
-        # Create a SwissParlResponse with the mock request
+        # Create an ODataResponse with the mock request
         with pytest.raises(
             errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
-            SwissParlResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, ["ID", "Title"])
 
     def test_non_timeout_http_error(self):
         """Test that non-timeout HTTP errors are handled correctly"""
@@ -258,9 +259,9 @@ class TestClient(SwissParlTestCase):
         http_error = pyodata.exceptions.HttpError("Not Found", mock_response)
         mock_request.execute.side_effect = http_error
 
-        # Create a SwissParlResponse with the mock request
+        # Create an ODataResponse with the mock request
         # Should raise SwissParlError, not TimeoutError
         with pytest.raises(
             errors.SwissParlError, match="The server returned a HTTP error"
         ):
-            SwissParlResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, ["ID", "Title"])
