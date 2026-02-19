@@ -7,12 +7,13 @@
 swissparlpy
 ===========
 
-This module provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss parliament](https://www.parlament.ch/en).
+This module provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss parliament](https://www.parlament.ch/en) and the [OpenParlData.ch](https://openparldata.ch) REST API.
 
 ## Table of Contents
 
 * [Installation](#installation)
 * [Usage](#usage)
+    * [Backend Selection](#backend-selection)
     * [Get tables and their variables](#get-tables-and-their-variables)
     * [Get data of a table](#get-data-of-a-table)
     * [Use together with `pandas`](#use-together-with-pandas)
@@ -44,6 +45,44 @@ $ pip install swissparlpy[visualization]
 ## Usage
 
 See the [`examples` directory](/examples) for more scripts.
+
+### Backend Selection
+
+swissparlpy supports multiple data backends. By default, it uses the official OData API, but you can also use the OpenParlData.ch REST API.
+
+**Using the default OData backend:**
+
+```python
+>>> import swissparlpy as spp
+>>> tables = spp.get_tables()  # Uses OData by default
+```
+
+**Using the OpenParlData backend:**
+
+```python
+>>> import swissparlpy as spp
+>>> tables = spp.get_tables(backend='openparldata')
+>>> data = spp.get_data('cantons', backend='openparldata')
+```
+
+**Using backends with SwissParlClient:**
+
+```python
+>>> from swissparlpy import SwissParlClient
+>>> from swissparlpy.backends import ODataBackend, OpenParlDataBackend
+>>>
+>>> # OData backend
+>>> odata_client = SwissParlClient(backend=ODataBackend())
+>>> tables = odata_client.get_tables()
+>>>
+>>> # OpenParlData backend
+>>> opd_client = SwissParlClient(backend=OpenParlDataBackend())
+>>> tables = opd_client.get_tables()
+```
+
+All module-level functions (`get_tables()`, `get_variables()`, `get_overview()`, `get_glimpse()`, `get_data()`) support the `backend` parameter.
+
+**Note:** The OpenParlData backend is still under development. The actual API endpoints and query parameters may need to be adjusted based on the final OpenParlData.ch API specification.
 
 ### Get tables and their variables
 
