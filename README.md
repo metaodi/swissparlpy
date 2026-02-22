@@ -48,13 +48,13 @@ See the [`examples` directory](/examples) for more scripts.
 
 ### Backend Selection
 
-swissparlpy supports multiple data backends. By default, it uses the official OData API, but you can also use the OpenParlData.ch REST API.
+swissparlpy supports multiple data backends. By default, it uses the official OData API of parlament.ch, but you can also use the OpenParlData.ch REST API.
 
-**Using the default OData backend:**
+**Using the default OData (parlament.ch) backend:**
 
 ```python
 >>> import swissparlpy as spp
->>> tables = spp.get_tables()  # Uses OData by default
+>>> tables = spp.get_tables()  # Uses OData service of parlament.ch by default
 ```
 
 **Using the OpenParlData backend:**

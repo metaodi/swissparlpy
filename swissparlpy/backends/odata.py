@@ -4,7 +4,7 @@ import logging
 import warnings
 import requests
 import pyodata
-from .base import BaseBackend
+from .base import BaseBackend, BaseResponse
 from .. import errors
 from typing import Optional, Union, Callable, Any
 
@@ -73,16 +73,24 @@ class ODataBackend(BaseBackend):
         return getattr(self.client.entity_sets, table).get_entities()
 
 
-class ODataResponse(object):
+class ODataResponse(BaseResponse):
     """Response wrapper for OData queries"""
 
     def __init__(self, entity_request: object, variables: list[str]) -> None:
-        self.variables = variables
+        self._variables = variables
         self.data: list["ODataProxy"] = []
         self.count = 0
         self.entity_request = entity_request
         entities = self.load()
         self._parse_data(entities)
+
+    @property
+    def _records_loaded_count(self) -> int:
+        return len(self.data)
+
+    @property
+    def variables(self) -> list[str]:
+        return self._variables
 
     def load(self, next_url: Union[str, None] = None) -> object:
         log.debug(f"Load data, next_url={next_url}")

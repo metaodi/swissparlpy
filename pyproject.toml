@@ -40,6 +40,9 @@ build-backend = "hatchling.build"
 [project.urls]
 Home = "https://github.com/metaodi/swissparlpy"
 
+[tool.black]
+target-version = ["py39", "py310", "py311", "py312"]
+
 [tool.hatch.version]
 path = "swissparlpy/__init__.py"
 

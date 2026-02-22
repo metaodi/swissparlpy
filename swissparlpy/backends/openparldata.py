@@ -2,138 +2,153 @@
 
 import logging
 import requests
-from .base import BaseBackend
+from .base import BaseBackend, BaseResponse
 from .. import errors
 from typing import Optional, Union, Callable, Any
 
 log = logging.getLogger(__name__)
 
 OPENPARLDATA_URL = "https://api.openparldata.ch/v1"
+OPENPARLDATA_OPENAPI_URL = "https://api.openparldata.ch/openapi.json"
 
 
 class OpenParlDataBackend(BaseBackend):
     """Backend implementation for OpenParlData REST API"""
 
     def __init__(
-        self, session: Optional[requests.Session] = None, url: str = OPENPARLDATA_URL
+        self,
+        session: Optional[requests.Session] = None,
+        openapi_url: str = OPENPARLDATA_OPENAPI_URL,
     ) -> None:
         if not session:
             session = requests.Session()
-        self.url = url
         self.session = session
         self.cache: dict[str, list[str]] = {}
+        self.openapi_url = openapi_url
+        api_config = self._load_openapi_config(openapi_url)
+        self.base_url = api_config["base_url"]
+
+    def _load_openapi_config(self, openapi_url: str) -> dict[str, Any]:
+        """Load OpenAPI configuration from the given URL"""
+        resp = self._http_get_request(openapi_url)
+        data = resp.json()
+
+        api_paths = []
+        entities = set()
+        for api_path, api_details in data["paths"].items():
+            get_config = api_details.get("get", {})
+            tags = get_config.get("tags", [])
+            summary = get_config.get("summary", "")
+            api_paths.append(api_path)
+
+            # check if the path corresponds to a table/resource endpoint
+            if "List" in summary:
+                entities.update(tags)
+
+        api_config = {
+            "base_url": data.get("servers", [{"url": OPENPARLDATA_URL}])[0]["url"],
+            "tables": list(entities),
+            "endpoints": api_paths,
+        }
+        # Initialize cache with empty variable lists
+        self.cache = {table: [] for table in api_config["tables"]}
+        return api_config
+
+    def _http_get_request(self, url: str, params: dict = {}) -> requests.Response:
+        """Helper method to make HTTP requests with error handling"""
+        headers = {"user-agent": "Mozilla Firefox Mozilla/5.0; metaodi swissparlpy"}
+        if "user-agent" not in self.session.headers:
+            self.session.headers["user-agent"] = headers["user-agent"]
+
+        try:
+            r = self.session.get(url, timeout=10, params=params)
+            r.raise_for_status()
+            return r
+        except requests.exceptions.RequestException as e:
+            log.error(f"Error making GET request to {url}: {e}")
+            raise errors.SwissParlHttpRequestError(
+                f"Failed to make GET request to {url}: {e}"
+            ) from e
 
     def get_tables(self) -> list[str]:
         """
         Get list of available resources/tables from the API.
-        This will be implemented based on the API's endpoint discovery mechanism.
         """
-        # TODO: Implement based on actual API structure
-        # For now, return common parliament data tables
         if self.cache:
             return list(self.cache.keys())
 
         # Make request to discover available endpoints
-        try:
-            response = self.session.get(self.url)
-            response.raise_for_status()
-            data = response.json()
-
-            # Parse available endpoints from response
-            # The exact structure depends on the API implementation
-            if isinstance(data, dict) and "resources" in data:
-                tables = list(data["resources"].keys())
-                return tables
-            elif isinstance(data, dict):
-                # Assume keys are resource names
-                return list(data.keys())
-            else:
-                # Fallback to empty list if we can't parse
-                log.warning("Could not parse tables from API response")
-                return []
-        except requests.exceptions.RequestException as e:
-            log.error(f"Error fetching tables: {e}")
-            raise errors.SwissParlError(f"Failed to fetch tables: {e}") from e
+        self._load_openapi_config(self.openapi_url)
+        return list(self.cache.keys())
 
     def get_variables(self, table: str) -> list[str]:
         """
         Get list of variables/columns for a given table.
-        This will be implemented based on the API's schema discovery mechanism.
         """
-        if self.cache and table in self.cache:
+        if self.cache and table in self.cache and self.cache[table]:
             return self.cache[table]
 
-        # TODO: Implement based on actual API structure
-        # For now, make a sample request and parse the response schema
+        # Try to get a single record to discover the schema
+        response = self._http_get_request(
+            f"{self.base_url}/{table}", params={"limit": 1}
+        )
         try:
-            # Try to get a single record to discover the schema
-            response = self.session.get(f"{self.url}/{table}", params={"limit": 1})
-            response.raise_for_status()
-            data = response.json()
+            data = response.json()["data"][0]
+            if data:
+                self.cache[table] = list(data.keys())
 
-            # Parse schema from response
-            if isinstance(data, dict) and "results" in data and len(data["results"]) > 0:
-                # Results array format
-                return list(data["results"][0].keys())
-            elif isinstance(data, list) and len(data) > 0:
-                # Direct array format
-                return list(data[0].keys())
-            elif isinstance(data, dict) and "data" in data and len(data["data"]) > 0:
-                # Data array format
-                return list(data["data"][0].keys())
-            else:
-                log.warning(f"Could not parse variables for table {table}")
-                return []
-        except requests.exceptions.RequestException as e:
-            log.error(f"Error fetching variables for {table}: {e}")
+            return self.cache[table]
+        except (KeyError, IndexError) as e:
+            log.error(f"Error parsing response for variables of table '{table}': {e}")
             raise errors.SwissParlError(
-                f"Failed to fetch variables for {table}: {e}"
+                f"Failed to get variables for table '{table}': {e}"
             ) from e
 
     def get_glimpse(self, table: str, rows: int = 5) -> "OpenParlDataResponse":
         """Get a preview of the first N rows of a table"""
         params = {"limit": rows}
         return OpenParlDataResponse(
-            self.session, f"{self.url}/{table}", params, self.get_variables(table)
+            self.session, f"{self.base_url}/{table}", params, self.get_variables(table)
         )
 
     def get_data(
         self, table: str, filter: Union[str, Callable, None] = None, **kwargs: Any
     ) -> "OpenParlDataResponse":
         """Query data from a table with optional filters"""
-        params = {}
+        if table not in self.get_tables():
+            raise errors.TableNotFoundError(
+                f"Table '{table}' not found in OpenParlData API"
+            )
+        variables = self.get_variables(table)
 
-        # Convert kwargs to query parameters
-        # This will need to be adapted based on the actual API's query syntax
-        for key, value in kwargs.items():
-            # Handle special operators like __startswith, __contains, etc.
-            if "__" in key:
-                field, operator = key.rsplit("__", 1)
-                # Map operators to API query syntax (this is placeholder logic)
-                if operator == "startswith":
-                    params[f"{field}__startswith"] = value
-                elif operator == "contains":
-                    params[f"{field}__contains"] = value
-                elif operator in ["gt", "gte", "lt", "lte"]:
-                    params[f"{field}__{operator}"] = value
-                else:
-                    params[key] = value
-            else:
-                params[key] = value
+        params = {
+            "lang_format": "flat",
+            "lang": "en",
+            "lang_fallback": "de",
+            "search_mode": "partial",
+        }
+
+        params["search"] = ""
 
         # Handle text filter
         if filter and isinstance(filter, str):
-            params["filter"] = filter
+            params["search"] = filter
         elif filter and callable(filter):
             # Callable filters are not supported for REST API
             log.warning("Callable filters are not supported for OpenParlData backend")
 
+        # Convert kwargs to query parameters
+        for key, value in kwargs.items():
+            params[key] = value
+            if key not in variables:
+                log.warning(f"Filter key '{key}' is not a variable for table '{table}'")
+
         return OpenParlDataResponse(
-            self.session, f"{self.url}/{table}", params, self.get_variables(table)
+            self.session, f"{self.base_url}/{table}", params, self.get_variables(table)
         )
 
 
-class OpenParlDataResponse(object):
+class OpenParlDataResponse(BaseResponse):
     """Response wrapper for OpenParlData queries"""
 
     def __init__(
@@ -141,20 +156,31 @@ class OpenParlDataResponse(object):
         session: requests.Session,
         url: str,
         params: dict[str, Any],
-        variables: list[str],
+        variables: Optional[list[str]] = None,
     ) -> None:
         self.session = session
         self.url = url
         self.params = params
-        self.variables = variables
-        self.data: list[dict[str, object]] = []
+        self._variables = variables or []
+        self.data: list[OpenParlDataProxy] = []
         self.count = 0
         self.next_url: Optional[str] = None
         self._load_first_page()
 
+    @property
+    def _records_loaded_count(self) -> int:
+        return len(self.data)
+
+    @property
+    def variables(self) -> list[str]:
+        return self._variables
+
     def _load_first_page(self) -> None:
         """Load the first page of results"""
         try:
+            log.debug(
+                f"Loading first page of data from {self.url} with params {self.params}"
+            )
             response = self.session.get(self.url, params=self.params)
             response.raise_for_status()
             self._parse_response(response.json())
@@ -164,41 +190,25 @@ class OpenParlDataResponse(object):
 
     def _parse_response(self, data: Any) -> None:
         """Parse API response and extract data"""
-        # Handle different response formats
         if isinstance(data, dict):
-            # Check for common pagination patterns
-            if "results" in data:
-                # Format: {"results": [...], "next": "...", "count": 123}
-                records = data["results"]
-                self.count = data.get("count", len(records))
-                self.next_url = data.get("next")
-            elif "data" in data:
-                # Format: {"data": [...], "pagination": {...}}
-                records = data["data"]
-                pagination = data.get("pagination", {})
-                self.count = pagination.get("total", len(records))
-                self.next_url = pagination.get("next")
-            elif "items" in data:
-                # Format: {"items": [...], "total": 123, "next": "..."}
-                records = data["items"]
-                self.count = data.get("total", len(records))
-                self.next_url = data.get("next")
-            else:
-                # Assume the dict itself is a single record
-                records = [data]
-                self.count = 1
-                self.next_url = None
-        elif isinstance(data, list):
-            # Direct array of records
-            records = data
-            self.count = len(records)
-            self.next_url = None
+            records = data["data"]
+            pagination = data.get("meta", {})
+            self.count = pagination.get("total_records", len(records))
+            if pagination.get("has_more", False):
+                self.next_url = pagination.get("next_page")
+
+            # Update variables if not already set
+            if self._variables and len(records) > 0:
+                self._variables = list(records[0].keys())
+
         else:
             records = []
             self.count = 0
             self.next_url = None
 
-        self.data.extend(records)
+        # Wrap each record in a proxy object
+        for record in records:
+            self.data.append(OpenParlDataProxy(record, self))
 
     def _load_next_page(self) -> None:
         """Load the next page of results"""
@@ -223,6 +233,9 @@ class OpenParlDataResponse(object):
 
     def __len__(self) -> int:
         return self.count
+
+    def __repr__(self) -> str:
+        return self.data.__repr__()
 
     def __iter__(self) -> Any:
         """Iterate over all records, loading pages as needed"""
@@ -266,4 +279,46 @@ class OpenParlDataResponse(object):
     def to_dict_list(self) -> list[dict[str, object]]:
         """Convert all data to a list of dictionaries"""
         self._load_until(self.count)
-        return list(self.data)
+        return list(self)
+
+
+class OpenParlDataProxy(dict):
+    """Proxy for OpenParlData entity objects"""
+
+    def __init__(
+        self, record: dict[str, object], parent: "OpenParlDataResponse"
+    ) -> None:
+        super().__init__(record)
+        self.record = record
+        self.parent = parent
+
+    def __call__(self, attribute: str) -> object:
+        return self.record.get(attribute)
+
+    def __getitem__(self, key: str) -> object:
+        return self.record[key]
+
+    def follow_link(self, table: str, **kwargs: Any) -> Optional[OpenParlDataResponse]:
+        """Follow a linked table and return its data as OpenParlDataResponse"""
+        links = self.record.get("links", {})
+
+        if not isinstance(links, dict) or table not in links:
+            log.debug(f"Table {table} not found in links for this record")
+            return None
+
+        params = {
+            "lang_format": self.parent.params.get("lang_format", "flat"),
+            "lang": self.parent.params.get("lang", "en"),
+            "lang_fallback": self.parent.params.get("lang_fallback", "de"),
+            "search_mode": self.parent.params.get("search_mode", "partial"),
+        }
+        for key, value in kwargs.items():
+            params[key] = value
+
+        url = links[table]
+        return OpenParlDataResponse(
+            session=self.parent.session,
+            url=url,
+            params=params,  # Use the same params as the parent
+            variables=[],  # Let the response discover variables
+        )

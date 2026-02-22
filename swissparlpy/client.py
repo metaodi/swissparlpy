@@ -1,8 +1,7 @@
 import logging
 import requests
-from . import errors
 from .backends import ODataBackend
-from .backends.base import BaseBackend
+from .backends.base import BaseBackend, BaseResponse
 from typing import Optional, Union, Callable, Any
 
 try:
@@ -54,13 +53,17 @@ class SwissParlClient(object):
 class SwissParlResponse(object):
     """Wrapper for backend responses that provides a unified interface"""
 
-    def __init__(self, backend_response: object) -> None:
+    def __init__(self, backend_response: BaseResponse) -> None:
         # Delegate to the backend response object
         self._backend_response = backend_response
 
     @property
     def count(self) -> int:
         return len(self._backend_response)
+
+    @property
+    def _records_loaded_count(self) -> int:
+        return self._backend_response._records_loaded_count
 
     @property
     def variables(self) -> list[str]:
