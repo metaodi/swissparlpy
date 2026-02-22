@@ -28,3 +28,9 @@ def business_page1():
 def business_page2():
     """OData business data fixture"""
     return fixture_content("business_2.json")
+
+
+@pytest.fixture
+def openapi_spec():
+    """OpenParlData OpenAPI specification fixture"""
+    return fixture_content("openapi.json")

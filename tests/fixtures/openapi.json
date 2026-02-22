@@ -1,0 +1,74 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "OpenParlData API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.openparldata.ch/v1"
+    }
+  ],
+  "paths": {
+    "/cantons": {
+      "get": {
+        "summary": "List Cantons",
+        "tags": ["cantons"],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/parties": {
+      "get": {
+        "summary": "List Parties",
+        "tags": ["parties"],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/persons": {
+      "get": {
+        "summary": "List Persons",
+        "tags": ["persons"],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    }
+  }
+}
