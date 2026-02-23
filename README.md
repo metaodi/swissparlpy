@@ -96,8 +96,7 @@ All module-level functions (`get_tables()`, `get_variables()`, `get_overview()`,
 ['ID', 'Language', 'PartyNumber', 'PartyName', 'StartDate', 'EndDate', 'Modified', 'PartyAbbreviation']
 ```
 
-### Get data from a specific backend
-
+### Get data of a table
 ```python
 >>> import swissparlpy as spp
 >>> data = spp.get_data('Canton', Language='DE')
