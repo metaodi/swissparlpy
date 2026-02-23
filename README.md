@@ -16,11 +16,13 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Backend Selection](#backend-selection)
     * [Get tables and their variables](#get-tables-and-their-variables)
     * [Get data of a table](#get-data-of-a-table)
+    * [Get data from a specific backend](#get-data-from-a-specific-backend)
     * [Use together with `pandas`](#use-together-with-pandas)
     * [Visualize voting results](#visualize-voting-results)
     * [Substrings](#substrings)
     * [Date ranges](#date-ranges)
     * [Advanced filter](#advanced-filter)
+    * [Search with the `OpenParlDataBackend`]()
     * [Large queries](#large-queries)
     * [API documentation](#documentation)
     * [Similar libraries for other languages](#similar-libraries-for-other-languages)
@@ -94,7 +96,7 @@ All module-level functions (`get_tables()`, `get_variables()`, `get_overview()`,
 ['ID', 'Language', 'PartyNumber', 'PartyName', 'StartDate', 'EndDate', 'Modified', 'PartyAbbreviation']
 ```
 
-### Get data of a table
+### Get data from a specific backend
 
 ```python
 >>> import swissparlpy as spp
@@ -118,7 +120,9 @@ for rec in data[:5]:
    print(rec)
 ```
 
-**Get data from a specific backend**
+### Get data from a specific backend
+
+Use the `backend` parameter to specify which backend you want to query.
 
 ```python
 >>> import swissparlpy as spp
@@ -129,6 +133,19 @@ for rec in data[:5]:
 234
 >>> data[0]
 {'id': 11374, 'url_api': 'https://api.openparldata.ch/v1/persons/11374', 'body_key': 'LU', 'external_id': '890ce2d9430741659346d8f2d9074e77', 'external_alternative_id': None, 'title': None, 'fullname': 'Stefan Roth', 'firstname': 'Stefan', 'lastname': 'Roth', 'body_id': 261, 'party_de': 'CVP', 'party_fr': None, 'party_it': None, 'party_external_id': None, 'party_harmonized_de': 'Christlichdemokratische Volkspartei der Schweiz', 'party_harmonized_fr': 'Parti démocrate-chrétien', 'party_harmonized_it': 'Partito popolare democratico', 'party_harmonized_en': "Christian Democratic People's Party", 'party_harmonized_wikidata_id': 'Q659461', 'website_parliament_url_de': 'https://www.lu.ch/kr/mitglieder_und_organe/mitglieder/mitglieder_detail?Id=890ce2d9430741659346d8f2d9074e77', 'website_parliament_url_fr': None, 'website_parliament_url_it': None, 'image_url_external': 'https://www.lu.ch/kr/parlamentsgeschaefte/CdwsFiles?fotoid=890ce2d9430741659346d8f2d9074e77-1664&amp;version=2', 'image_url_oparl': 'https://files.openparldata.ch/images/persons/original/LU-11374_v1.jpg', 'email': None, 'phone': None, 'birthday': '1960-01-01', 'birthday_format': 'year', 'deathday': None, 'street': None, 'postal_code': None, 'city': 'Luzern', 'occupation_de': 'Betriebsökonom FH / Executive MBA', 'occupation_fr': None, 'occupation_it': None, 'marital_status_de': None, 'marital_status_fr': None, 'marital_status_it': None, 'electoral_district_de': 'Luzern-Stadt', 'electoral_district_fr': None, 'electoral_district_it': None, 'website_personal': None, 'gender': 'm', 'parliamentary_group_name_de': None, 'parliamentary_group_name_fr': None, 'parliamentary_group_name_it': None, 'parliamentary_group_name_rm': None, 'parliamentary_group_external_id': None, 'parliament_sector': None, 'parliament_seat': None, 'active': False, 'language': 'de', 'function_latest_de': None, 'function_latest_fr': None, 'function_latest_it': None, 'function_latest_rm': None, 'function_latest_external_id': None, 'wikidata_id': None, 'updated_external_at': None, 'updated_at': '2026-02-22T11:57:59', 'created_at': '2025-08-14T06:31:49', 'links': {'memberships': 'https://api.openparldata.ch/v1/persons/11374/memberships', 'interests': 'https://api.openparldata.ch/v1/persons/11374/interests', 'access_badges': 'https://api.openparldata.ch/v1/persons/11374/access_badges', 'contributors': 'https://api.openparldata.ch/v1/persons/11374/contributors', 'affairs': 'https://api.openparldata.ch/v1/persons/11374/affairs', 'speeches': 'https://api.openparldata.ch/v1/persons/11374/speeches', 'votes': 'https://api.openparldata.ch/v1/persons/11374/votes', 'external_links': 'https://api.openparldata.ch/v1/persons/11374/external_links', 'person_images': 'https://api.openparldata.ch/v1/persons/11374/person_images', 'bodies': 'https://api.openparldata.ch/v1/persons/11374/bodies'}}
+```
+
+Or create a `client` object to create a specfic backend
+
+```python
+import swissparlpy as spp
+
+opd_client = spp.SwissParlClient(backend="openparldata")
+odata_client = SwissParlClient(backend="odata")
+
+# then use the client to query the backend
+person_vars_opd = opd_client.get_variables("persons")
+person_vars_odata = odata_client.get_variables("Person")
 ```
 
 ### Use together with `pandas`
