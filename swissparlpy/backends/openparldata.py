@@ -151,12 +151,12 @@ class OpenParlDataBackend(BaseBackend):
 
         # Convert kwargs to query parameters
         for key, value in kwargs.items():
-            params[key] = value
             if (key not in variables) and (key not in params):
                 log.warning(
                     f"Attribute '{key}' is not a variable "
                     "or search param for table '{table}'"
                 )
+            params[key] = value
 
         return OpenParlDataResponse(
             session=self.session,
