@@ -119,6 +119,7 @@ for rec in data[:5]:
 
 **Get data from a specific backend**
 
+```python
 >>> import swissparlpy as spp
 >>> data = spp.get_data('persons', firstname="Stefan", backend="openparldata")
 >>> data
