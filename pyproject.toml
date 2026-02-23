@@ -19,6 +19,8 @@ test = [
     "pytest",
     "pytest-cov",
     "black[jupyter]>=24.0.0,<25.0.0",
+    "matplotlib>=3.0.0",
+    "pandas",
 ]
 dev = [
     "jupyter",
@@ -49,7 +51,7 @@ path = "swissparlpy/__init__.py"
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
-    "ignore::pyparsing.warnings.PyparsingDeprecationWarning"
+    "ignore::DeprecationWarning",
 ]
 addopts = "--cov=swissparlpy"
 
