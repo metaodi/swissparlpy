@@ -152,6 +152,7 @@ class TestImportErrors:
             # So we just verify the code doesn't crash
             try:
                 import swissparlpy
+
                 # Module loaded successfully
                 assert True
             except Exception as e:

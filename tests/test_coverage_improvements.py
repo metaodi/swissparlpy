@@ -285,7 +285,9 @@ class TestODataBackendEdgeCases:
         # Create mock entities with large count
         mock_entities = Mock()
         mock_entities.total_count = 15000
-        mock_entities.next_url = None  # No next page, so it will raise NoMoreRecordsError
+        mock_entities.next_url = (
+            None  # No next page, so it will raise NoMoreRecordsError
+        )
         mock_entities.__iter__ = Mock(return_value=iter([]))
 
         mock_request.execute.return_value = mock_entities
@@ -314,6 +316,7 @@ class TestOpenParlDataBackendEdgeCases:
 
         # Create a new session without user-agent
         import requests
+
         session = requests.Session()
         # Explicitly remove user-agent if it exists
         if "user-agent" in session.headers:
@@ -335,6 +338,7 @@ class TestOpenParlDataBackendEdgeCases:
         )
 
         import requests
+
         session = requests.Session()
         session.headers["user-agent"] = "CustomAgent/1.0"
 
@@ -398,7 +402,9 @@ class TestOpenParlDataBackendEdgeCases:
 
         backend = OpenParlDataBackend()
 
-        with pytest.raises(errors.TableNotFoundError, match="Table 'nonexistent' not found"):
+        with pytest.raises(
+            errors.TableNotFoundError, match="Table 'nonexistent' not found"
+        ):
             backend.get_data("nonexistent")
 
 

@@ -186,9 +186,7 @@ class TestVisualizationEdgeCases:
         mock_client = Mock()
 
         with pytest.raises(ValueError, match="Missing required columns in seats"):
-            plot_voting(
-                self.mock_votes, seats=incomplete_seats, client=mock_client
-            )
+            plot_voting(self.mock_votes, seats=incomplete_seats, client=mock_client)
 
     def test_plot_voting_invalid_highlight_format(self):
         """Test error when highlight has wrong format."""
@@ -299,9 +297,7 @@ class TestVisualizationEdgeCases:
             viz_module.PANDAS_AVAILABLE = False
             viz_module.MATPLOTLIB_AVAILABLE = False
 
-            with pytest.raises(
-                ImportError, match="pandas and matplotlib are required"
-            ):
+            with pytest.raises(ImportError, match="pandas and matplotlib are required"):
                 viz_module.plot_voting(
                     self.mock_votes, seats=self.mock_seats, client=Mock()
                 )
