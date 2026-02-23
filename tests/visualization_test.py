@@ -47,7 +47,10 @@ class TestVisualization:
     def test_plot_voting_basic(self, mock_client):
         """Test basic plot_voting functionality."""
         fig = plot_voting(
-            self.mock_votes, seats=self.mock_seats, theme="scoreboard", client=mock_client
+            self.mock_votes,
+            seats=self.mock_seats,
+            theme="scoreboard",
+            client=mock_client,
         )
         assert fig is not None
         assert isinstance(fig, plt.Figure)
@@ -107,7 +110,9 @@ class TestVisualization:
         votes_list = self.mock_votes.to_dict("records")
         seats_list = self.mock_seats.to_dict("records")
 
-        fig = plot_voting(votes_list, seats=seats_list, theme="scoreboard", client=mock_client)
+        fig = plot_voting(
+            votes_list, seats=seats_list, theme="scoreboard", client=mock_client
+        )
         assert fig is not None
 
     def test_plot_voting_custom_point_settings(self, mock_client):
@@ -138,7 +143,11 @@ class TestVisualization:
         """Test providing custom axes."""
         fig, ax = plt.subplots()
         result_fig = plot_voting(
-            self.mock_votes, seats=self.mock_seats, theme="scoreboard", ax=ax, client=mock_client
+            self.mock_votes,
+            seats=self.mock_seats,
+            theme="scoreboard",
+            ax=ax,
+            client=mock_client,
         )
         assert result_fig is fig
 
