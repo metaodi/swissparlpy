@@ -44,17 +44,17 @@ def single_person():
 
 @pytest.fixture
 def person_memberships():
-    """OpenParlData response fixture for a single person"""
+    """OpenParlData response fixture for a person's memberships"""
     return fixture_content("person_memberships.json")
 
 
 @pytest.fixture
 def affairs_page1():
-    """OpenParlData affairs data fixture"""
+    """OpenParlData affairs data fixture (page 1)"""
     return fixture_content("affairs_1.json")
 
 
 @pytest.fixture
 def affairs_page2():
-    """OpenParlData affairs data fixture"""
+    """OpenParlData affairs data fixture (page 2)"""
     return fixture_content("affairs_2.json")
