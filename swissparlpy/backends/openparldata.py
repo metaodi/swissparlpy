@@ -229,7 +229,7 @@ class OpenParlDataResponse(BaseResponse):
                 self.next_url = None  # Ensure next_url is None if has_more is False
 
             # Update variables if not already set
-            if self._variables and len(records) > 0:
+            if not self._variables and len(records) > 0:
                 self._variables = list(records[0].keys())
 
         else:
