@@ -46,6 +46,11 @@ target-version = ["py39", "py310", "py311", "py312"]
 [tool.hatch.version]
 path = "swissparlpy/__init__.py"
 
+[pytest]
+filterwarnings = [
+    "error",
+]
+
 [tool.pytest.ini_options]
 addopts = "--cov=swissparlpy"
 

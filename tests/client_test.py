@@ -2,6 +2,8 @@ from swissparlpy_test import SwissParlTestCase
 from swissparlpy.client import SwissParlClient
 from swissparlpy.client import SwissParlResponse
 from swissparlpy.backends.odata import ODataResponse
+from swissparlpy.backends.openparldata import OpenParlDataBackend
+from swissparlpy.backends.odata import ODataBackend
 from swissparlpy import errors
 import responses
 import pytest
@@ -9,6 +11,8 @@ from unittest.mock import Mock
 import pyodata.exceptions
 
 SERVICE_URL = "https://ws.parlament.ch/odata.svc"
+OPENPARLDATA_URL = "https://api.openparldata.ch/v1"
+OPENPARLDATA_OPENAPI_URL = "https://api.openparldata.ch/openapi.json"
 
 
 class TestClient(SwissParlTestCase):
@@ -22,6 +26,21 @@ class TestClient(SwissParlTestCase):
             status=200,
         )
         client = SwissParlClient()
+        overview = client.get_overview()
+        assert isinstance(overview, dict), "Overview is not a dict"
+        assert len(overview) == 44
+
+    @responses.activate
+    def test_overview_with_backend(self, metadata):
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/$metadata",
+            content_type="text/xml",
+            body=metadata,
+            status=200,
+        )
+        backend = ODataBackend()
+        client = SwissParlClient(backend=backend)
         overview = client.get_overview()
         assert isinstance(overview, dict), "Overview is not a dict"
         assert len(overview) == 44
@@ -167,7 +186,7 @@ class TestClient(SwissParlTestCase):
         with pytest.raises(
             errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
-            ODataResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, "Test", ["ID", "Title"])
 
     def test_timeout_http_status_504(self):
         """Test that HTTP 504 status code is treated as a timeout"""
@@ -186,7 +205,7 @@ class TestClient(SwissParlTestCase):
         with pytest.raises(
             errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
-            ODataResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, "Test", ["ID", "Title"])
 
     def test_timeout_execution_timeout_message(self):
         """Test that 'Execution Timeout Expired.' message is detected as timeout"""
@@ -207,7 +226,7 @@ class TestClient(SwissParlTestCase):
         with pytest.raises(
             errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
-            ODataResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, "Test", ["ID", "Title"])
 
     def test_timeout_no_response_object(self):
         """Test that HttpError without response object is handled correctly"""
@@ -223,7 +242,7 @@ class TestClient(SwissParlTestCase):
         with pytest.raises(
             errors.SwissParlError, match="The server returned a HTTP error"
         ):
-            ODataResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, "Test", ["ID", "Title"])
 
     def test_timeout_string_content(self):
         """Test that string content is handled correctly"""
@@ -244,7 +263,7 @@ class TestClient(SwissParlTestCase):
         with pytest.raises(
             errors.SwissParlTimeoutError, match="The server returned a timeout error"
         ):
-            ODataResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, "Test", ["ID", "Title"])
 
     def test_non_timeout_http_error(self):
         """Test that non-timeout HTTP errors are handled correctly"""
@@ -264,4 +283,51 @@ class TestClient(SwissParlTestCase):
         with pytest.raises(
             errors.SwissParlError, match="The server returned a HTTP error"
         ):
-            ODataResponse(mock_request, ["ID", "Title"])
+            ODataResponse(mock_request, "Test", ["ID", "Title"])
+
+    @responses.activate
+    def test_client_integration_with_openparldata(self, openapi_spec):
+        """Test SwissParlClient with OpenParlData backend"""
+        # Mock the OpenAPI spec endpoint
+        responses.add(
+            responses.GET,
+            OPENPARLDATA_OPENAPI_URL,
+            body=openapi_spec,
+            status=200,
+            content_type="application/json",
+        )
+
+        # Mock the bodies data endpoint for getting variables
+        responses.add(
+            responses.GET,
+            f"{OPENPARLDATA_URL}/bodies",
+            json={
+                "data": [
+                    {"id": 1, "name": "Schweiz"},
+                ],
+            },
+            status=200,
+        )
+
+        # Mock the cantons data endpoint for actual query
+        responses.add(
+            responses.GET,
+            f"{OPENPARLDATA_URL}/cantons",
+            json={
+                "data": [
+                    {"id": 1, "name": "Zürich"},
+                ],
+                "meta": {
+                    "total_records": 1,
+                    "has_more": False,
+                },
+            },
+            status=200,
+        )
+
+        backend = OpenParlDataBackend()
+        client = SwissParlClient(backend=backend)
+        response = client.get_data("bodies")
+
+        assert response.count == 1
+        assert response[0]["name"] == "Schweiz"

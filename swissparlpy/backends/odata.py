@@ -50,6 +50,7 @@ class ODataBackend(BaseBackend):
         entities = self._get_entities(table)
         return ODataResponse(
             entities.top(rows).count(inline=True),  # type: ignore
+            table,
             self.get_variables(table),
         )
 
@@ -66,6 +67,7 @@ class ODataBackend(BaseBackend):
             entities = entities.filter(**kwargs)  # type: ignore
         return ODataResponse(
             entities.count(inline=True),  # type: ignore
+            table,
             self.get_variables(table),
         )
 
@@ -76,7 +78,10 @@ class ODataBackend(BaseBackend):
 class ODataResponse(BaseResponse):
     """Response wrapper for OData queries"""
 
-    def __init__(self, entity_request: object, variables: list[str]) -> None:
+    def __init__(
+        self, entity_request: object, table: str, variables: list[str]
+    ) -> None:
+        self._table = table
         self._variables = variables
         self.data: list["ODataProxy"] = []
         self.count = 0
@@ -87,6 +92,10 @@ class ODataResponse(BaseResponse):
     @property
     def _records_loaded_count(self) -> int:
         return len(self.data)
+
+    @property
+    def table(self) -> str:
+        return self._table
 
     @property
     def variables(self) -> list[str]:

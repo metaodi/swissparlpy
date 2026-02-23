@@ -2,9 +2,11 @@
 
 import logging
 import requests
+import warnings
 from .base import BaseBackend, BaseResponse
 from .. import errors
 from typing import Optional, Union, Callable, Any
+from urllib.parse import urlparse, parse_qs
 
 log = logging.getLogger(__name__)
 
@@ -98,7 +100,7 @@ class OpenParlDataBackend(BaseBackend):
                 self.cache[table] = list(data.keys())
 
             return self.cache[table]
-        except (KeyError, IndexError) as e:
+        except (KeyError, IndexError, TypeError) as e:
             log.error(f"Error parsing response for variables of table '{table}': {e}")
             raise errors.SwissParlError(
                 f"Failed to get variables for table '{table}': {e}"
@@ -108,7 +110,11 @@ class OpenParlDataBackend(BaseBackend):
         """Get a preview of the first N rows of a table"""
         params = {"limit": rows}
         return OpenParlDataResponse(
-            self.session, f"{self.base_url}/{table}", params, self.get_variables(table)
+            session=self.session,
+            url=f"{self.base_url}/{table}",
+            params=params,
+            table=table,
+            variables=self.get_variables(table),
         )
 
     def get_data(
@@ -144,7 +150,11 @@ class OpenParlDataBackend(BaseBackend):
                 log.warning(f"Filter key '{key}' is not a variable for table '{table}'")
 
         return OpenParlDataResponse(
-            self.session, f"{self.base_url}/{table}", params, self.get_variables(table)
+            session=self.session,
+            url=f"{self.base_url}/{table}",
+            params=params,
+            table=table,
+            variables=self.get_variables(table),
         )
 
 
@@ -156,20 +166,35 @@ class OpenParlDataResponse(BaseResponse):
         session: requests.Session,
         url: str,
         params: dict[str, Any],
+        table: str,
         variables: Optional[list[str]] = None,
     ) -> None:
         self.session = session
-        self.url = url
-        self.params = params
+        self._table = table
         self._variables = variables or []
         self.data: list[OpenParlDataProxy] = []
         self.count = 0
         self.next_url: Optional[str] = None
+
+        # Extract query parameters from URL if present
+        parsed_url = urlparse(url)
+        url = parsed_url.scheme + "://" + parsed_url.netloc + parsed_url.path
+        if parsed_url.query:
+            query_params = parse_qs(parsed_url.query)
+            for key, values in query_params.items():
+                params[key] = values[0] if values else ""
+
+        self.url = url
+        self.params = params
         self._load_first_page()
 
     @property
     def _records_loaded_count(self) -> int:
         return len(self.data)
+
+    @property
+    def table(self) -> str:
+        return self._table
 
     @property
     def variables(self) -> list[str]:
@@ -194,8 +219,9 @@ class OpenParlDataResponse(BaseResponse):
             records = data["data"]
             pagination = data.get("meta", {})
             self.count = pagination.get("total_records", len(records))
-            if pagination.get("has_more", False):
-                self.next_url = pagination.get("next_page")
+            self.next_url = pagination.get("next_page")
+            if not pagination.get("has_more", False):
+                self.next_url = None  # Ensure next_url is None if has_more is False
 
             # Update variables if not already set
             if self._variables and len(records) > 0:
@@ -242,8 +268,19 @@ class OpenParlDataResponse(BaseResponse):
         i = 0
         while True:
             if i >= len(self.data):
+                if i > self.count:
+                    warnings.warn(
+                        f"Loaded more records ({i}) than total count ({self.count}),"
+                        "stopping iteration",
+                        errors.PaginationWarning,
+                    )
+                    break
                 if self.next_url:
                     try:
+                        log.debug(
+                            f"Reached end of current data {i}/{len(self.data)}, "
+                            f"loading next page: {self.next_url}"
+                        )
                         self._load_next_page()
                     except errors.NoMoreRecordsError:
                         break
@@ -298,27 +335,27 @@ class OpenParlDataProxy(dict):
     def __getitem__(self, key: str) -> object:
         return self.record[key]
 
-    def follow_link(self, table: str, **kwargs: Any) -> Optional[OpenParlDataResponse]:
-        """Follow a linked table and return its data as OpenParlDataResponse"""
+    def get_related_data(self, table: str) -> Optional[OpenParlDataResponse]:
+        """Get related data and return its data as OpenParlDataResponse"""
         links = self.record.get("links", {})
 
         if not isinstance(links, dict) or table not in links:
-            log.debug(f"Table {table} not found in links for this record")
-            return None
+            raise errors.TableNotFoundError(
+                f"Table {table} not found in links for this entry, "
+                f"available links: {links}"
+            )
 
         params = {
             "lang_format": self.parent.params.get("lang_format", "flat"),
             "lang": self.parent.params.get("lang", "en"),
             "lang_fallback": self.parent.params.get("lang_fallback", "de"),
-            "search_mode": self.parent.params.get("search_mode", "partial"),
         }
-        for key, value in kwargs.items():
-            params[key] = value
 
         url = links[table]
         return OpenParlDataResponse(
             session=self.parent.session,
             url=url,
-            params=params,  # Use the same params as the parent
+            params=params,
+            table=table,
             variables=[],  # Let the response discover variables
         )

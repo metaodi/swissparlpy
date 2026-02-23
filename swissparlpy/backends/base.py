@@ -72,6 +72,12 @@ class BaseResponse(ABC):
         """Return the list of variable names in the response"""
         pass
 
+    @property
+    @abstractmethod
+    def table(self) -> str:
+        """Return the name of the table in the response"""
+        pass
+
     def to_dataframe(self) -> "pd.DataFrame":
         if not PANDAS_AVAILABLE:
             raise ImportError(

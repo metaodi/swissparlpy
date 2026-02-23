@@ -11,6 +11,7 @@ from pathlib import Path
 
 from . import SwissParlResponse
 from . import SwissParlClient
+from . import errors
 from typing import Union, Optional, cast
 
 try:
@@ -189,7 +190,8 @@ def plot_voting(  # noqa: C901
                     "The voting data is not from the current legislative period. "
                     "Seating data might not be up-to-date. "
                     "Consider providing seating data explicitly for "
-                    "the correct legislative period."
+                    "the correct legislative period.",
+                    errors.OutdatedDataWarning,
                 )
     else:
         seats = pd.DataFrame(seats)

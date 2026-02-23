@@ -22,6 +22,12 @@ class SwissParlTimeoutError(SwissParlError):
     """
 
 
+class SwissParlHttpRequestError(SwissParlError):
+    """
+    Error to indicate, that there was an HTTP request error.
+    """
+
+
 class SwissParlWarning(Warning):
     """
     General SwissParl warning class to provide a superclass for all warnings
@@ -35,7 +41,14 @@ class ResultVeryLargeWarning(SwissParlWarning):
     """
 
 
-class SwissParlHttpRequestError(SwissParlError):
+class OutdatedDataWarning(SwissParlWarning):
     """
-    Error to indicate, that there was an HTTP request error.
+    A warning to indicate, that the provided data is outdated and might not be accurate.
+    """
+
+
+class PaginationWarning(SwissParlWarning):
+    """
+    A warning to indicate that there was a problem with pagination,
+    such as loading more records than the total count.
     """
