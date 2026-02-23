@@ -51,7 +51,7 @@ path = "swissparlpy/__init__.py"
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
-    "ignore::DeprecationWarning:pyparsing",
+    "ignore:'oneOf' deprecated:DeprecationWarning",
 ]
 addopts = "--cov=swissparlpy"
 
