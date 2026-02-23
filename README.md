@@ -159,7 +159,7 @@ To create a pandas DataFrame from `get_data` simply pass the return value to the
 [83 rows x 8 columns]
 ```
 
-Or the the convinence method `.to_dataframe()`:
+Or use the convenience method `.to_dataframe()`:
 
 ```python
 >>> import swissparlpy as spp
