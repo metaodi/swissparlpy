@@ -298,11 +298,11 @@ df = spp.get_data("Person", filter=filter_by_name, Language='DE').to_dataframe()
 print(df[['FirstName', 'LastName']])
 ```
 
-### Search with the `OpenParlDataBackend`**
+### Search with the `OpenParlDataBackend`
 
 The OpenParlDataBackend has the ability to filter and search, all the parameters described in the [API documentation](https://api.openparldata.ch/documentation#/) can be used here.
 
-**Filter by values***
+**Filter by values**
 ```python
 >>> import swissparlpy as spp
 >>> 
