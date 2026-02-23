@@ -1,0 +1,10 @@
+{
+    "data": [
+        {"id": 3, "affair": "Luzern"},
+        {"id": 4, "affair": "Basel"}
+    ], "meta": {
+        "total_records": 4,
+        "has_more": false,
+        "next_page": null
+    }
+}

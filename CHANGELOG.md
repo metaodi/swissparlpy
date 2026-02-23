@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Added type hints in the library
 - Add to_dataframe() convenience method to SwissParlResponse to directly transform a result to a DataFrame
 - Detect server timeout and raise `SwissParlTimeoutError` if necessary
+- Add support for multiple backends
+- Add support for OpenParlData.ch as a backend (Issue #40)
 
 ## [0.3.0] - 2023-08-31
 ### Added

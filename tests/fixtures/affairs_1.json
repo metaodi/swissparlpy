@@ -1,0 +1,10 @@
+{
+    "data": [
+        {"id": 1, "affair": "Zürich"},
+        {"id": 2, "affair": "Bern"}
+    ], "meta": {
+        "total_records": 4,
+        "has_more": true,
+        "next_page": "https://api.openparldata.ch/v1/affairs?lang_format=flat&lang=en&lang_fallback=de&search_mode=partial&search=&offset=2&limit=2"
+    }
+}

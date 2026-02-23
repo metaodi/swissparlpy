@@ -40,10 +40,17 @@ build-backend = "hatchling.build"
 [project.urls]
 Home = "https://github.com/metaodi/swissparlpy"
 
+[tool.black]
+target-version = ["py39", "py310", "py311", "py312"]
+
 [tool.hatch.version]
 path = "swissparlpy/__init__.py"
 
 [tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::pyparsing.warnings.PyparsingDeprecationWarning"
+]
 addopts = "--cov=swissparlpy"
 
 [tool.mypy]

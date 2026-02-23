@@ -7,12 +7,13 @@
 swissparlpy
 ===========
 
-This module provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss parliament](https://www.parlament.ch/en).
+This module provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss parliament](https://www.parlament.ch/en) and the [OpenParlData.ch](https://openparldata.ch) REST API.
 
 ## Table of Contents
 
 * [Installation](#installation)
 * [Usage](#usage)
+    * [Backend Selection](#backend-selection)
     * [Get tables and their variables](#get-tables-and-their-variables)
     * [Get data of a table](#get-data-of-a-table)
     * [Use together with `pandas`](#use-together-with-pandas)
@@ -44,6 +45,43 @@ $ pip install swissparlpy[visualization]
 ## Usage
 
 See the [`examples` directory](/examples) for more scripts.
+
+### Backend Selection
+
+swissparlpy supports multiple data backends. By default, it uses the official OData API of parlament.ch, but you can also use the OpenParlData.ch REST API.
+
+**Using the default OData (parlament.ch) backend:**
+
+```python
+>>> import swissparlpy as spp
+>>> tables = spp.get_tables()  # Uses OData service of parlament.ch by default
+```
+
+**Using the OpenParlData backend:**
+
+```python
+>>> import swissparlpy as spp
+>>> tables = spp.get_tables(backend='openparldata')
+>>> data = spp.get_data('cantons', backend='openparldata')
+```
+
+**Using backends with SwissParlClient:**
+
+```python
+>>> from swissparlpy import SwissParlClient
+>>>
+>>> # OData backend
+>>> odata_client = SwissParlClient(backend="odata")
+>>> tables = odata_client.get_tables()
+>>>
+>>> # OpenParlData backend
+>>> opd_client = SwissParlClient(backend="openparldata")
+>>> tables = opd_client.get_tables()
+```
+
+All module-level functions (`get_tables()`, `get_variables()`, `get_overview()`, `get_glimpse()`, `get_data()`) support the `backend` parameter.
+
+**Note:** The OpenParlData backend is still under development. The actual API endpoints and query parameters may need to be adjusted based on the final OpenParlData.ch API specification.
 
 ### Get tables and their variables
 
@@ -79,6 +117,18 @@ for rec in data[:5]:
    print(rec)
 ```
 
+**Get data from a specific backend**
+
+>>> import swissparlpy as spp
+>>> data = spp.get_data('persons', firstname="Stefan", backend="openparldata")
+>>> data
+<swissparlpy.client.SwissParlResponse object at 0x0000023357FF9F60>
+>>> data.count
+234
+>>> data[0]
+{'id': 11374, 'url_api': 'https://api.openparldata.ch/v1/persons/11374', 'body_key': 'LU', 'external_id': '890ce2d9430741659346d8f2d9074e77', 'external_alternative_id': None, 'title': None, 'fullname': 'Stefan Roth', 'firstname': 'Stefan', 'lastname': 'Roth', 'body_id': 261, 'party_de': 'CVP', 'party_fr': None, 'party_it': None, 'party_external_id': None, 'party_harmonized_de': 'Christlichdemokratische Volkspartei der Schweiz', 'party_harmonized_fr': 'Parti démocrate-chrétien', 'party_harmonized_it': 'Partito popolare democratico', 'party_harmonized_en': "Christian Democratic People's Party", 'party_harmonized_wikidata_id': 'Q659461', 'website_parliament_url_de': 'https://www.lu.ch/kr/mitglieder_und_organe/mitglieder/mitglieder_detail?Id=890ce2d9430741659346d8f2d9074e77', 'website_parliament_url_fr': None, 'website_parliament_url_it': None, 'image_url_external': 'https://www.lu.ch/kr/parlamentsgeschaefte/CdwsFiles?fotoid=890ce2d9430741659346d8f2d9074e77-1664&amp;version=2', 'image_url_oparl': 'https://files.openparldata.ch/images/persons/original/LU-11374_v1.jpg', 'email': None, 'phone': None, 'birthday': '1960-01-01', 'birthday_format': 'year', 'deathday': None, 'street': None, 'postal_code': None, 'city': 'Luzern', 'occupation_de': 'Betriebsökonom FH / Executive MBA', 'occupation_fr': None, 'occupation_it': None, 'marital_status_de': None, 'marital_status_fr': None, 'marital_status_it': None, 'electoral_district_de': 'Luzern-Stadt', 'electoral_district_fr': None, 'electoral_district_it': None, 'website_personal': None, 'gender': 'm', 'parliamentary_group_name_de': None, 'parliamentary_group_name_fr': None, 'parliamentary_group_name_it': None, 'parliamentary_group_name_rm': None, 'parliamentary_group_external_id': None, 'parliament_sector': None, 'parliament_seat': None, 'active': False, 'language': 'de', 'function_latest_de': None, 'function_latest_fr': None, 'function_latest_it': None, 'function_latest_rm': None, 'function_latest_external_id': None, 'wikidata_id': None, 'updated_external_at': None, 'updated_at': '2026-02-22T11:57:59', 'created_at': '2025-08-14T06:31:49', 'links': {'memberships': 'https://api.openparldata.ch/v1/persons/11374/memberships', 'interests': 'https://api.openparldata.ch/v1/persons/11374/interests', 'access_badges': 'https://api.openparldata.ch/v1/persons/11374/access_badges', 'contributors': 'https://api.openparldata.ch/v1/persons/11374/contributors', 'affairs': 'https://api.openparldata.ch/v1/persons/11374/affairs', 'speeches': 'https://api.openparldata.ch/v1/persons/11374/speeches', 'votes': 'https://api.openparldata.ch/v1/persons/11374/votes', 'external_links': 'https://api.openparldata.ch/v1/persons/11374/external_links', 'person_images': 'https://api.openparldata.ch/v1/persons/11374/person_images', 'bodies': 'https://api.openparldata.ch/v1/persons/11374/bodies'}}
+```
+
 ### Use together with `pandas`
 
 To create a pandas DataFrame from `get_data` simply pass the return value to the constructor:
@@ -104,6 +154,14 @@ To create a pandas DataFrame from `get_data` simply pass the return value to the
 
 [83 rows x 8 columns]
 ```
+
+Or use the convenience method `.to_dataframe()`:
+
+```python
+>>> import swissparlpy as spp
+>>> parties_df = spp.get_data('Party', Language='DE').to_dataframe()
+```
+
 
 ### Visualize voting results
 
@@ -172,7 +230,7 @@ If you want to query for substrings there are two main operators to use:
 
 You can suffix any field with those operators to query the data.
 
-### Date ranges
+### Date ranges (only available with the `odata` backend)
 
 To query for date ranges you can use the operators...
 
@@ -196,7 +254,7 @@ To query for date ranges you can use the operators...
 22
 ```
 
-### Advanced filter
+### Advanced filter (only supported by the `odata` backend)
 
 **Text query**
 
@@ -232,10 +290,51 @@ def filter_by_name(ent):
       ent.LastName == 'Seiler'
    )
    
-persons = spp.get_data("Person", filter=filter_by_name, Language='DE')
-
-df = pd.DataFrame(persons)
+df = spp.get_data("Person", filter=filter_by_name, Language='DE').to_dataframe()
 print(df[['FirstName', 'LastName']])
+```
+
+### Search with the `OpenParlDataBackend`
+
+The OpenParlDataBackend has the ability to filter and search, all the parameters described in the [API documentation](https://api.openparldata.ch/documentation#/) can be used here.
+
+**Filter by values**
+```python
+>>> import swissparlpy as spp
+>>> 
+>>> opd_client = spp.SwissParlClient(backend="openparldata")
+>>> response = opd_client.get_data("persons", firstname="Karin", lastname="Keller-Sutter")
+>>> df = response.to_dataframe()
+>>> print(df[['firstname', 'lastname', "title"]])
+  firstname       lastname                         title
+0     Karin  Keller-Sutter  Dipl. Konferenzdolmetscherin
+```
+
+**Search in the data**
+
+```python
+>>> import swissparlpy as spp
+>>> 
+>>> opd_client = spp.SwissParlClient(backend="openparldata")
+>>> response = opd_client.get_data("speeches", search_mode="natural", search_scope="all", search_language="de", search="Budget")
+>>> len(response)
+457
+>>> df = response.to_dataframe()
+>>> df[["id", "body_key", "person_id", "meeting_id", "date_start", "date_end", "text_content_de"]]       
+          id body_key  person_id  meeting_id           date_start date_end                                    text_content_de
+0    1100333      351     4256.0        1262  2024-11-14T18:18:52     None  <p><b>Corina Liebi (JGLP)</b> für die PVS: Für...
+1    1100301      351     4191.0        1578  2024-05-30T22:24:34     None  <p><b>Ursina Anderegg (GB)</b> für die Fraktio...
+2    1100187      351     4139.0        1219  2025-11-20T18:02:10     None  <p><b>Debora Alder-Gasser (EVP)</b> für die Ko...
+3    1100167      351     4315.0        1219  2025-11-20T17:11:50     None  <p><b>Simone Richner (FDP)</b> für die Kommiss...
+4    1100016      351     4237.0        1628  2024-06-27T13:44:06     None  <p><b>Franziska Geiser (GB)</b> für die FIKO: ...
+..       ...      ...        ...         ...                  ...      ...                                                ...
+452  1088291      351     4237.0        1193  2025-03-27T21:51:35     None  <p><b>Franziska Geiser (GB)</b> für die Frakti...
+453  1088272      351     4162.0        1404  2025-03-20T17:36:23     None  <p><b>Janina Aeberhard (GLP)</b> für die Kommi...
+454  1088255      351     4123.0        1870  2023-09-21T15:50:27     None  <p><b>Barbara Keller (SP)</b> für die SBK: Ich...
+455  1088206      351     4114.0        1404  2025-03-20T17:50:35     None  <p><b>Laura Curau (Mitte)</b> für die Fraktion...
+456  1088186      351     4237.0        1404  2025-03-20T18:39:10     None  <p><b>Franziska Geiser (GB)</b> für die Frakti...
+
+[457 rows x 7 columns]
 ```
 
 ### Large queries
