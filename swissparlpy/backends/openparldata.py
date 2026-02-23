@@ -57,8 +57,12 @@ class OpenParlDataBackend(BaseBackend):
         self.cache = {table: [] for table in api_config["tables"]}
         return api_config
 
-    def _http_get_request(self, url: str, params: dict = {}) -> requests.Response:
+    def _http_get_request(
+        self, url: str, params: Optional[dict] = None
+    ) -> requests.Response:
         """Helper method to make HTTP requests with error handling"""
+        if params is None:
+            params = {}
         headers = {"user-agent": "Mozilla Firefox Mozilla/5.0; metaodi swissparlpy"}
         if "user-agent" not in self.session.headers:
             self.session.headers["user-agent"] = headers["user-agent"]
