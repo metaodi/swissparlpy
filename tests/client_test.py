@@ -309,22 +309,6 @@ class TestClient(SwissParlTestCase):
             status=200,
         )
 
-        # Mock the cantons data endpoint for actual query
-        responses.add(
-            responses.GET,
-            f"{OPENPARLDATA_URL}/cantons",
-            json={
-                "data": [
-                    {"id": 1, "name": "Zürich"},
-                ],
-                "meta": {
-                    "total_records": 1,
-                    "has_more": False,
-                },
-            },
-            status=200,
-        )
-
         backend = OpenParlDataBackend()
         client = SwissParlClient(backend=backend)
         response = client.get_data("bodies")

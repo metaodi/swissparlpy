@@ -50,7 +50,7 @@ def person_memberships():
 
 @pytest.fixture
 def affairs_page1():
-    """OData affairs data fixture"""
+    """OpenParlData affairs data fixture"""
     return fixture_content("affairs_1.json")
 
 
