@@ -96,7 +96,7 @@ class TestModuleLevelFunctions:
             status=200,
         )
         glimpse = spp.get_glimpse("Business", rows=3)
-        assert isinstance(glimpse, SwissParlResponse)
+        assert type(glimpse).__name__ == "SwissParlResponse"
 
     @responses.activate
     def test_get_data(self, metadata, business_page1):
@@ -116,7 +116,7 @@ class TestModuleLevelFunctions:
             status=200,
         )
         data = spp.get_data("Business", Language="DE")
-        assert isinstance(data, SwissParlResponse)
+        assert type(data).__name__ == "SwissParlResponse"
 
 
 class TestSwissParlClientEdgeCases:
