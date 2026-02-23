@@ -69,14 +69,13 @@ swissparlpy supports multiple data backends. By default, it uses the official OD
 
 ```python
 >>> from swissparlpy import SwissParlClient
->>> from swissparlpy.backends import ODataBackend, OpenParlDataBackend
 >>>
 >>> # OData backend
->>> odata_client = SwissParlClient(backend=ODataBackend())
+>>> odata_client = SwissParlClient(backend="odata")
 >>> tables = odata_client.get_tables()
 >>>
 >>> # OpenParlData backend
->>> opd_client = SwissParlClient(backend=OpenParlDataBackend())
+>>> opd_client = SwissParlClient(backend="openparldata")
 >>> tables = opd_client.get_tables()
 ```
 
@@ -118,6 +117,22 @@ for rec in data[:5]:
    print(rec)
 ```
 
+**Get data from a specific backend**
+
+
+
+>>> import swissparlpy as spp
+>>> data = spp.get_data('persons', firstname=)
+>>> data
+<swissparlpy.client.SwissParlResponse object at 0x7f8e38baa610>
+>>> data.count
+26
+>>> data[0]
+{'ID': 2, 'Language': 'DE', 'CantonNumber': 2, 'CantonName': 'Bern', 'CantonAbbreviation': 'BE'}
+>>> [d['CantonName'] for d in data]
+['Bern', 'Neuenburg', 'Genf', 'Wallis', 'Uri', 'Schaffhausen', 'Jura', 'Basel-Stadt', 'St. Gallen', 'Obwalden', 'Appenzell A.-Rh.', 'Solothurn', 'Waadt', 'Zug', 'Aargau', 'Basel-Landschaft', 'Luzern', 'Thurgau', 'Freiburg', 'Appenzell I.-Rh.', 'Schwyz', 'Graubünden', 'Glarus', 'Tessin', 'Zürich', 'Nidwalden']
+```
+
 ### Use together with `pandas`
 
 To create a pandas DataFrame from `get_data` simply pass the return value to the constructor:
@@ -143,6 +158,14 @@ To create a pandas DataFrame from `get_data` simply pass the return value to the
 
 [83 rows x 8 columns]
 ```
+
+Or the the convinence method `.to_dataframe()`:
+
+```python
+>>> import swissparlpy as spp
+>>> parties_df = spp.get_data('Party', Language='DE').to_dataframe()
+```
+
 
 ### Visualize voting results
 
@@ -211,7 +234,7 @@ If you want to query for substrings there are two main operators to use:
 
 You can suffix any field with those operators to query the data.
 
-### Date ranges
+### Date ranges (only available with the `odata` backend)
 
 To query for date ranges you can use the operators...
 
@@ -235,7 +258,7 @@ To query for date ranges you can use the operators...
 22
 ```
 
-### Advanced filter
+### Advanced filter (only supported by the `odata` backend)
 
 **Text query**
 
@@ -271,10 +294,51 @@ def filter_by_name(ent):
       ent.LastName == 'Seiler'
    )
    
-persons = spp.get_data("Person", filter=filter_by_name, Language='DE')
-
-df = pd.DataFrame(persons)
+df = spp.get_data("Person", filter=filter_by_name, Language='DE').to_dataframe()
 print(df[['FirstName', 'LastName']])
+```
+
+### Search with the `OpenParlDataBackend`**
+
+The OpenParlDataBackend has the ability to filter and search, all the parameters described in the [API documentation](https://api.openparldata.ch/documentation#/) can be used here.
+
+**Filter by values***
+```python
+>>> import swissparlpy as spp
+>>> 
+>>> opd_client = spp.SwissParlClient(backend="openparldata")
+>>> response = opd_client.get_data("persons", firstname="Karin", lastname="Keller-Sutter")
+>>> df = response.to_dataframe()
+>>> print(df[['firstname', 'lastname', "title"]])
+  firstname       lastname                         title
+0     Karin  Keller-Sutter  Dipl. Konferenzdolmetscherin
+```
+
+**Search in the data**
+
+```python
+>>> import swissparlpy as spp
+>>> 
+>>> opd_client = spp.SwissParlClient(backend="openparldata")
+>>> response = opd_client.get_data("speeches", search_mode="natural", search_scope="all", search_language="de", search="Budget")
+>>> len(response)
+457
+>>> df = response.to_dataframe()
+>>> df[["id", "body_key", "person_id", "meeting_id", "date_start", "date_end", "text_content_de"]]       
+          id body_key  person_id  meeting_id           date_start date_end                                    text_content_de
+0    1100333      351     4256.0        1262  2024-11-14T18:18:52     None  <p><b>Corina Liebi (JGLP)</b> für die PVS: Für...
+1    1100301      351     4191.0        1578  2024-05-30T22:24:34     None  <p><b>Ursina Anderegg (GB)</b> für die Fraktio...
+2    1100187      351     4139.0        1219  2025-11-20T18:02:10     None  <p><b>Debora Alder-Gasser (EVP)</b> für die Ko...
+3    1100167      351     4315.0        1219  2025-11-20T17:11:50     None  <p><b>Simone Richner (FDP)</b> für die Kommiss...
+4    1100016      351     4237.0        1628  2024-06-27T13:44:06     None  <p><b>Franziska Geiser (GB)</b> für die FIKO: ...
+..       ...      ...        ...         ...                  ...      ...                                                ...
+452  1088291      351     4237.0        1193  2025-03-27T21:51:35     None  <p><b>Franziska Geiser (GB)</b> für die Frakti...
+453  1088272      351     4162.0        1404  2025-03-20T17:36:23     None  <p><b>Janina Aeberhard (GLP)</b> für die Kommi...
+454  1088255      351     4123.0        1870  2023-09-21T15:50:27     None  <p><b>Barbara Keller (SP)</b> für die SBK: Ich...
+455  1088206      351     4114.0        1404  2025-03-20T17:50:35     None  <p><b>Laura Curau (Mitte)</b> für die Fraktion...
+456  1088186      351     4237.0        1404  2025-03-20T18:39:10     None  <p><b>Franziska Geiser (GB)</b> für die Frakti...
+
+[457 rows x 7 columns]
 ```
 
 ### Large queries

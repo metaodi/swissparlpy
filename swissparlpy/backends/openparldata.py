@@ -10,7 +10,7 @@ from urllib.parse import urlparse, parse_qs
 
 log = logging.getLogger(__name__)
 
-OPENPARLDATA_URL = "https://api.openparldata.ch/v1"
+OPENPARLDATA_URL = "https://api.openparldata.ch/"
 OPENPARLDATA_OPENAPI_URL = "https://api.openparldata.ch/openapi.json"
 
 
@@ -20,15 +20,16 @@ class OpenParlDataBackend(BaseBackend):
     def __init__(
         self,
         session: Optional[requests.Session] = None,
-        openapi_url: str = OPENPARLDATA_OPENAPI_URL,
+        url: str = OPENPARLDATA_OPENAPI_URL,
     ) -> None:
         if not session:
             session = requests.Session()
         self.session = session
         self.cache: dict[str, list[str]] = {}
-        self.openapi_url = openapi_url
-        api_config = self._load_openapi_config(openapi_url)
-        self.base_url = api_config["base_url"]
+        self.openapi_url = url
+        api_config = self._load_openapi_config(url)
+        # use v1 of the API
+        self.base_url = f"{api_config['base_url']}v1"
 
     def _load_openapi_config(self, openapi_url: str) -> dict[str, Any]:
         """Load OpenAPI configuration from the given URL"""
@@ -132,6 +133,7 @@ class OpenParlDataBackend(BaseBackend):
             "lang": "en",
             "lang_fallback": "de",
             "search_mode": "partial",
+            "search_scope": "all",
         }
 
         params["search"] = ""
@@ -146,15 +148,18 @@ class OpenParlDataBackend(BaseBackend):
         # Convert kwargs to query parameters
         for key, value in kwargs.items():
             params[key] = value
-            if key not in variables:
-                log.warning(f"Filter key '{key}' is not a variable for table '{table}'")
+            if (key not in variables) and (key not in params):
+                log.warning(
+                    f"Attribute '{key}' is not a variable "
+                    "or search param for table '{table}'"
+                )
 
         return OpenParlDataResponse(
             session=self.session,
             url=f"{self.base_url}/{table}",
             params=params,
             table=table,
-            variables=self.get_variables(table),
+            variables=variables,
         )
 
 
@@ -339,10 +344,15 @@ class OpenParlDataProxy(dict):
         """Get related data and return its data as OpenParlDataResponse"""
         links = self.record.get("links", {})
 
-        if not isinstance(links, dict) or table not in links:
+        if not isinstance(links, dict):
+            raise errors.SwissParlError(
+                f"'links' field is not a dict, type: {type(links)}"
+            )
+
+        if table not in links:
             raise errors.TableNotFoundError(
                 f"Table {table} not found in links for this entry, "
-                f"available links: {links}"
+                f"available links: {list(links.keys())}"
             )
 
         params = {

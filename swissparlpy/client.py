@@ -1,8 +1,8 @@
 import logging
 import requests
-from .backends import ODataBackend
-from .backends.base import BaseBackend, BaseResponse
-from typing import Optional, Union, Callable, Any
+from .backends import ODataBackend, OpenParlDataBackend
+from .backends import BaseBackend, BaseResponse
+from typing import Optional, Union, Callable, Any, Literal
 
 try:
     import pandas as pd
@@ -11,7 +11,6 @@ try:
 except ImportError:
     PANDAS_AVAILABLE = False
 
-SERVICE_URL = "https://ws.parlament.ch/odata.svc/"
 log = logging.getLogger(__name__)
 
 
@@ -19,15 +18,15 @@ class SwissParlClient(object):
     def __init__(
         self,
         session: Optional[requests.Session] = None,
-        url: str = SERVICE_URL,
-        backend: Optional[BaseBackend] = None,
+        backend: Optional[Union[BaseBackend, Literal["odata", "openparldata"]]] = None,
     ) -> None:
-        if backend:
+        if isinstance(backend, BaseBackend):
             self.backend = backend
+        elif backend == "openparldata":
+            self.backend = OpenParlDataBackend(session)
         else:
             # Default to OData backend for backward compatibility
-            self.backend = ODataBackend(session, url)
-        self.url = getattr(self.backend, "url", url)
+            self.backend = ODataBackend(session)
 
     def get_tables(self) -> list[str]:
         return self.backend.get_tables()

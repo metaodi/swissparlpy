@@ -1,7 +1,8 @@
 """Base backend interface for swissparlpy"""
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Union
+from typing import Any, Callable, Union, Optional
+import requests
 
 try:
     import pandas as pd
@@ -13,6 +14,13 @@ except ImportError:
 
 class BaseBackend(ABC):
     """Abstract base class for backend implementations"""
+
+    @abstractmethod
+    def __init__(
+        self, session: Optional[requests.Session] = None, url: str = ""
+    ) -> None:
+        """Initialize the backend with a session and URL"""
+        pass
 
     @abstractmethod
     def get_tables(self) -> list[str]:

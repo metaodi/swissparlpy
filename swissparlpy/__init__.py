@@ -19,28 +19,28 @@ except ImportError:
 
 
 def get_tables(backend: Literal["odata", "openparldata"] = "odata") -> list[str]:
-    client = SwissParlClient(backend=_get_backend_instance(backend))
+    client = SwissParlClient(backend=backend)
     return client.get_tables()
 
 
 def get_variables(
     table: str, backend: Literal["odata", "openparldata"] = "odata"
 ) -> list[str]:
-    client = SwissParlClient(backend=_get_backend_instance(backend))
+    client = SwissParlClient(backend=backend)
     return client.get_variables(table)
 
 
 def get_overview(
     backend: Literal["odata", "openparldata"] = "odata",
 ) -> dict[str, list[str]]:
-    client = SwissParlClient(backend=_get_backend_instance(backend))
+    client = SwissParlClient(backend=backend)
     return client.get_overview()
 
 
 def get_glimpse(
     table: str, rows: int = 5, backend: Literal["odata", "openparldata"] = "odata"
 ) -> "SwissParlResponse":
-    client = SwissParlClient(backend=_get_backend_instance(backend))
+    client = SwissParlClient(backend=backend)
     return client.get_glimpse(table, rows)
 
 
@@ -50,13 +50,5 @@ def get_data(
     backend: Literal["odata", "openparldata"] = "odata",
     **kwargs: Any,
 ) -> "SwissParlResponse":
-    client = SwissParlClient(backend=_get_backend_instance(backend))
+    client = SwissParlClient(backend=backend)
     return client.get_data(table, filter, **kwargs)
-
-
-def _get_backend_instance(backend: Literal["odata", "openparldata"]) -> Any:
-    """Helper function to instantiate the appropriate backend"""
-    if backend == "openparldata":
-        return OpenParlDataBackend()
-    else:
-        return ODataBackend()
