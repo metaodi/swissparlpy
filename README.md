@@ -411,7 +411,24 @@ The OpenParlDataBackend has the ability to filter and search, all the parameters
 
 ### Get related data
 
-The OpenParlData-API returns related tables/entities for their data. E.g. if you query `persons` the API will return all related entities like `memberships`
+The OpenParlData-API returns related tables/entities for their data. E.g. if you query `persons` the API will return all related entities like `memberships` or `affairs`.
+
+```python
+>>> import swissparlpy as spp
+>>> 
+>>> opd_client = spp.SwissParlClient(backend="openparldata")
+>>> geru = opd_client.get_data("persons", firstname="Gerhard", lastname="Andrey")[0]
+>>> geru.get_related_tables()
+['memberships', 'interests', 'access_badges', 'contributors', 'affairs', 'speeches', 'votes', 'external_links', 'person_images', 'bodies']
+>>> member_df = geru.get_related_data('memberships').to_dataframe()
+>>> print(member_df[["external_id", "group_name_de", "role_name_de", "type_harmonized"]].head())
+                            external_id               group_name_de      role_name_de   type_harmonized
+0              CHE_interest_kultur_4245                      Kultur          Mitglied    interest_group
+1  936edfe6-f8fd-4667-a986-ab5200acafb9  Gruppe Parlaments-IT (PIT)          Mitglied  committee_ad_hoc
+2  6f42fed7-0dc6-4ed7-b655-b391ad828068  Gruppe Parlaments-IT (PIT)          Mitglied  committee_ad_hoc
+3  63898798-ac17-469f-bb21-5e562d76b1de  Gruppe Parlaments-IT (PIT)  Vizepräsident/in  committee_ad_hoc
+4  28d9ed41-e55c-4c55-a1f3-ab1300c25d52                     Büro NR  Stimmenzähler/in         committee
+```
 
 ## Similar libraries for other languages
 
