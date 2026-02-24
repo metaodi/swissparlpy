@@ -343,7 +343,7 @@ class OpenParlDataProxy(dict):
 
     def __getitem__(self, key: str) -> object:
         return self.record[key]
-    
+
     def get_related_tables(self) -> list[str]:
         """Get list of related tables available in the 'links' field"""
         links = self.record.get("links", {})
