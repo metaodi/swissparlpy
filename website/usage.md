@@ -36,9 +36,9 @@ print(tables)
 <details>
 <summary>Output</summary>
     
-```
+<code>
 ['MemberParty', 'Party', 'Person', 'PersonAddress', 'PersonCommunication', 'PersonInterest', 'Session', 'Committee', 'MemberCommittee', 'Canton', 'Council', 'Objective', 'Resolution', 'Publication', 'External', 'Meeting', 'Subject', 'Citizenship', 'Preconsultation', 'Bill', 'BillLink', 'BillStatus', 'Business', 'BusinessResponsibility', 'BusinessRole', 'LegislativePeriod', 'MemberCouncil', 'MemberParlGroup', 'ParlGroup', 'PersonOccupation', 'RelatedBusiness', 'BusinessStatus', 'BusinessType', 'MemberCouncilHistory', 'MemberCommitteeHistory', 'Vote', 'Voting', 'SubjectBusiness', 'Transcript', 'ParlGroupHistory', 'Tags', 'SeatOrganisationNr', 'PersonEmployee', 'Rapporteur', 'Mutation', 'SeatOrganisationSr', 'MemberParlGroupHistory', 'MemberPartyHistory']
-```
+</code>
 
 </details>
 
