@@ -461,6 +461,7 @@ To create a new release, follow these steps (please respect [Semantic Versioning
 
 1. Adapt the version number in `swissparlpy/__init__.py`
 1. Update the CHANGELOG with the version
+1. Update the website in the `website` directory if necessary (at least the version number)
 1. Create a [pull request to merge `develop` into `main`](https://github.com/metaodi/swissparlpy/compare/main...develop?expand=1) (make sure the tests pass!)
 1. Create a [new release/tag on GitHub](https://github.com/metaodi/swissparlpy/releases) (on the main branch)
 1. The [publication on PyPI](https://pypi.python.org/pypi/swissparlpy) happens via [GitHub Actions](https://github.com/metaodi/swissparlpy/actions?query=workflow%3A%22Upload+Python+Package%22) on every tagged commit
