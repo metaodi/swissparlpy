@@ -237,6 +237,14 @@ df = response.to_dataframe()
 print(df[['firstname', 'lastname', 'title']])
 ```
 
+<details markdown="1">
+<summary>Output</summary>
+```
+  firstname       lastname                         title
+0     Karin  Keller-Sutter  Dipl. Konferenzdolmetscherin
+```
+</details>
+
 **Full-text search:**
 
 ```python
@@ -254,6 +262,27 @@ print(len(response))
 df = response.to_dataframe()
 print(df[["id", "person_id", "date_start", "text_content_de"]].head())
 ```
+
+<details markdown="1">
+<summary>Output</summary>
+```
+"meeting_id", "date_start", "date_end", "text_content_de"]]       
+          id body_key  person_id  meeting_id           date_start date_end                                    text_content_de
+0    1100333      351     4256.0        1262  2024-11-14T18:18:52     None  <p><b>Corina Liebi (JGLP)</b> für die PVS: Für...
+1    1100301      351     4191.0        1578  2024-05-30T22:24:34     None  <p><b>Ursina Anderegg (GB)</b> für die Fraktio...
+2    1100187      351     4139.0        1219  2025-11-20T18:02:10     None  <p><b>Debora Alder-Gasser (EVP)</b> für die Ko...
+3    1100167      351     4315.0        1219  2025-11-20T17:11:50     None  <p><b>Simone Richner (FDP)</b> für die Kommiss...
+4    1100016      351     4237.0        1628  2024-06-27T13:44:06     None  <p><b>Franziska Geiser (GB)</b> für die FIKO: ...
+..       ...      ...        ...         ...                  ...      ...                                                ...
+452  1088291      351     4237.0        1193  2025-03-27T21:51:35     None  <p><b>Franziska Geiser (GB)</b> für die Frakti...
+453  1088272      351     4162.0        1404  2025-03-20T17:36:23     None  <p><b>Janina Aeberhard (GLP)</b> für die Kommi...
+454  1088255      351     4123.0        1870  2023-09-21T15:50:27     None  <p><b>Barbara Keller (SP)</b> für die SBK: Ich...
+455  1088206      351     4114.0        1404  2025-03-20T17:50:35     None  <p><b>Laura Curau (Mitte)</b> für die Fraktion...
+456  1088186      351     4237.0        1404  2025-03-20T18:39:10     None  <p><b>Franziska Geiser (GB)</b> für die Frakti...
+
+[457 rows x 7 columns]
+```
+</details>
 
 ### Get Related Data
 
@@ -273,6 +302,19 @@ print(geru.get_related_tables())
 member_df = geru.get_related_data('memberships').to_dataframe()
 print(member_df[["group_name_de", "role_name_de", "type_harmonized"]].head())
 ```
+
+<details markdown="1">
+<summary>Output</summary>
+```
+
+                            external_id               group_name_de      role_name_de   type_harmonized
+0              CHE_interest_kultur_4245                      Kultur          Mitglied    interest_group
+1  936edfe6-f8fd-4667-a986-ab5200acafb9  Gruppe Parlaments-IT (PIT)          Mitglied  committee_ad_hoc
+2  6f42fed7-0dc6-4ed7-b655-b391ad828068  Gruppe Parlaments-IT (PIT)          Mitglied  committee_ad_hoc
+3  63898798-ac17-469f-bb21-5e562d76b1de  Gruppe Parlaments-IT (PIT)  Vizepräsident/in  committee_ad_hoc
+4  28d9ed41-e55c-4c55-a1f3-ab1300c25d52                     Büro NR  Stimmenzähler/in         committee
+```
+</details>
 
 ---
 
