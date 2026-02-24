@@ -46,8 +46,15 @@ print(tables)
 import swissparlpy as spp
 
 tables = spp.get_tables(backend='openparldata')
-data = spp.get_data('cantons', backend='openparldata')
+print(tables)
 ```
+
+<details markdown="1">
+<summary>Output</summary>
+```
+['bodies', 'speeches', 'persons', 'groups', 'meetings', 'agendas', 'texts', 'votes', 'docs', 'affairs', 'votings', 'interests', 'events', 'external_links', 'contributors', 'person_images', 'memberships', 'access_badges']
+```
+</details>
 
 **Using the `SwissParlClient` class:**
 
