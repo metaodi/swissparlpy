@@ -18,14 +18,17 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Get data of a table](#get-data-of-a-table)
     * [Get data from a specific backend](#get-data-from-a-specific-backend)
     * [Use together with `pandas`](#use-together-with-pandas)
-    * [Visualize voting results](#visualize-voting-results)
-    * [Substrings (only available with the OData backend](#substrings)
-    * [Date ranges (only available with the OData backend](date-ranges-only-available-with-the-odata-backend)
-    * [Advanced filter (only supported by the OData backend)](#advanced-filter-only-supported-by-the-odata-backend)
-    * [Search with the `OpenParlDataBackend`](#search-with-the-openparldatabackend)
     * [Large queries](#large-queries)
+ * [OData backend specific options](#odata-backend-specific-options)
+    * [Substrings](#substrings)
+    * [Date ranges](date-ranges)
+    * [Advanced filter](#advanced-filter)
+    * [Visualize voting results](#visualize-voting-results)
     * [API documentation](#documentation)
-    * [Similar libraries for other languages](#similar-libraries-for-other-languages)
+ * [OData backend specific options](#odata-backend-specific-options)
+    * [Search with the `OpenParlDataBackend`](#search-with-the-openparldatabackend)
+
+* [Similar libraries for other languages](#similar-libraries-for-other-languages)
 * [Credits](#credits)
 * [Development](#development)
 * [Release](#release)
@@ -180,6 +183,142 @@ Or use the convenience method `.to_dataframe()`:
 >>> parties_df = spp.get_data('Party', Language='DE').to_dataframe()
 ```
 
+### Large queries
+
+Large queries (especially the tables Voting and Transcripts) may result in server-side errors (500 Internal Server Error). In these cases it is recommended to download the data in smaller batches, save the individual blocks and combine them after the download.
+
+This is an [example script](/examples/download_votes_in_batches.py) to download all votes of the legislative period 50, session by session, and combine them afterwards in one `DataFrame`:
+
+```python
+import swissparlpy as spp
+import pandas as pd
+import os
+
+__location__ = os.path.realpath(os.getcwd())
+path = os.path.join(__location__, "voting50")
+
+# download votes of one session and save as pickled DataFrame
+def save_votes_of_session(id, path):
+    if not os.path.exists(path):
+        os.mkdir(path)
+    data = spp.get_data("Voting", Language="DE", IdSession=id)
+    print(f"{data.count} rows loaded.")
+    df = pd.DataFrame(data)
+    pickle_path = os.path.join(path, f'{id}.pks')
+    df.to_pickle(pickle_path)
+    print(f"Saved pickle at {pickle_path}")
+
+
+# get all session of the 50 legislative period
+sessions50 = spp.get_data("Session", Language="DE", LegislativePeriodNumber=50)
+sessions50.count
+
+for session in sessions50:
+    print(f"Loading session {session['ID']}")
+    save_votes_of_session(session['ID'], path)
+
+# Combine to one dataframe
+df_voting50 = pd.concat([pd.read_pickle(os.path.join(path, x)) for x in os.listdir(path)])
+```
+
+## OData backend specific options
+
+Some features (like advanced filters) or only available with the OData backend.
+
+### Substrings
+
+If you want to query for substrings there are two main operators to use:
+
+**`__startswith`**:
+
+```python
+>>> import swissparlpy as spp
+>>> persons = spp.get_data("Person", Language="DE", LastName__startswith='Bal')
+>>> persons.count
+12
+```
+
+**`__contains`**
+```python
+>>> import swissparlpy as spp
+>>> co2_business = spp.get_data("Business", Title__contains="CO2", Language = "DE")
+>>> co2_business.count
+265
+```
+
+You can suffix any field with those operators to query the data.
+
+### Date ranges
+
+To query for date ranges you can use the operators...
+
+* `__gt` (greater than)
+* `__gte` (greater than or equal)
+* `__lt` (less than)
+* `__lte` (less than or equal)
+
+...in combination with a `datetime` object.
+
+```python
+>>> import swissparlpy as spp
+>>> from datetime import datetime
+>>> business = spp.get_data(
+...     "Business",
+...     Language="DE",
+...     SubmissionDate__gt=datetime.fromisoformat('2019-09-30'),
+...     SubmissionDate__lte=datetime.fromisoformat('2019-10-31')
+... )
+>>> business.count
+22
+```
+
+### Advanced filter
+**Text query**
+
+It's possible to write text queries using operators like `eq` (equals), `ne` (not equals), `lt`/`lte` (less than/less than or equals), `gt` / `gte` (greater than/greater than or equals), `startswith()` and `contains`:
+
+```python
+import swissparlpy as spp
+import pandas as pd
+   
+persons = spp.get_data(
+   "Person",
+   filter="(startswith(FirstName, 'Ste') or LastName eq 'Seiler') and Language eq 'DE'"
+)
+
+df = pd.DataFrame(persons)
+print(df[['FirstName', 'LastName']])
+```
+
+**Callable Filter**
+
+You can provide a callable as a filter which allows for more advanced filters.
+
+`swissparlpy.Filter` provides `or_` and `and_`.
+
+```python
+import swissparlpy as spp
+import pandas as pd
+
+# filter by FirstName = 'Stefan' OR LastName == 'Seiler'
+def filter_by_name(ent):
+   return spp.Filter.or_(
+      ent.FirstName == 'Stefan',
+      ent.LastName == 'Seiler'
+   )
+   
+df = spp.get_data("Person", filter=filter_by_name, Language='DE').to_dataframe()
+print(df[['FirstName', 'LastName']])
+```
+
+### Documentation
+
+The referencing table has been created and is available [here](docs/swissparAPY_diagram.pdf). It contains the dependency diagram between all of the tables as well, some exhaustive descriptions as well as the code needed to generate such interactive documentation.
+The documentation can indeed be recreated using [dbdiagram.io](https://dbdiagram.io/home).
+
+Below is a first look of what the dependencies are between the tables contained in the API:
+
+![db diagram of swiss parliament API](/docs/swissparAPY_diagram.png "db diagram of swiss parliament API")
 
 ### Visualize voting results
 
@@ -225,94 +364,9 @@ You can also highlight specific parliamentary groups:
 
 See the [visualization example](/examples/visualize_voting.py) for more details.
 
-### Substrings
+## OpenParlData backend specific options
 
-If you want to query for substrings there are two main operators to use:
-
-**`__startswith`**:
-
-```python
->>> import swissparlpy as spp
->>> persons = spp.get_data("Person", Language="DE", LastName__startswith='Bal')
->>> persons.count
-12
-```
-
-**`__contains`**
-```python
->>> import swissparlpy as spp
->>> co2_business = spp.get_data("Business", Title__contains="CO2", Language = "DE")
->>> co2_business.count
-265
-```
-
-You can suffix any field with those operators to query the data.
-
-### Date ranges (only available with the `odata` backend)
-
-To query for date ranges you can use the operators...
-
-* `__gt` (greater than)
-* `__gte` (greater than or equal)
-* `__lt` (less than)
-* `__lte` (less than or equal)
-
-...in combination with a `datetime` object.
-
-```python
->>> import swissparlpy as spp
->>> from datetime import datetime
->>> business = spp.get_data(
-...     "Business",
-...     Language="DE",
-...     SubmissionDate__gt=datetime.fromisoformat('2019-09-30'),
-...     SubmissionDate__lte=datetime.fromisoformat('2019-10-31')
-... )
->>> business.count
-22
-```
-
-### Advanced filter (only supported by the `odata` backend)
-
-**Text query**
-
-It's possible to write text queries using operators like `eq` (equals), `ne` (not equals), `lt`/`lte` (less than/less than or equals), `gt` / `gte` (greater than/greater than or equals), `startswith()` and `contains`:
-
-```python
-import swissparlpy as spp
-import pandas as pd
-   
-persons = spp.get_data(
-   "Person",
-   filter="(startswith(FirstName, 'Ste') or LastName eq 'Seiler') and Language eq 'DE'"
-)
-
-df = pd.DataFrame(persons)
-print(df[['FirstName', 'LastName']])
-```
-
-**Callable Filter**
-
-You can provide a callable as a filter which allows for more advanced filters.
-
-`swissparlpy.Filter` provides `or_` and `and_`.
-
-```python
-import swissparlpy as spp
-import pandas as pd
-
-# filter by FirstName = 'Stefan' OR LastName == 'Seiler'
-def filter_by_name(ent):
-   return spp.Filter.or_(
-      ent.FirstName == 'Stefan',
-      ent.LastName == 'Seiler'
-   )
-   
-df = spp.get_data("Person", filter=filter_by_name, Language='DE').to_dataframe()
-print(df[['FirstName', 'LastName']])
-```
-
-### Search with the `OpenParlDataBackend`
+### Search
 
 The OpenParlDataBackend has the ability to filter and search, all the parameters described in the [API documentation](https://api.openparldata.ch/documentation#/) can be used here.
 
@@ -355,54 +409,11 @@ The OpenParlDataBackend has the ability to filter and search, all the parameters
 [457 rows x 7 columns]
 ```
 
-### Large queries
+### Get related data
 
-Large queries (especially the tables Voting and Transcripts) may result in server-side errors (500 Internal Server Error). In these cases it is recommended to download the data in smaller batches, save the individual blocks and combine them after the download.
+The OpenParlData-API returns related tables/entities for their data. E.g. if you query `persons` the API will return all related entities like `memberships`
 
-This is an [example script](/examples/download_votes_in_batches.py) to download all votes of the legislative period 50, session by session, and combine them afterwards in one `DataFrame`:
-
-```python
-import swissparlpy as spp
-import pandas as pd
-import os
-
-__location__ = os.path.realpath(os.getcwd())
-path = os.path.join(__location__, "voting50")
-
-# download votes of one session and save as pickled DataFrame
-def save_votes_of_session(id, path):
-    if not os.path.exists(path):
-        os.mkdir(path)
-    data = spp.get_data("Voting", Language="DE", IdSession=id)
-    print(f"{data.count} rows loaded.")
-    df = pd.DataFrame(data)
-    pickle_path = os.path.join(path, f'{id}.pks')
-    df.to_pickle(pickle_path)
-    print(f"Saved pickle at {pickle_path}")
-
-
-# get all session of the 50 legislative period
-sessions50 = spp.get_data("Session", Language="DE", LegislativePeriodNumber=50)
-sessions50.count
-
-for session in sessions50:
-    print(f"Loading session {session['ID']}")
-    save_votes_of_session(session['ID'], path)
-
-# Combine to one dataframe
-df_voting50 = pd.concat([pd.read_pickle(os.path.join(path, x)) for x in os.listdir(path)])
-```
-
-### Documentation
-
-The referencing table has been created and is available [here](docs/swissparAPY_diagram.pdf). It contains the dependency diagram between all of the tables as well, some exhaustive descriptions as well as the code needed to generate such interactive documentation.
-The documentation can indeed be recreated using [dbdiagram.io](https://dbdiagram.io/home).
-
-Below is a first look of what the dependencies are between the tables contained in the API:
-
-![db diagram of swiss parliament API](/docs/swissparAPY_diagram.png "db diagram of swiss parliament API")
-
-### Similar libraries for other languages
+## Similar libraries for other languages
 
 * R: [zumbov2/swissparl](https://github.com/zumbov2/swissparl)
 * JavaScript: [michaelschoenbaechler/swissparl](https://github.com/michaelschoenbaechler/swissparl)
