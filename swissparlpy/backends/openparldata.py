@@ -29,7 +29,7 @@ class OpenParlDataBackend(BaseBackend):
         self.openapi_url = url
         api_config = self._load_openapi_config(url)
         # use v1 of the API
-        self.base_url = f"{api_config['base_url']}v1"
+        self.base_url = f"{api_config['base_url'].rstrip('/')}/v1"
 
     def _load_openapi_config(self, openapi_url: str) -> dict[str, Any]:
         """Load OpenAPI configuration from the given URL"""
@@ -343,6 +343,15 @@ class OpenParlDataProxy(dict):
 
     def __getitem__(self, key: str) -> object:
         return self.record[key]
+    
+    def get_related_tables(self) -> list[str]:
+        """Get list of related tables available in the 'links' field"""
+        links = self.record.get("links", {})
+        if not isinstance(links, dict):
+            raise errors.SwissParlError(
+                f"'links' field is not a dict, type: {type(links)}"
+            )
+        return list(links.keys())
 
     def get_related_data(self, table: str) -> Optional[OpenParlDataResponse]:
         """Get related data and return its data as OpenParlDataResponse"""
