@@ -203,6 +203,8 @@ spp.plot_voting(votes)
 
 This produces a seat map of the Swiss National Council coloured by vote (yes / no / abstain).
 
+![Voting visualization example with scoreboard](https://github.com/user-attachments/assets/314c178c-e281-43b0-84ac-d5da501e218b)
+
 ---
 
 ## OpenParlData Backend
