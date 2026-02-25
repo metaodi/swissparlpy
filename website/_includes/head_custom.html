@@ -1,0 +1,17 @@
+{% assign page_title = page.title | default: site.title %}
+{% assign page_desc  = page.description | default: site.description %}
+{% assign image_path = page.social_image | default: "/assets/images/swissparlpy_social.png" %}
+{% assign image_url  = image_path | absolute_url %}
+{% assign page_url   = page.url | absolute_url %}
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ site.title }}">
+<meta property="og:title" content="{{ page_title }}">
+<meta property="og:description" content="{{ page_desc }}">
+<meta property="og:url" content="{{ page_url }}">
+<meta property="og:image" content="{{ image_url }}">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ page_title }}">
+<meta name="twitter:description" content="{{ page_desc }}">
+<meta name="twitter:image" content="{{ image_url }}">
