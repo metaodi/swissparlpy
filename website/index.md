@@ -58,7 +58,7 @@ Vizualization of voting results as scoreboard:
 ## Credits
 
 This library is inspired by the R package [swissparl](https://github.com/zumbov2/swissparl) by [David Zumbach](https://github.com/zumbov2).
-The idea for a Python version was triggered by [Ralph Straumann](https://twitter.com/rastrau) [asking on Twitter](https://twitter.com/rastrau/status/1441048778740432902).
+The idea for a Python version was triggered by [Ralph Straumann](https://twitter.com/rastrau) [asking on Twitter](https://web.archive.org/web/20210923211621/https://twitter.com/rastrau/status/1441048778740432902).
 
 ## Similar Libraries
 
