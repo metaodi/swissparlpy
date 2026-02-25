@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<searchDetailResponse xmlns="http://www.cmiag.ch/cdws/searchDetailResponse" indexName="WAHLKREISE" numHits="3" q="seq &gt; 0" m="2" s="3">
+  <Hit Guid="guid-003">
+    <Wahlkreis OBJ_GUID="guid-003">
+      <Bezeichnung>Uster</Bezeichnung>
+      <Nummer>3</Nummer>
+      <Kuerzel>UST</Kuerzel>
+    </Wahlkreis>
+  </Hit>
+</searchDetailResponse>

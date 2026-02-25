@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<searchDetailResponse xmlns="http://www.cmiag.ch/cdws/searchDetailResponse" indexName="WAHLKREISE" numHits="3" q="seq &gt; 0" m="500" s="1">
+  <Hit Guid="guid-001">
+    <Wahlkreis OBJ_GUID="guid-001">
+      <Bezeichnung>Zuerich</Bezeichnung>
+      <Nummer>1</Nummer>
+      <Kuerzel>ZH</Kuerzel>
+    </Wahlkreis>
+  </Hit>
+  <Hit Guid="guid-002">
+    <Wahlkreis OBJ_GUID="guid-002">
+      <Bezeichnung>Winterthur</Bezeichnung>
+      <Nummer>2</Nummer>
+      <Kuerzel>WIN</Kuerzel>
+    </Wahlkreis>
+  </Hit>
+  <Hit Guid="guid-003">
+    <Wahlkreis OBJ_GUID="guid-003">
+      <Bezeichnung>Uster</Bezeichnung>
+      <Nummer>3</Nummer>
+      <Kuerzel>UST</Kuerzel>
+    </Wahlkreis>
+  </Hit>
+</searchDetailResponse>
