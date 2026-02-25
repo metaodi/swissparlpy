@@ -45,15 +45,11 @@ for c in councillors:
 - **pandas integration** – Convert results directly to a `DataFrame` with `.to_dataframe()`
 - **Visualization** – Plot voting results directly with the optional visualization support
 
----
+–––
 
-## Architecture
 
-The diagram below shows the high-level architecture of swissparlpy:
 
-![swissparlpy architecture diagram](assets/images/swissparAPY_diagram.png)
-
----
+–--
 
 ## Credits
 
