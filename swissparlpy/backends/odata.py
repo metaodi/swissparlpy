@@ -178,7 +178,7 @@ class ODataResponse(BaseResponse):
 
     def __len__(self) -> int:
         return self.count
-    
+
     def __repr__(self) -> str:
         return pformat(self.data, width=80, sort_dicts=False)
 

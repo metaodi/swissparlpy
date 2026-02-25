@@ -6,7 +6,7 @@ import warnings
 from pprint import pformat
 from .base import BaseBackend, BaseResponse
 from .. import errors
-from typing import Optional, Union, Callable, Any
+from typing import Optional, Union, Callable, Any, Iterator
 from urllib.parse import urlparse, parse_qs
 
 log = logging.getLogger(__name__)
@@ -243,7 +243,7 @@ class OpenParlDataResponse(BaseResponse):
             records = []
             self.count = 0
             self.next_url = None
-        
+
         if not records:
             log.debug("No records found in response data")
         if not pagination:
@@ -280,7 +280,7 @@ class OpenParlDataResponse(BaseResponse):
     def __repr__(self) -> str:
         return pformat(self.data, width=80, sort_dicts=False)
 
-    def __iter__(self) -> Any:
+    def __iter__(self) -> Iterator["OpenParlDataProxy"]:
         """Iterate over all records, loading pages as needed"""
         i = 0
         while True:
@@ -310,7 +310,9 @@ class OpenParlDataResponse(BaseResponse):
             else:
                 break
 
-    def __getitem__(self, key: Union[int, slice]) -> object:
+    def __getitem__(
+        self, key: Union[int, slice]
+    ) -> "Union[OpenParlDataProxy, list[OpenParlDataProxy]]":
         if isinstance(key, slice):
             # Load enough data for the slice
             limit = max(key.start or 0, key.stop or self.count)

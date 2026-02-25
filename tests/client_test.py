@@ -1,3 +1,4 @@
+import swissparlpy as spp
 from swissparlpy_test import SwissParlTestCase
 from swissparlpy.client import SwissParlClient
 from swissparlpy.client import SwissParlResponse
@@ -315,3 +316,188 @@ class TestClient(SwissParlTestCase):
 
         assert response.count == 1
         assert response[0]["name"] == "Schweiz"
+
+
+class TestModuleLevelFunctions:
+    """Test module-level convenience functions from __init__.py"""
+
+    @responses.activate
+    def test_get_tables(self, metadata):
+        """Test get_tables() module function with default backend"""
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/$metadata",
+            content_type="text/xml",
+            body=metadata,
+            status=200,
+        )
+        tables = spp.get_tables()
+        assert isinstance(tables, list)
+        assert len(tables) == 44
+
+    @responses.activate
+    def test_get_tables_openparldata(self, openapi_spec):
+        """Test get_tables() module function with openparldata backend"""
+        responses.add(
+            responses.GET,
+            OPENPARLDATA_OPENAPI_URL,
+            body=openapi_spec,
+            status=200,
+            content_type="application/json",
+        )
+        tables = spp.get_tables(backend="openparldata")
+        assert isinstance(tables, list)
+        assert "persons" in tables
+
+    @responses.activate
+    def test_get_variables(self, metadata):
+        """Test get_variables() module function"""
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/$metadata",
+            content_type="text/xml",
+            body=metadata,
+            status=200,
+        )
+        variables = spp.get_variables("Party")
+        assert isinstance(variables, list)
+        assert "PartyName" in variables
+
+    @responses.activate
+    def test_get_overview(self, metadata):
+        """Test get_overview() module function"""
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/$metadata",
+            content_type="text/xml",
+            body=metadata,
+            status=200,
+        )
+        overview = spp.get_overview()
+        assert isinstance(overview, dict)
+        assert len(overview) == 44
+
+    @responses.activate
+    def test_get_glimpse(self, metadata, business_page1):
+        """Test get_glimpse() module function"""
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/$metadata",
+            content_type="text/xml",
+            body=metadata,
+            status=200,
+        )
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/Business?%24top=3&%24inlinecount=allpages",
+            content_type="text/xml",
+            body=business_page1,
+            status=200,
+        )
+        glimpse = spp.get_glimpse("Business", rows=3)
+        assert type(glimpse).__name__ == "SwissParlResponse"
+
+    @responses.activate
+    def test_get_data(self, metadata, business_page1):
+        """Test get_data() module function"""
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/$metadata",
+            content_type="text/xml",
+            body=metadata,
+            status=200,
+        )
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/Business?%24filter=Language+eq+%27DE%27&%24inlinecount=allpages",
+            content_type="text/xml",
+            body=business_page1,
+            status=200,
+        )
+        data = spp.get_data("Business", Language="DE")
+        assert type(data).__name__ == "SwissParlResponse"
+
+
+class TestSwissParlClientEdgeCases:
+    """Test edge cases in SwissParlClient"""
+
+    @responses.activate
+    def test_client_with_backend_instance(self, metadata):
+        """Test creating client with backend instance"""
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/$metadata",
+            content_type="text/xml",
+            body=metadata,
+            status=200,
+        )
+        backend = ODataBackend()
+        client = SwissParlClient(backend=backend)
+        assert (
+            client.backend == backend
+        ), "Client backend does not match the provided instance"
+
+    @responses.activate
+    def test_client_with_openparldata_string(self, openapi_spec):
+        """Test creating client with 'openparldata' string"""
+        responses.add(
+            responses.GET,
+            OPENPARLDATA_OPENAPI_URL,
+            body=openapi_spec,
+            status=200,
+            content_type="application/json",
+        )
+        client = SwissParlClient(backend="openparldata")
+        assert isinstance(
+            client.backend, OpenParlDataBackend
+        ), f"Backend is not an instance of OpenParlDataBackend, got {type(client.backend)}"
+
+    @responses.activate
+    def test_response_variables_property(self, metadata, business_page1):
+        """Test SwissParlResponse variables property"""
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/$metadata",
+            content_type="text/xml",
+            body=metadata,
+            status=200,
+        )
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/Business?%24filter=Language+eq+%27DE%27&%24inlinecount=allpages",
+            content_type="text/xml",
+            body=business_page1,
+            status=200,
+        )
+        client = SwissParlClient()
+        data = client.get_data("Business", Language="DE")
+        variables = data.variables
+        assert isinstance(
+            variables, list
+        ), f"variables is not a list, got {type(variables)}"
+        assert "Title" in variables, "Expected 'Title' in variables list"
+
+    @responses.activate
+    def test_response_records_loaded_count_property(self, metadata, business_page1):
+        """Test SwissParlResponse _records_loaded_count property"""
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/$metadata",
+            content_type="text/xml",
+            body=metadata,
+            status=200,
+        )
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/Business?%24filter=Language+eq+%27DE%27&%24inlinecount=allpages",
+            content_type="text/xml",
+            body=business_page1,
+            status=200,
+        )
+        client = SwissParlClient()
+        data = client.get_data("Business", Language="DE")
+        count = data._records_loaded_count
+        assert isinstance(
+            count, int
+        ), f"_records_loaded_count is not an int, got {type(count)}"
+        assert count > 0, f"_records_loaded_count should be greater than 0, got {count}"
