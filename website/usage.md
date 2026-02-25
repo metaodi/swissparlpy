@@ -220,6 +220,8 @@ This produces a seat map of the Swiss National Council coloured by vote (yes / n
 
 ![Voting visualization example with scoreboard](https://github.com/user-attachments/assets/314c178c-e281-43b0-84ac-d5da501e218b)
 
+![Voting visualization example with poly1 and a highlighted group](https://github.com/user-attachments/assets/a11ecf2b-a966-4e21-b5ec-e99e60f06c89)
+
 ---
 
 ## OpenParlData Backend
