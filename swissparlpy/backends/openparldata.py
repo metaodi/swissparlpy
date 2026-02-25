@@ -243,7 +243,7 @@ class OpenParlDataResponse(BaseResponse):
             records = []
             self.count = 0
             self.next_url = None
-        
+
         if not records:
             log.debug("No records found in response data")
         if not pagination:
