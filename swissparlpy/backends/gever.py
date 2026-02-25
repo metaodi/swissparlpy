@@ -370,7 +370,8 @@ class GeverResponse(BaseResponse):
         for xml_rec in xml_recs:
             record: dict[str, Any] = {}
             guid = xml_rec.attrib.get("Guid", "")
-            rec = self.xmlparser.find(xml_rec, f"./*[@OBJ_GUID = '{guid}']")
+            safe_guid = guid.replace("'", "&apos;")
+            rec = self.xmlparser.find(xml_rec, f"./*[@OBJ_GUID = '{safe_guid}']")
             record.update(self._tag_data(rec))
             new_records.append(record)
         self.records.extend(new_records)
