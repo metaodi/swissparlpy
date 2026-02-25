@@ -1,6 +1,6 @@
 title: swissparlpy
 url: "https://metaodi.ch"
-baseurl: "swissparlpy"
+baseurl: "/swissparlpy"
 description: Python module for easy access to the Swiss Parliament OData webservice and OpenParlData.ch REST API
 repository: metaodi/swissparlpy
 remote_theme: just-the-docs/just-the-docs@v0.10.0
