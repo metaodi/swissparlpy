@@ -61,7 +61,7 @@ _DEFAULT_CONFIG: dict[str, Any] = {
             "geschaeftsart": {"path": "/api/geschaeftsart"},
             "partei": {"path": "/api/partei"},
             "pendentbei": {"path": "/api/pendentbei"},
-            "geschaeftvorstoesser": {"path": "/api/geschaeftsvorstoesser"},
+            "geschaeftsvorstoesser": {"path": "/api/geschaeftsvorstoesser"},
             "kontakt": {"path": "/api/kontakt"},
             "behoerdenmandat": {"path": "/api/behoerdenmandat"},
             "wohnkreis": {"path": "/api/wohnkreis"},
