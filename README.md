@@ -438,7 +438,7 @@ The OpenParlData-API returns related tables/entities for their data. E.g. if you
 ## Credits
 
 This library is inspired by the R package [swissparl](https://github.com/zumbov2/swissparl) of [David Zumbach](https://github.com/zumbov2).
-[Ralph Straumann](https://twitter.com/rastrau) initial [asked about a Python version of `swissparl` on Twitter](https://twitter.com/rastrau/status/1441048778740432902), which led to this project.
+[Ralph Straumann](https://twitter.com/rastrau) initial [asked about a Python version of `swissparl` on Twitter](https://web.archive.org/web/20210923211621/https://twitter.com/rastrau/status/1441048778740432902), which led to this project.
 
 ## Development
 
