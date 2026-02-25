@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project follows [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.0.0] - 2026-02-25
 ### Changed
 - BC-Break: Python 3.9 is now required
 - BC-Break: Renamed the callable filter from `swissparlpy.filter` to `swissparlpy.Filter`
@@ -75,7 +77,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `Fixed` for any bug fixes.
 - `Security` to invite users to upgrade in case of vulnerabilities.
 
-[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/metaodi/swissparlpy/compare/v0.3.0...v1.0.0
 [0.3.0]: https://github.com/metaodi/swissparlpy/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/metaodi/swissparlpy/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/metaodi/swissparlpy/compare/v0.1.1...v0.2.0
