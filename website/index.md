@@ -6,7 +6,7 @@ nav_order: 1
 
 # swissparlpy
 
-[![PyPI Version](https://img.shields.io/pypi/v/swissparlpy)](https://pypi.org/project/swissparlpy/)
+[![PyPI Version](https://img.shields.io/pypi/v/swissparlpy?1)](https://pypi.org/project/swissparlpy/)
 [![Build Status](https://github.com/metaodi/swissparlpy/actions/workflows/build.yml/badge.svg)](https://github.com/metaodi/swissparlpy/actions/workflows/build.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
