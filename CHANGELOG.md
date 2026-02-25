@@ -4,6 +4,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-02-25
+### Changed
+- BC-Break: Python 3.9 is now required
+- BC-Break: Renamed the callable filter from `swissparlpy.filter` to `swissparlpy.Filter`
+- Switched from `flit` to `uv` to install dependencies, build and publish the package
+
+### Added
+- Added the plotting functionality from [`ggswissparl`](https://github.com/zumbov2/swissparl#ggswissparl) (Issue #9)
+- Added type hints in the library
+- Add to_dataframe() convenience method to SwissParlResponse to directly transform a result to a DataFrame
+- Detect server timeout and raise `SwissParlTimeoutError` if necessary
+- Add support for multiple backends
+- Add support for OpenParlData.ch as a backend (Issue #40)
+
 ## [0.3.0] - 2023-08-31
 ### Added
 - Support for server-side pagination (transparent to the user)
@@ -63,7 +77,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `Fixed` for any bug fixes.
 - `Security` to invite users to upgrade in case of vulnerabilities.
 
-[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/metaodi/swissparlpy/compare/v0.3.0...v1.0.0
 [0.3.0]: https://github.com/metaodi/swissparlpy/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/metaodi/swissparlpy/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/metaodi/swissparlpy/compare/v0.1.1...v0.2.0

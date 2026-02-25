@@ -7,3 +7,8 @@ pyenv
 dist/
 examples/voting50/
 examples/.ipynb_checkpoints/
+.mypy_cache/
+website/_site/
+website/.jekyll-cache/
+website/.bundle/
+website/vendor/

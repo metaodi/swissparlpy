@@ -8,7 +8,7 @@ def fixture_content(filename):
     path = os.path.join(__location__, "fixtures", filename)
     if not os.path.exists(path):
         return ""
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         return f.read()
 
 
@@ -28,3 +28,33 @@ def business_page1():
 def business_page2():
     """OData business data fixture"""
     return fixture_content("business_2.json")
+
+
+@pytest.fixture
+def openapi_spec():
+    """OpenParlData OpenAPI specification fixture"""
+    return fixture_content("openapi.json")
+
+
+@pytest.fixture
+def single_person():
+    """OpenParlData response fixture for a single person"""
+    return fixture_content("single_person.json")
+
+
+@pytest.fixture
+def person_memberships():
+    """OpenParlData response fixture for a person's memberships"""
+    return fixture_content("person_memberships.json")
+
+
+@pytest.fixture
+def affairs_page1():
+    """OpenParlData affairs data fixture (page 1)"""
+    return fixture_content("affairs_1.json")
+
+
+@pytest.fixture
+def affairs_page2():
+    """OpenParlData affairs data fixture (page 2)"""
+    return fixture_content("affairs_2.json")

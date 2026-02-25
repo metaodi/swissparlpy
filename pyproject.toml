@@ -1,17 +1,14 @@
-[build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
-
 [project]
 name = "swissparlpy"
 authors = [{name = "Stefan Oderbolz", email = "odi@metaodi.ch"}]
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 classifiers = ["License :: OSI Approved :: MIT License"]
-dynamic = ["version", "description"]
+dynamic = ["version"]
+description = "Client for Swiss parliament API"
 dependencies = [
     "requests",
-    "pyodata>=1.10.0",
+    "pyodata>=1.11.1",
 ]
 
 [project.optional-dependencies]
@@ -21,15 +18,48 @@ test = [
     "responses",
     "pytest",
     "pytest-cov",
+    "black[jupyter]>=24.0.0,<25.0.0",
+    "matplotlib>=3.0.0",
+    "pandas",
 ]
 dev = [
-    "flit",
     "jupyter",
-    "pandas",
-    "black",
+    "black[jupyter]>=24.0.0,<25.0.0",
     "pre-commit",
+    "mypy",
+    "types-requests",
+    "pandas-stubs",
+]
+visualization = [
+    "matplotlib>=3.0.0",
+    "pandas",
 ]
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project.urls]
 Home = "https://github.com/metaodi/swissparlpy"
+
+[tool.black]
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.hatch.version]
+path = "swissparlpy/__init__.py"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+]
+addopts = "--cov=swissparlpy"
+
+[tool.mypy]
+python_version = "3.9"
+ignore_missing_imports = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_return_any = true
+show_error_codes = true
+pretty = true

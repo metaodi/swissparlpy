@@ -1,0 +1,49 @@
+title: swissparlpy
+description: Python module for easy access to the Swiss Parliament OData webservice and OpenParlData.ch REST API
+repository: metaodi/swissparlpy
+remote_theme: just-the-docs/just-the-docs@v0.10.0
+markdown: kramdown
+color_scheme: light
+
+search_enabled: true
+
+# Aux links in the header
+aux_links:
+  "GitHub":
+    - "https://github.com/metaodi/swissparlpy"
+  "PyPI":
+    - "https://pypi.org/project/swissparlpy/"
+
+aux_links_new_tab: true
+
+# Footer
+footer_content: "Released under the <a href=\"https://github.com/metaodi/swissparlpy/blob/main/LICENSE.md\">MIT License</a>. Maintained by <a href=\"https://github.com/metaodi\">metaodi</a>."
+
+# Edit page link
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub"
+gh_edit_repository: "https://github.com/metaodi/swissparlpy"
+gh_edit_branch: "develop"
+gh_edit_source: "website"
+gh_edit_view_mode: "edit"
+
+# Callouts
+callouts_level: quiet
+callouts:
+  highlight:
+    color: yellow
+  important:
+    title: Important
+    color: blue
+  new:
+    title: New
+    color: green
+  note:
+    title: Note
+    color: purple
+  warning:
+    title: Warning
+    color: red
+
+plugins:
+  - jekyll-seo-tag
