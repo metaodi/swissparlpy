@@ -12,6 +12,8 @@ nav_order: 1
 
 **swissparlpy** is a Python module that provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss Parliament](https://www.parlament.ch/en) and the [OpenParlData.ch](https://openparldata.ch) REST API.
 
+![swissparlpy](assets/images/swissparlpy.png)
+
 ---
 
 ## Quick Start
