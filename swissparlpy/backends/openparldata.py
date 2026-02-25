@@ -3,6 +3,7 @@
 import logging
 import requests
 import warnings
+from pprint import pformat
 from .base import BaseBackend, BaseResponse
 from .. import errors
 from typing import Optional, Union, Callable, Any
@@ -224,8 +225,9 @@ class OpenParlDataResponse(BaseResponse):
 
     def _parse_response(self, data: Any) -> None:
         """Parse API response and extract data"""
+        pagination = {}
         if isinstance(data, dict):
-            records = data["data"]
+            records = data.get("data", [])
             pagination = data.get("meta", {})
             self.count = pagination.get("total_records", len(records))
             self.next_url = pagination.get("next_page")
@@ -237,9 +239,15 @@ class OpenParlDataResponse(BaseResponse):
                 self._variables = list(records[0].keys())
 
         else:
+            log.debug(f"Response data is not a dict, got type: {type(data)}")
             records = []
             self.count = 0
             self.next_url = None
+        
+        if not records:
+            log.debug("No records found in response data")
+        if not pagination:
+            log.debug("No pagination info found in response data")
 
         # Wrap each record in a proxy object
         for record in records:
@@ -270,7 +278,7 @@ class OpenParlDataResponse(BaseResponse):
         return self.count
 
     def __repr__(self) -> str:
-        return self.data.__repr__()
+        return pformat(self.data, width=80, sort_dicts=False)
 
     def __iter__(self) -> Any:
         """Iterate over all records, loading pages as needed"""

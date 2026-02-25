@@ -4,6 +4,7 @@ import logging
 import warnings
 import requests
 import pyodata
+from pprint import pformat
 from .base import BaseBackend, BaseResponse
 from .. import errors
 from typing import Optional, Union, Callable, Any
@@ -177,6 +178,9 @@ class ODataResponse(BaseResponse):
 
     def __len__(self) -> int:
         return self.count
+    
+    def __repr__(self) -> str:
+        return pformat(self.data, width=80, sort_dicts=False)
 
     def __iter__(self) -> Any:
         # use while loop since self.data could grow while iterating
