@@ -45,11 +45,13 @@ for c in councillors:
 - **pandas integration** – Convert results directly to a `DataFrame` with `.to_dataframe()`
 - **Visualization** – Plot voting results directly with the optional visualization support
 
+---
+
 Vizualization of voting results as scoreboard:
 
 ![Voting visualization example with scoreboard](https://github.com/user-attachments/assets/314c178c-e281-43b0-84ac-d5da501e218b)
 
-–--
+---
 
 ## Credits
 
