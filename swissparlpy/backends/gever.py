@@ -227,7 +227,7 @@ class GeverBackend(BaseBackend):
                 return f"{base}/{section}{path}"
             return f"{base}{path}"
         except KeyError as e:
-            raise errors.SwissParlError(f"Index '{index}' not found in config: {e}")
+            raise errors.TableNotFoundError(f"Index '{index}' not found in config: {e}")
 
 
 class GeverResponse(BaseResponse):
