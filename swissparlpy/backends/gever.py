@@ -94,7 +94,7 @@ class _GeverDataLoader:
     def load(self, **kwargs: Any) -> bytes:
         self.params.update(kwargs)
         try:
-            res = self.session.get(self.url, params=self.params)
+            res = self.session.get(self.url, params=self.params, timeout=10)
             res.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise errors.SwissParlHttpRequestError(f"HTTP error: {e}") from e
