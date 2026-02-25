@@ -47,7 +47,7 @@ for c in councillors:
 
 –––
 
-
+![Voting visualization example with scoreboard](https://github.com/user-attachments/assets/314c178c-e281-43b0-84ac-d5da501e218b)
 
 –--
 
