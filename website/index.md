@@ -1,5 +1,5 @@
 ---
-title: Home
+title: Python library for the Swiss Parliament API and OpenParlData.ch API
 layout: home
 nav_order: 1
 ---
