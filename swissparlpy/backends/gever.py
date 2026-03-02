@@ -3,7 +3,7 @@
 import logging
 import re
 from datetime import datetime
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Literal, Optional, Sequence, Union, cast
 
 import requests
 
@@ -49,30 +49,62 @@ _DEFAULT_CONFIG: dict[str, Any] = {
         },
     },
     "city_zurich": {
-        "api_base": "https://www.integ.gemeinderat-zuerich.ch",
+        "api_base": "https://www.gemeinderat-zuerich.ch",
         "files_api": {"path": "/api/files"},
         "indexes": {
-            "geschaeft": {"path": "/api/geschaeft"},
-            "dokument": {"path": "/api/dokument"},
-            "departement": {"path": "/api/departement"},
-            "gremiumsuebersicht": {"path": "/api/gremiumsuebersicht"},
-            "gremium": {"path": "/api/gremium"},
-            "gremiumstyp": {"path": "/api/gremiumstyp"},
-            "geschaeftsart": {"path": "/api/geschaeftsart"},
-            "partei": {"path": "/api/partei"},
-            "pendentbei": {"path": "/api/pendentbei"},
-            "geschaeftsvorstoesser": {"path": "/api/geschaeftsvorstoesser"},
-            "kontakt": {"path": "/api/kontakt"},
-            "behoerdenmandat": {"path": "/api/behoerdenmandat"},
-            "wohnkreis": {"path": "/api/wohnkreis"},
-            "wahlkreis": {"path": "/api/wahlkreis"},
-            "ablaufschritt": {"path": "/api/ablaufschritt"},
-            "referendum": {"path": "/api/referendum"},
-            "sitzung": {"path": "/api/sitzung"},
-            "ratspost": {"path": "/api/ratspost"},
+            "Ablaufschritt": {"path": "/api/ablaufschritt"},
+            "Abstimmung": {"path": "/api/abstimmung"},
+            "Behoerdenmandat": {"path": "/api/behoerdenmandat"},
+            "Departement": {"path": "/api/departement"},
+            "Dokument": {"path": "/api/dokument"},
+            "Geschaeft": {"path": "/api/geschaeft"},
+            "Geschaeftsart": {"path": "/api/geschaeftsart"},
+            # This endpoint seems to be currently unavailable (returns 404)
+            # "Geschlecht": {"path": "/api/geschlecht"},
+            "Gremiumdetail": {"path": "/api/gremiumdetail"},
+            "Gremiumstyp": {"path": "/api/gremiumstyp"},
+            "Gremiumsuebersicht": {"path": "/api/gremiumsuebersicht"},
+            "Kontakt": {"path": "/api/kontakt"},
+            "Partei": {"path": "/api/partei"},
+            "PendentBei": {"path": "/api/pendentbei"},
+            "Ratspost": {"path": "/api/ratspost"},
+            "Referendum": {"path": "/api/referendum"},
+            "Sitzung": {"path": "/api/sitzung"},
+            "Wahlkreis": {"path": "/api/wahlkreis"},
+            "Wohnkreis": {"path": "/api/wohnkreis"},
+            "Wortmeldung": {"path": "/api/wortmeldung"},
         },
     },
 }
+
+
+def flatten_dict(
+    d: dict[str, Any],
+    reducer: Union[Literal["tuple", "path", "underscore", "dot"], Callable] = "tuple",
+    inverse: bool = False,
+    max_flatten_depth: Optional[int] = None,
+    enumerate_types: Sequence[type] = (),
+    keep_empty_types: Sequence[type] = (),
+) -> dict[str, Any]:
+    """Flatten a nested dictionary using the specified reducer."""
+    try:
+        from flatten_dict import flatten
+    except ImportError as e:
+        raise ImportError(
+            "The Gever backend requires 'muzzle' and 'flatten-dict'. "
+            "Install them with: pip install swissparlpy[gever]"
+        ) from e
+
+    flat_dict = flatten(
+        d,
+        reducer=reducer,  # type: ignore
+        inverse=inverse,
+        max_flatten_depth=max_flatten_depth,
+        enumerate_types=enumerate_types,
+        keep_empty_types=keep_empty_types,
+    )
+
+    return cast(dict[str, Any], flat_dict)  # for type checker
 
 
 class _NoMoreRecordsError(Exception):
@@ -144,22 +176,29 @@ class GeverBackend(BaseBackend):
 
     def get_variables(self, table: str) -> list[str]:
         """Query the /schema endpoint and extract field names."""
-        import muzzle
+        try:
+            import muzzle
 
-        index_url = self._get_index_url(table)
-        url = f"{index_url}/schema"
-        data_loader = _GeverDataLoader(url, {}, self.session)
-        xml_bytes = data_loader.load()
-        xsd_ns = {"xsd": "http://www.w3.org/2001/XMLSchema"}
-        parser = muzzle.XMLParser(xsd_ns)
-        xml = parser.parse(xml_bytes)
-        # Extract leaf xsd:element names (skip root wrapper elements with children)
-        fields = []
-        for elem in parser.findall(xml, ".//xsd:element"):
-            name = elem.attrib.get("name")
-            if name and not list(elem):
-                fields.append(name)
-        return fields
+            index_url = self._get_index_url(table)
+            url = f"{index_url}/schema"
+            data_loader = _GeverDataLoader(url, {}, self.session)
+            xml_bytes = data_loader.load()
+            xsd_ns = {"xsd": "http://www.w3.org/2001/XMLSchema"}
+            parser = muzzle.XMLParser(xsd_ns)
+            xml = parser.parse(xml_bytes)
+            # Extract leaf xsd:element names (skip root wrapper elements with children)
+            fields = []
+            for elem in parser.findall(xml, ".//xsd:element"):
+                name = elem.attrib.get("name")
+                if name and not list(elem):
+                    fields.append(name)
+            return fields
+        except errors.SwissParlHttpRequestError as e:
+            log.warning(f"HTTP request error: {e}. Falling back to get_data method.")
+            res = self.get_data(table)
+            if len(res) > 0 and isinstance(res[0], dict):
+                return list(res[0].keys())
+            raise e
 
     def get_data(
         self,
@@ -231,7 +270,7 @@ class GeverBackend(BaseBackend):
 
 
 class GeverResponse(BaseResponse):
-    """Response wrapper for Gever API queries (ports goifer's SearchResponse/SchemaResponse)."""
+    """Response wrapper for Gever API queries."""
 
     def __init__(
         self,
@@ -435,8 +474,6 @@ class GeverResponse(BaseResponse):
         return (url, filename)
 
     def _flat_dict(self, d: Any) -> dict[str, Any]:
-        from flatten_dict import flatten
-
         def leaf_reducer(k1: Any, k2: Any) -> Any:
             if k1 is None or k2.lower() in k1.lower():
                 return k2
@@ -444,7 +481,7 @@ class GeverResponse(BaseResponse):
                 return k1
             return f"{k1}_{k2}"
 
-        flat_data = flatten(d, max_flatten_depth=2, reducer=leaf_reducer)
+        flat_data = flatten_dict(d, max_flatten_depth=2, reducer=leaf_reducer)
         flat_data = self._clean_dict(flat_data)
 
         for k in ["person_kontakt", "position", "geschaeft"]:
@@ -452,23 +489,26 @@ class GeverResponse(BaseResponse):
                 flat_data[k] = [self._flat_dict(ik) for ik in flat_data[k]]
             elif k in flat_data and isinstance(flat_data[k], dict):
                 flat_data.update(
-                    flatten(flat_data[k], max_flatten_depth=2, reducer=leaf_reducer)
+                    flatten_dict(
+                        flat_data[k], max_flatten_depth=2, reducer=leaf_reducer
+                    )
                 )
                 del flat_data[k]
 
         return flat_data
 
     def _get_xmlns(self, elem: Any) -> dict[str, Any]:
-        from flatten_dict import flatten
-
         dict_namespaces: dict[str, Any] = {}
-        elem_dict = flatten(self.xmlparser.todict(elem, xml_attribs=True))
+        ns_dict = self.xmlparser.todict(elem, xml_attribs=True)
+        if not isinstance(ns_dict, dict):
+            raise ValueError("Expected XML element to be converted to a dictionary")
+        elem_dict = flatten_dict(ns_dict)
         for k, v in elem_dict.items():
             if "xmlns" in k and v:
                 dict_namespaces[v] = None
         return dict_namespaces
 
-    def _clean_dict(self, records: dict[str, Any]) -> dict[str, Any]:
+    def _clean_dict(self, records: dict[str, Any]) -> dict[str, Any]:  # noqa: C901
         ns_pattern = re.compile("^.+:")
 
         def clean_name(key: str) -> str:

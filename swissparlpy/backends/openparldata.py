@@ -98,7 +98,8 @@ class OpenParlDataBackend(BaseBackend):
 
         # Try to get a single record to discover the schema
         response = self._http_get_request(
-            f"{self.base_url}/{table}", params={"limit": 1}
+            f"{self.base_url}/{table}",
+            params={"limit": 2},  # TODO: use 1 if API is fixed
         )
         try:
             data = response.json()["data"][0]
