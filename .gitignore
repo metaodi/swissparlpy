@@ -1,5 +1,5 @@
 swissparlpy.egg-info
-*.pyc
+*.pyc*
 *.swp
 .coverage
 __pycache__/
