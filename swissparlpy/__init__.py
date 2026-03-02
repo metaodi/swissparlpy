@@ -7,6 +7,7 @@ from .errors import SwissParlError  # noqa
 from .client import SwissParlClient  # noqa
 from .client import SwissParlResponse  # noqa
 from .backends import ODataBackend, OpenParlDataBackend  # noqa
+from .backends import ODataResponse, OpenParlDataResponse  # noqa
 from pyodata.v2.service import GetEntitySetFilter as Filter  # noqa
 from typing import Callable, Union, Any, Literal
 
