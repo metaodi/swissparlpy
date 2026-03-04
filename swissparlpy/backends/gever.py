@@ -201,6 +201,41 @@ class GeverBackend(BaseBackend):
                 return list(res[0].keys())
             raise e
 
+    def _get_schema_list_fields(self, table: str) -> set[str]:
+        """Parse schema to identify fields with maxOccurs > 1 (should always be lists)."""
+        try:
+            import muzzle
+
+            index_url = self._get_index_url(table)
+            url = f"{index_url}/schema"
+            data_loader = _GeverDataLoader(url, {}, self.session)
+            xml_bytes = data_loader.load()
+            xsd_ns = {"xsd": "http://www.w3.org/2001/XMLSchema"}
+            parser = muzzle.XMLParser(xsd_ns)
+            xml = parser.parse(xml_bytes)
+
+            list_fields = set()
+            # Find elements with maxOccurs > 1 or maxOccurs="unbounded"
+            for elem in parser.findall(xml, ".//xsd:element"):
+                name = elem.attrib.get("name")
+                max_occurs = elem.attrib.get("maxOccurs")
+
+                if name and max_occurs:
+                    # maxOccurs="unbounded" or maxOccurs > 1 means it's a list field
+                    if max_occurs == "unbounded":
+                        list_fields.add(name.lower())
+                    else:
+                        try:
+                            if int(max_occurs) > 1:
+                                list_fields.add(name.lower())
+                        except (ValueError, TypeError):
+                            pass
+
+            return list_fields
+        except (errors.SwissParlHttpRequestError, Exception) as e:
+            log.warning(f"Could not parse schema for list fields: {e}")
+            return set()
+
     def get_data(
         self,
         table: str,
@@ -228,12 +263,17 @@ class GeverBackend(BaseBackend):
         }
         data_loader = _GeverDataLoader(url, params, self.session)
         xml_bytes = data_loader.load()
+
+        # Get list fields from schema
+        list_fields = self._get_schema_list_fields(table)
+
         return GeverResponse(
             xml_bytes=xml_bytes,
             data_loader=data_loader,
             table=table,
             config=self.config,
             is_schema=False,
+            list_fields=list_fields,
         )
 
     def get_glimpse(self, table: str, rows: int = 5) -> "GeverResponse":
@@ -247,6 +287,10 @@ class GeverBackend(BaseBackend):
         }
         data_loader = _GeverDataLoader(url, params, self.session)
         xml_bytes = data_loader.load()
+
+        # Get list fields from schema
+        list_fields = self._get_schema_list_fields(table)
+
         return GeverResponse(
             xml_bytes=xml_bytes,
             data_loader=data_loader,
@@ -254,6 +298,7 @@ class GeverBackend(BaseBackend):
             config=self.config,
             is_schema=False,
             maximum_records=rows,
+            list_fields=list_fields,
         )
 
     def _get_index_url(self, index: str) -> str:
@@ -281,6 +326,7 @@ class GeverResponse(BaseResponse):
         config: dict[str, Any],
         is_schema: bool = False,
         maximum_records: Optional[int] = None,
+        list_fields: Optional[set[str]] = None,
     ) -> None:
         import muzzle
 
@@ -290,6 +336,7 @@ class GeverResponse(BaseResponse):
         self._is_schema = is_schema
         self._data_loader = data_loader
         self._maximum_records = maximum_records
+        self._list_fields = list_fields or set()
 
         self.namespaces = NAMESPACES
         self.xmlparser = muzzle.XMLParser(self.namespaces)
@@ -580,5 +627,15 @@ class GeverResponse(BaseResponse):
                 clean_rec[clean_k] = convert_value(v)
             else:
                 clean_rec[clean_k] = v
+
+        # Normalize list fields: if a field should be a list (per schema),
+        # but is currently a dict, wrap it in a list
+        for field in self._list_fields:
+            if field in clean_rec:
+                if isinstance(clean_rec[field], dict):
+                    clean_rec[field] = [clean_rec[field]]
+                elif not isinstance(clean_rec[field], list) and clean_rec[field] is not None:
+                    # Wrap non-list, non-None values in a list
+                    clean_rec[field] = [clean_rec[field]]
 
         return clean_rec

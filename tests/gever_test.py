@@ -457,3 +457,125 @@ class TestSwissParlClientGeverIntegration:
         backend = GeverBackend(instance="canton_zurich")
         client = SwissParlClient(backend=backend)
         assert client.backend is backend
+
+
+class TestGeverSchemaBasedListFields:
+    """Tests for schema-based list field detection and normalization"""
+
+    @responses.activate
+    def test_get_schema_list_fields(self, mitglieder_schema):
+        """Test extraction of list fields from schema"""
+        responses.add(
+            responses.GET,
+            f"{CANTON_ZURICH_BASE}/parlzh2/cdws/Index/MITGLIEDER/schema",
+            body=mitglieder_schema,
+            status=200,
+            content_type="application/xml",
+        )
+
+        backend = GeverBackend(instance="canton_zurich")
+        list_fields = backend._get_schema_list_fields("Mitglieder")
+
+        # Position and Kontakt have maxOccurs="unbounded"
+        assert "position" in list_fields
+        assert "kontakt" in list_fields
+        # Adresse does not have maxOccurs
+        assert "adresse" not in list_fields
+
+    @responses.activate
+    def test_list_field_normalization_single_item(self, mitglieder_xml, mitglieder_schema):
+        """Test that single items are wrapped in lists for maxOccurs fields"""
+        responses.add(
+            responses.GET,
+            f"{CANTON_ZURICH_BASE}/parlzh2/cdws/Index/MITGLIEDER/schema",
+            body=mitglieder_schema,
+            status=200,
+            content_type="application/xml",
+        )
+        responses.add(
+            responses.GET,
+            f"{CANTON_ZURICH_BASE}/parlzh2/cdws/Index/MITGLIEDER/searchdetails",
+            body=mitglieder_xml,
+            status=200,
+            content_type="application/xml",
+        )
+
+        backend = GeverBackend(instance="canton_zurich")
+        response = backend.get_data("Mitglieder")
+
+        # First record has single Position and Kontakt - should be lists
+        first_record = response[0]
+        assert isinstance(first_record.get("position"), list)
+        assert isinstance(first_record.get("kontakt"), list)
+        assert len(first_record["position"]) == 1
+        assert len(first_record["kontakt"]) == 1
+
+        # Adresse should NOT be a list (no maxOccurs)
+        assert isinstance(first_record.get("adresse"), dict)
+
+    @responses.activate
+    def test_list_field_normalization_multiple_items(
+        self, mitglieder_xml, mitglieder_schema
+    ):
+        """Test that multiple items remain as lists"""
+        responses.add(
+            responses.GET,
+            f"{CANTON_ZURICH_BASE}/parlzh2/cdws/Index/MITGLIEDER/schema",
+            body=mitglieder_schema,
+            status=200,
+            content_type="application/xml",
+        )
+        responses.add(
+            responses.GET,
+            f"{CANTON_ZURICH_BASE}/parlzh2/cdws/Index/MITGLIEDER/searchdetails",
+            body=mitglieder_xml,
+            status=200,
+            content_type="application/xml",
+        )
+
+        backend = GeverBackend(instance="canton_zurich")
+        response = backend.get_data("Mitglieder")
+
+        # Second record has multiple Positions and Kontakte - should remain lists
+        second_record = response[1]
+        assert isinstance(second_record.get("position"), list)
+        assert isinstance(second_record.get("kontakt"), list)
+        assert len(second_record["position"]) == 2
+        assert len(second_record["kontakt"]) == 2
+
+        # Adresse should NOT be a list
+        assert isinstance(second_record.get("adresse"), dict)
+
+    @responses.activate
+    def test_dataframe_conversion_with_list_normalization(
+        self, mitglieder_xml, mitglieder_schema
+    ):
+        """Test that normalized list fields work better with DataFrame conversion"""
+        responses.add(
+            responses.GET,
+            f"{CANTON_ZURICH_BASE}/parlzh2/cdws/Index/MITGLIEDER/schema",
+            body=mitglieder_schema,
+            status=200,
+            content_type="application/xml",
+        )
+        responses.add(
+            responses.GET,
+            f"{CANTON_ZURICH_BASE}/parlzh2/cdws/Index/MITGLIEDER/searchdetails",
+            body=mitglieder_xml,
+            status=200,
+            content_type="application/xml",
+        )
+
+        backend = GeverBackend(instance="canton_zurich")
+        response = backend.get_data("Mitglieder")
+
+        # Convert to DataFrame
+        df = response.to_dataframe()
+
+        # Both records should have consistent types for list fields
+        assert df.shape[0] == 2  # 2 records
+        # position and kontakt should be lists in both rows
+        for idx in range(len(df)):
+            # These will be flattened with enumerate_types, so check the pattern
+            assert any("position" in col for col in df.columns)
+            assert any("kontakt" in col for col in df.columns)

@@ -90,3 +90,15 @@ def wahlkreise_page1():
 def wahlkreise_page2():
     """Gever Wahlkreise paginated response - page 2"""
     return fixture_bytes("wahlkreise_page2.xml")
+
+
+@pytest.fixture
+def mitglieder_xml():
+    """Gever Mitglieder search response fixture with list inconsistencies"""
+    return fixture_bytes("mitglieder.xml")
+
+
+@pytest.fixture
+def mitglieder_schema():
+    """Gever Mitglieder schema fixture with maxOccurs attributes"""
+    return fixture_bytes("mitglieder_schema.xml")
