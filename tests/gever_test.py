@@ -99,9 +99,10 @@ class TestGeverBackendGetVariables:
         variables = backend.get_variables("Wahlkreise")
 
         assert isinstance(variables, list)
-        assert "Bezeichnung" in variables
-        assert "Nummer" in variables
-        assert "Kuerzel" in variables
+        # Variables should be lowercase to match record keys
+        assert "bezeichnung" in variables
+        assert "nummer" in variables
+        assert "kuerzel" in variables
 
     @responses.activate
     def test_get_variables_unknown_table(self):

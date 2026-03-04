@@ -187,11 +187,12 @@ class GeverBackend(BaseBackend):
             parser = muzzle.XMLParser(xsd_ns)
             xml = parser.parse(xml_bytes)
             # Extract leaf xsd:element names (skip root wrapper elements with children)
+            # Convert to lowercase to match the keys returned by get_data()
             fields = []
             for elem in parser.findall(xml, ".//xsd:element"):
                 name = elem.attrib.get("name")
                 if name and not list(elem):
-                    fields.append(name)
+                    fields.append(name.lower())
             return fields
         except errors.SwissParlHttpRequestError as e:
             log.warning(f"HTTP request error: {e}. Falling back to get_data method.")
@@ -437,7 +438,12 @@ class GeverResponse(BaseResponse):
         record_data = self._add_download_to_docs(record_data)
 
         keys = list(record_data.keys())
-        if len(record_data) == 1 and len(keys) > 0 and len(record_data[keys[0]]) > 0:
+        if (
+            len(record_data) == 1
+            and len(keys) > 0
+            and isinstance(record_data[keys[0]], (dict, list))
+            and len(record_data[keys[0]]) > 0
+        ):
             record_data = record_data[keys[0]]
 
         record_data = self._flat_dict(record_data)
@@ -451,7 +457,10 @@ class GeverResponse(BaseResponse):
                 v["download_url"], v["FileName"] = self._get_download_url(v)
                 new_rec[k] = v
             elif isinstance(v, list):
-                new_rec[k] = [self._add_download_to_docs(vi) for vi in v]
+                new_rec[k] = [
+                    self._add_download_to_docs(vi) if isinstance(vi, dict) else vi
+                    for vi in v
+                ]
             elif isinstance(v, dict):
                 new_rec[k] = self._add_download_to_docs(v)
             else:
@@ -480,7 +489,9 @@ class GeverResponse(BaseResponse):
         self, d: Any, max_flatten_depth: Optional[int] = 2
     ) -> dict[str, Any]:
         def leaf_reducer(k1: Any, k2: Any) -> Any:
-            if k1 is None or k2.lower() in k1.lower():
+            if k1 is None:
+                return k2
+            if isinstance(k1, str) and isinstance(k2, str) and k2.lower() in k1.lower():
                 return k2
             if k2 == "text":
                 return k1
@@ -530,10 +541,16 @@ class GeverResponse(BaseResponse):
         def clean_name(key: str) -> str:
             return ns_pattern.sub("", key).lower()
 
-        def convert_value(v: str) -> Any:
+        def convert_value(v: Any) -> Any:
+            if not isinstance(v, str):
+                return v
+            # Normalize ISO 8601 UTC notation (Z suffix) for fromisoformat
+            value_str = v
+            if value_str.endswith("Z"):
+                value_str = value_str[:-1] + "+00:00"
             try:
-                return datetime.fromisoformat(v)
-            except ValueError:
+                return datetime.fromisoformat(value_str)
+            except (ValueError, AttributeError):
                 pass
             if v.lower() == "true":
                 return True
@@ -555,8 +572,10 @@ class GeverResponse(BaseResponse):
                         clean_rec[clean_k] = convert_value(v["text"])
                         continue
                 clean_rec[clean_k] = self._clean_dict(v)
-            elif isinstance(v, list) and len(v) > 0 and isinstance(v[0], dict):
-                clean_rec[clean_k] = [self._clean_dict(vi) for vi in v]
+            elif isinstance(v, list):
+                clean_rec[clean_k] = [
+                    self._clean_dict(vi) if isinstance(vi, dict) else vi for vi in v
+                ]
             elif isinstance(v, str):
                 clean_rec[clean_k] = convert_value(v)
             else:
