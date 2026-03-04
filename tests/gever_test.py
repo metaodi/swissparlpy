@@ -13,7 +13,7 @@ from swissparlpy.client import SwissParlClient
 from swissparlpy import errors
 
 CANTON_ZURICH_BASE = "https://parlzhcdws.cmicloud.ch"
-CITY_ZURICH_BASE = "https://www.integ.gemeinderat-zuerich.ch"
+CITY_ZURICH_BASE = "https://www.gemeinderat-zuerich.ch"
 
 
 class TestGeverBackendInit:
@@ -80,7 +80,7 @@ class TestGeverBackendGetTables:
         assert "geschaeft" in tables
         assert "dokument" in tables
         assert "kontakt" in tables
-        assert len(tables) == 18
+        assert len(tables) == 19
 
 
 class TestGeverBackendGetVariables:

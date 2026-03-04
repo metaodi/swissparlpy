@@ -52,27 +52,27 @@ _DEFAULT_CONFIG: dict[str, Any] = {
         "api_base": "https://www.gemeinderat-zuerich.ch",
         "files_api": {"path": "/api/files"},
         "indexes": {
-            "Ablaufschritt": {"path": "/api/ablaufschritt"},
-            "Abstimmung": {"path": "/api/abstimmung"},
-            "Behoerdenmandat": {"path": "/api/behoerdenmandat"},
-            "Departement": {"path": "/api/departement"},
-            "Dokument": {"path": "/api/dokument"},
-            "Geschaeft": {"path": "/api/geschaeft"},
-            "Geschaeftsart": {"path": "/api/geschaeftsart"},
+            "ablaufschritt": {"path": "/api/ablaufschritt"},
+            "abstimmung": {"path": "/api/abstimmung"},
+            "behoerdenmandat": {"path": "/api/behoerdenmandat"},
+            "departement": {"path": "/api/departement"},
+            "dokument": {"path": "/api/dokument"},
+            "geschaeft": {"path": "/api/geschaeft"},
+            "geschaeftsart": {"path": "/api/geschaeftsart"},
             # This endpoint seems to be currently unavailable (returns 404)
-            # "Geschlecht": {"path": "/api/geschlecht"},
-            "Gremiumdetail": {"path": "/api/gremiumdetail"},
-            "Gremiumstyp": {"path": "/api/gremiumstyp"},
-            "Gremiumsuebersicht": {"path": "/api/gremiumsuebersicht"},
-            "Kontakt": {"path": "/api/kontakt"},
-            "Partei": {"path": "/api/partei"},
-            "PendentBei": {"path": "/api/pendentbei"},
-            "Ratspost": {"path": "/api/ratspost"},
-            "Referendum": {"path": "/api/referendum"},
-            "Sitzung": {"path": "/api/sitzung"},
-            "Wahlkreis": {"path": "/api/wahlkreis"},
-            "Wohnkreis": {"path": "/api/wohnkreis"},
-            "Wortmeldung": {"path": "/api/wortmeldung"},
+            # "geschlecht": {"path": "/api/geschlecht"},
+            "gremiumdetail": {"path": "/api/gremiumdetail"},
+            "gremiumstyp": {"path": "/api/gremiumstyp"},
+            "gremiumsuebersicht": {"path": "/api/gremiumsuebersicht"},
+            "kontakt": {"path": "/api/kontakt"},
+            "partei": {"path": "/api/partei"},
+            "pendentbei": {"path": "/api/pendentbei"},
+            "ratspost": {"path": "/api/ratspost"},
+            "referendum": {"path": "/api/referendum"},
+            "sitzung": {"path": "/api/sitzung"},
+            "wahlkreis": {"path": "/api/wahlkreis"},
+            "wohnkreis": {"path": "/api/wohnkreis"},
+            "wortmeldung": {"path": "/api/wortmeldung"},
         },
     },
 }
@@ -302,17 +302,35 @@ class GeverBackend(BaseBackend):
         )
 
     def _get_index_url(self, index: str) -> str:
-        """Build full URL for the given index."""
-        try:
+        """Build full URL for the given index.
+
+        Index lookup is case-insensitive to allow flexible usage.
+        """
+        # Try exact match first
+        if index in self.config["indexes"]:
             index_config = self.config["indexes"][index]
-            base = self.config["api_base"]
-            section = index_config.get("section", "")
-            path = index_config["path"]
-            if section:
-                return f"{base}/{section}{path}"
-            return f"{base}{path}"
-        except KeyError as e:
-            raise errors.TableNotFoundError(f"Index '{index}' not found in config: {e}")
+        else:
+            # Try case-insensitive lookup
+            index_lower = index.lower()
+            matching_index = None
+            for key in self.config["indexes"].keys():
+                if key.lower() == index_lower:
+                    matching_index = key
+                    break
+            if matching_index:
+                index_config = self.config["indexes"][matching_index]
+            else:
+                raise errors.TableNotFoundError(
+                    f"Index '{index}' not found in config. "
+                    f"Available indexes: {list(self.config['indexes'].keys())}"
+                )
+
+        base = self.config["api_base"]
+        section = index_config.get("section", "")
+        path = index_config["path"]
+        if section:
+            return f"{base}/{section}{path}"
+        return f"{base}{path}"
 
 
 class GeverResponse(BaseResponse):
