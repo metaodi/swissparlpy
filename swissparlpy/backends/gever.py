@@ -357,7 +357,10 @@ class GeverResponse(BaseResponse):
     def to_dict_list(self) -> list[dict[str, Any]]:
         """Convert all data to a list of dictionaries."""
         self._load_new_data_until(self.count)
-        return list(self.records)
+        return [
+            flatten_dict(record, reducer="underscore", enumerate_types=[list])
+            for record in self.records
+        ]
 
     # ---- pagination helpers ----
 
@@ -473,7 +476,9 @@ class GeverResponse(BaseResponse):
         url = f"{self._config['api_base']}{path}/{file_id}/{version}/{view}"
         return (url, filename)
 
-    def _flat_dict(self, d: Any) -> dict[str, Any]:
+    def _flat_dict(
+        self, d: Any, max_flatten_depth: Optional[int] = 2
+    ) -> dict[str, Any]:
         def leaf_reducer(k1: Any, k2: Any) -> Any:
             if k1 is None or k2.lower() in k1.lower():
                 return k2
@@ -481,16 +486,27 @@ class GeverResponse(BaseResponse):
                 return k1
             return f"{k1}_{k2}"
 
-        flat_data = flatten_dict(d, max_flatten_depth=2, reducer=leaf_reducer)
+        flat_data = flatten_dict(
+            d,
+            max_flatten_depth=max_flatten_depth,
+            reducer=leaf_reducer,
+            keep_empty_types=[dict, list],
+        )
         flat_data = self._clean_dict(flat_data)
 
         for k in ["person_kontakt", "position", "geschaeft"]:
             if k in flat_data and isinstance(flat_data[k], list):
-                flat_data[k] = [self._flat_dict(ik) for ik in flat_data[k]]
+                flat_data[k] = [
+                    self._flat_dict(ik, max_flatten_depth=max_flatten_depth)
+                    for ik in flat_data[k]
+                ]
             elif k in flat_data and isinstance(flat_data[k], dict):
                 flat_data.update(
                     flatten_dict(
-                        flat_data[k], max_flatten_depth=2, reducer=leaf_reducer
+                        flat_data[k],
+                        max_flatten_depth=max_flatten_depth,
+                        reducer=leaf_reducer,
+                        keep_empty_types=[dict, list],
                     )
                 )
                 del flat_data[k]
