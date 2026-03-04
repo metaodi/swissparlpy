@@ -551,7 +551,7 @@ class GeverResponse(BaseResponse):
         return (url, filename)
 
     def _flat_dict(
-        self, d: Any, max_flatten_depth: Optional[int] = 2
+        self, d: Any, max_flatten_depth: Optional[int] = 1
     ) -> dict[str, Any]:
         def leaf_reducer(k1: Any, k2: Any) -> Any:
             if k1 is None:
@@ -562,6 +562,20 @@ class GeverResponse(BaseResponse):
                 return k1
             return f"{k1}_{k2}"
 
+        # First, normalize list fields BEFORE flattening to preserve structure
+        # Convert field names to lowercase for comparison
+        if isinstance(d, dict):
+            for key in list(d.keys()):
+                key_lower = key.lower()
+                if key_lower in self._list_fields:
+                    # This field should always be a list
+                    if isinstance(d[key], dict):
+                        # Single item - wrap in list
+                        d[key] = [d[key]]
+                    elif not isinstance(d[key], list) and d[key] is not None:
+                        # Non-list, non-None value - wrap in list
+                        d[key] = [d[key]]
+
         flat_data = flatten_dict(
             d,
             max_flatten_depth=max_flatten_depth,
@@ -570,7 +584,13 @@ class GeverResponse(BaseResponse):
         )
         flat_data = self._clean_dict(flat_data)
 
+        # Special handling for certain keys: flatten them into parent dict
+        # unless they're marked as list fields (in which case keep them as lists)
         for k in ["person_kontakt", "position", "geschaeft"]:
+            # Skip list fields - they should remain as structured lists
+            if k in self._list_fields:
+                continue
+
             if k in flat_data and isinstance(flat_data[k], list):
                 flat_data[k] = [
                     self._flat_dict(ik, max_flatten_depth=max_flatten_depth)
