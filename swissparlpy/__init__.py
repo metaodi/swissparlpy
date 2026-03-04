@@ -6,7 +6,7 @@ __all__ = ["client", "errors", "visualization", "backends"]
 from .errors import SwissParlError  # noqa
 from .client import SwissParlClient  # noqa
 from .client import SwissParlResponse  # noqa
-from .backends import ODataBackend, OpenParlDataBackend  # noqa
+from .backends import ODataBackend, OpenParlDataBackend, GeverBackend  # noqa
 from pyodata.v2.service import GetEntitySetFilter as Filter  # noqa
 from typing import Callable, Union, Any, Literal
 
@@ -18,27 +18,40 @@ except ImportError:
     pass
 
 
-def get_tables(backend: Literal["odata", "openparldata"] = "odata") -> list[str]:
+def get_tables(
+    backend: Literal[
+        "odata", "openparldata", "gever_canton_zurich", "gever_city_zurich"
+    ] = "odata",
+) -> list[str]:
     client = SwissParlClient(backend=backend)
     return client.get_tables()
 
 
 def get_variables(
-    table: str, backend: Literal["odata", "openparldata"] = "odata"
+    table: str,
+    backend: Literal[
+        "odata", "openparldata", "gever_canton_zurich", "gever_city_zurich"
+    ] = "odata",
 ) -> list[str]:
     client = SwissParlClient(backend=backend)
     return client.get_variables(table)
 
 
 def get_overview(
-    backend: Literal["odata", "openparldata"] = "odata",
+    backend: Literal[
+        "odata", "openparldata", "gever_canton_zurich", "gever_city_zurich"
+    ] = "odata",
 ) -> dict[str, list[str]]:
     client = SwissParlClient(backend=backend)
     return client.get_overview()
 
 
 def get_glimpse(
-    table: str, rows: int = 5, backend: Literal["odata", "openparldata"] = "odata"
+    table: str,
+    rows: int = 5,
+    backend: Literal[
+        "odata", "openparldata", "gever_canton_zurich", "gever_city_zurich"
+    ] = "odata",
 ) -> "SwissParlResponse":
     client = SwissParlClient(backend=backend)
     return client.get_glimpse(table, rows)
@@ -47,7 +60,9 @@ def get_glimpse(
 def get_data(
     table: str,
     filter: Union[str, Callable, None] = None,
-    backend: Literal["odata", "openparldata"] = "odata",
+    backend: Literal[
+        "odata", "openparldata", "gever_canton_zurich", "gever_city_zurich"
+    ] = "odata",
     **kwargs: Any,
 ) -> "SwissParlResponse":
     client = SwissParlClient(backend=backend)

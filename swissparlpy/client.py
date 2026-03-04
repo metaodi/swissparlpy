@@ -1,6 +1,6 @@
 import logging
 import requests
-from .backends import ODataBackend, OpenParlDataBackend
+from .backends import ODataBackend, OpenParlDataBackend, GeverBackend
 from .backends import BaseBackend, BaseResponse
 from typing import Optional, Union, Callable, Any, Literal
 
@@ -18,12 +18,23 @@ class SwissParlClient(object):
     def __init__(
         self,
         session: Optional[requests.Session] = None,
-        backend: Optional[Union[BaseBackend, Literal["odata", "openparldata"]]] = None,
+        backend: Optional[
+            Union[
+                BaseBackend,
+                Literal[
+                    "odata", "openparldata", "gever_canton_zurich", "gever_city_zurich"
+                ],
+            ]
+        ] = None,
     ) -> None:
         if isinstance(backend, BaseBackend):
             self.backend = backend
         elif backend == "openparldata":
             self.backend = OpenParlDataBackend(session)
+        elif backend == "gever_canton_zurich":
+            self.backend = GeverBackend(session, instance="canton_zurich")
+        elif backend == "gever_city_zurich":
+            self.backend = GeverBackend(session, instance="city_zurich")
         else:
             # Default to OData backend for backward compatibility
             self.backend = ODataBackend(session)

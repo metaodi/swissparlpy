@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="Mitglied">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="Name" type="xsd:string" minOccurs="0"/>
+        <xsd:element name="Vorname" type="xsd:string" minOccurs="0"/>
+        <xsd:element name="Partei" type="xsd:string" minOccurs="0"/>
+        <!-- Position can occur multiple times - should always be a list -->
+        <xsd:element name="Position" minOccurs="0" maxOccurs="unbounded">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="Titel" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="Von" type="xsd:date" minOccurs="0"/>
+              <xsd:element name="Bis" type="xsd:date" minOccurs="0"/>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+        <!-- Kontakt can occur multiple times - should always be a list -->
+        <xsd:element name="Kontakt" minOccurs="0" maxOccurs="unbounded">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="Typ" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="Wert" type="xsd:string" minOccurs="0"/>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+        <!-- Adresse is single - should NOT be a list -->
+        <xsd:element name="Adresse" minOccurs="0">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="Strasse" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="PLZ" type="xsd:string" minOccurs="0"/>
+              <xsd:element name="Ort" type="xsd:string" minOccurs="0"/>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+      <xsd:attribute name="OBJ_GUID" type="xsd:string"/>
+      <xsd:attribute name="seq" type="xsd:integer"/>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

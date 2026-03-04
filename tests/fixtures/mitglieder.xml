@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<searchDetailResponse xmlns="http://www.cmiag.ch/cdws/searchDetailResponse" indexName="MITGLIEDER" numHits="2" q="seq &gt; 0" m="500" s="1">
+  <Hit Guid="guid-001">
+    <Mitglied OBJ_GUID="guid-001">
+      <Name>Müller</Name>
+      <Vorname>Hans</Vorname>
+      <Partei>SVP</Partei>
+      <!-- Single Position - will be parsed as dict, not list -->
+      <Position>
+        <Titel>Präsident</Titel>
+        <Von>2020-01-01</Von>
+        <Bis>2024-12-31</Bis>
+      </Position>
+      <!-- Single Kontakt - will be parsed as dict, not list -->
+      <Kontakt>
+        <Typ>Email</Typ>
+        <Wert>hans.mueller@example.com</Wert>
+      </Kontakt>
+      <Adresse>
+        <Strasse>Hauptstrasse 1</Strasse>
+        <PLZ>8000</PLZ>
+        <Ort>Zürich</Ort>
+      </Adresse>
+    </Mitglied>
+  </Hit>
+  <Hit Guid="guid-002">
+    <Mitglied OBJ_GUID="guid-002">
+      <Name>Schmidt</Name>
+      <Vorname>Anna</Vorname>
+      <Partei>SP</Partei>
+      <!-- Multiple Positions - will be parsed as list -->
+      <Position>
+        <Titel>Mitglied</Titel>
+        <Von>2018-01-01</Von>
+        <Bis>2022-12-31</Bis>
+      </Position>
+      <Position>
+        <Titel>Vizepräsidentin</Titel>
+        <Von>2022-01-01</Von>
+      </Position>
+      <!-- Multiple Kontakte - will be parsed as list -->
+      <Kontakt>
+        <Typ>Email</Typ>
+        <Wert>anna.schmidt@example.com</Wert>
+      </Kontakt>
+      <Kontakt>
+        <Typ>Telefon</Typ>
+        <Wert>+41 44 123 45 67</Wert>
+      </Kontakt>
+      <Adresse>
+        <Strasse>Bahnhofstrasse 10</Strasse>
+        <PLZ>8001</PLZ>
+        <Ort>Zürich</Ort>
+      </Adresse>
+    </Mitglied>
+  </Hit>
+</searchDetailResponse>

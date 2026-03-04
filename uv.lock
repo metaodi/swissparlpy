@@ -1187,6 +1187,18 @@ wheels = [
 ]
 
 [[package]]
+name = "flatten-dict"
+version = "0.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/89/c6/5fe21639369f2ea609c964e20870b5c6c98a134ef12af848a7776ddbabe3/flatten-dict-0.4.2.tar.gz", hash = "sha256:506a96b6e6f805b81ae46a0f9f31290beb5fa79ded9d80dbe1b7fa236ab43076", size = 10362, upload-time = "2021-08-08T09:56:51.455Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/43/f5/ee39c6e92acc742c052f137b47c210cd0a1b72dcd3f98495528bb4d27761/flatten_dict-0.4.2-py2.py3-none-any.whl", hash = "sha256:7e245b20c4c718981212210eec4284a330c9f713e632e98765560e05421e48ad", size = 9656, upload-time = "2021-08-08T09:56:54.313Z" },
+]
+
+[[package]]
 name = "fonttools"
 version = "4.60.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2786,6 +2798,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/07/8c/14c2ae915e5f9dca5a22edd68b35be94400719ccfa068a03e0fb63d0f6f6/mock-5.2.0.tar.gz", hash = "sha256:4e460e818629b4b173f32d08bf30d3af8123afbb8e04bb5707a1fd4799e503f0", size = 92796, upload-time = "2025-03-03T12:31:42.911Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/bd/d9/617e6af809bf3a1d468e0d58c3997b1dc219a9a9202e650d30c2fc85d481/mock-5.2.0-py3-none-any.whl", hash = "sha256:7ba87f72ca0e915175596069dbbcc7c75af7b5e9b9bc107ad6349ede0819982f", size = 31617, upload-time = "2025-03-03T12:31:41.518Z" },
+]
+
+[[package]]
+name = "muzzle"
+version = "0.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "defusedxml" },
+    { name = "xmltodict" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c0/b7/cea616a99e7b4d998cebdadff335f25847c846e68b6411ec646ded43271b/muzzle-0.0.1.tar.gz", hash = "sha256:87792c949ef59d27531b6a4af893c2a8c273f206727515f0e6ebd93cf7709f87", size = 14261, upload-time = "2021-11-02T11:00:17.467Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f2/88/7bff970f2fad3029fc9b4243c3b636e552cfa9b80e2f454bae1f503048ad/muzzle-0.0.1-py3-none-any.whl", hash = "sha256:7391485f6dc45f44645ab4b01e9890f23d7292b0a195b318a8f680ea8a248b32", size = 3957, upload-time = "2021-11-02T11:00:16.265Z" },
 ]
 
 [[package]]
@@ -4665,6 +4690,10 @@ dev = [
     { name = "pre-commit", version = "4.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "types-requests" },
 ]
+gever = [
+    { name = "flatten-dict" },
+    { name = "muzzle" },
+]
 test = [
     { name = "black", extra = ["jupyter"] },
     { name = "flake8" },
@@ -4690,10 +4719,12 @@ requires-dist = [
     { name = "black", extras = ["jupyter"], marker = "extra == 'dev'", specifier = ">=24.0.0,<25.0.0" },
     { name = "black", extras = ["jupyter"], marker = "extra == 'test'", specifier = ">=24.0.0,<25.0.0" },
     { name = "flake8", marker = "extra == 'test'" },
+    { name = "flatten-dict", marker = "extra == 'gever'" },
     { name = "jupyter", marker = "extra == 'dev'" },
     { name = "matplotlib", marker = "extra == 'test'", specifier = ">=3.0.0" },
     { name = "matplotlib", marker = "extra == 'visualization'", specifier = ">=3.0.0" },
     { name = "mock", marker = "extra == 'test'" },
+    { name = "muzzle", marker = "extra == 'gever'" },
     { name = "mypy", marker = "extra == 'dev'" },
     { name = "pandas", marker = "extra == 'test'" },
     { name = "pandas", marker = "extra == 'visualization'" },
@@ -4706,7 +4737,7 @@ requires-dist = [
     { name = "responses", marker = "extra == 'test'" },
     { name = "types-requests", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev", "test", "visualization"]
+provides-extras = ["dev", "gever", "test", "visualization"]
 
 [[package]]
 name = "terminado"
@@ -4963,6 +4994,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/bd/f4/c67440c7fb409a71b7404b7aefcd7569a9c0d6bd071299bf4198ae7a5d95/widgetsnbextension-4.0.15.tar.gz", hash = "sha256:de8610639996f1567952d763a5a41af8af37f2575a41f9852a38f947eb82a3b9", size = 1097402, upload-time = "2025-11-01T21:15:55.178Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3f/0e/fa3b193432cfc60c93b42f3be03365f5f909d2b3ea410295cf36df739e31/widgetsnbextension-4.0.15-py3-none-any.whl", hash = "sha256:8156704e4346a571d9ce73b84bee86a29906c9abfd7223b7228a28899ccf3366", size = 2196503, upload-time = "2025-11-01T21:15:53.565Z" },
+]
+
+[[package]]
+name = "xmltodict"
+version = "1.0.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/70/80f3b7c10d2630aa66414bf23d210386700aa390547278c789afa994fd7e/xmltodict-1.0.4.tar.gz", hash = "sha256:6d94c9f834dd9e44514162799d344d815a3a4faec913717a9ecbfa5be1bb8e61", size = 26124, upload-time = "2026-02-22T02:21:22.074Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/38/34/98a2f52245f4d47be93b580dae5f9861ef58977d73a79eb47c58f1ad1f3a/xmltodict-1.0.4-py3-none-any.whl", hash = "sha256:a4a00d300b0e1c59fc2bfccb53d7b2e88c32f200df138a0dd2229f842497026a", size = 13580, upload-time = "2026-02-22T02:21:21.039Z" },
 ]
 
 [[package]]

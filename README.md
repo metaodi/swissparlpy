@@ -27,6 +27,9 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [API documentation](#documentation)
  * [OData backend specific options](#odata-backend-specific-options)
     * [Search with the `OpenParlDataBackend`](#search-with-the-openparldatabackend)
+ * [Gever backend (Canton/City of Zurich)](#gever-backend-cantoncity-of-zurich)
+    * [Backend selection (Gever)](#backend-selection)
+    * [Using GeverBackend directly](#using-geverbackend-directly)
 
 * [Similar libraries for other languages](#similar-libraries-for-other-languages)
 * [Credits](#credits)
@@ -45,6 +48,12 @@ To install with visualization support (for plotting voting results):
 
 ```
 $ pip install swissparlpy[visualization]
+```
+
+To install with Gever backend support (Canton/City of Zurich):
+
+```
+$ pip install swissparlpy[gever]
 ```
 
 ## Usage
@@ -68,6 +77,22 @@ swissparlpy supports multiple data backends. By default, it uses the official OD
 >>> import swissparlpy as spp
 >>> tables = spp.get_tables(backend='openparldata')
 >>> data = spp.get_data('cantons', backend='openparldata')
+```
+
+**Using the Gever backend (Canton of Zurich - Kantonsrat):**
+
+```python
+>>> import swissparlpy as spp
+>>> tables = spp.get_tables(backend='gever_canton_zurich')
+>>> data = spp.get_data('Wahlkreise', backend='gever_canton_zurich')
+```
+
+**Using the Gever backend (City of Zurich - Gemeinderat):**
+
+```python
+>>> import swissparlpy as spp
+>>> tables = spp.get_tables(backend='gever_city_zurich')
+>>> data = spp.get_data('geschaeft', backend='gever_city_zurich')
 ```
 
 **Using backends with SwissParlClient:**
@@ -428,6 +453,61 @@ The OpenParlData-API returns related tables/entities for their data. E.g. if you
 2  6f42fed7-0dc6-4ed7-b655-b391ad828068  Gruppe Parlaments-IT (PIT)          Mitglied  committee_ad_hoc
 3  63898798-ac17-469f-bb21-5e562d76b1de  Gruppe Parlaments-IT (PIT)  Vizepräsident/in  committee_ad_hoc
 4  28d9ed41-e55c-4c55-a1f3-ab1300c25d52                     Büro NR  Stimmenzähler/in         committee
+```
+
+## Gever backend (Canton/City of Zurich)
+
+The `GeverBackend` provides access to the Gever (Geschäftsverwaltungssystem) APIs for both the **Canton of Zurich** (Kantonsrat) and the **City of Zurich** (Gemeinderat). This backend integrates the functionality of the [goifer](https://github.com/metaodi/goifer) library.
+
+**Note:** This feature requires optional dependencies. Install with: `pip install swissparlpy[gever]`
+
+### Backend selection
+
+```python
+import swissparlpy as spp
+
+# Canton of Zurich (Kantonsrat)
+tables = spp.get_tables(backend="gever_canton_zurich")
+data = spp.get_data("Wahlkreise", backend="gever_canton_zurich")
+
+# City of Zurich (Gemeinderat)
+tables = spp.get_tables(backend="gever_city_zurich")
+data = spp.get_data("geschaeft", backend="gever_city_zurich")
+```
+
+### Using GeverBackend directly
+
+```python
+from swissparlpy import GeverBackend, SwissParlClient
+
+# Create backend for the Canton of Zurich
+backend = GeverBackend(instance="canton_zurich")
+client = SwissParlClient(backend=backend)
+
+# Get available tables (indexes)
+tables = client.get_tables()
+
+# Get fields for a table
+variables = client.get_variables("Wahlkreise")
+
+# Query data
+data = client.get_data("Wahlkreise")
+for record in data:
+    print(record)
+```
+
+### Query with custom filter string
+
+The Gever API supports query strings. Use the `filter` parameter or `query` keyword:
+
+```python
+import swissparlpy as spp
+
+data = spp.get_data(
+    "Geschaeft",
+    filter="Bezeichnung contains 'Budget'",
+    backend="gever_canton_zurich"
+)
 ```
 
 ## Similar libraries for other languages

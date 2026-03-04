@@ -12,6 +12,14 @@ def fixture_content(filename):
         return f.read()
 
 
+def fixture_bytes(filename):
+    path = os.path.join(__location__, "fixtures", filename)
+    if not os.path.exists(path):
+        return b""
+    with open(path, "rb") as f:
+        return f.read()
+
+
 @pytest.fixture
 def metadata():
     """OData metadata fixture"""
@@ -58,3 +66,39 @@ def affairs_page1():
 def affairs_page2():
     """OpenParlData affairs data fixture (page 2)"""
     return fixture_content("affairs_2.json")
+
+
+@pytest.fixture
+def wahlkreise_xml():
+    """Gever Wahlkreise search response fixture"""
+    return fixture_bytes("wahlkreise.xml")
+
+
+@pytest.fixture
+def wahlkreise_schema():
+    """Gever Wahlkreise schema fixture"""
+    return fixture_bytes("wahlkreise_schema.xml")
+
+
+@pytest.fixture
+def wahlkreise_page1():
+    """Gever Wahlkreise paginated response - page 1"""
+    return fixture_bytes("wahlkreise_page1.xml")
+
+
+@pytest.fixture
+def wahlkreise_page2():
+    """Gever Wahlkreise paginated response - page 2"""
+    return fixture_bytes("wahlkreise_page2.xml")
+
+
+@pytest.fixture
+def mitglieder_xml():
+    """Gever Mitglieder search response fixture with list inconsistencies"""
+    return fixture_bytes("mitglieder.xml")
+
+
+@pytest.fixture
+def mitglieder_schema():
+    """Gever Mitglieder schema fixture with maxOccurs attributes"""
+    return fixture_bytes("mitglieder_schema.xml")
