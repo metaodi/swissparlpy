@@ -9,6 +9,8 @@ description = "Client for Swiss parliament API"
 dependencies = [
     "requests",
     "pyodata>=1.11.1",
+    "muzzle",
+    "flatten-dict",
 ]
 
 [project.optional-dependencies]
@@ -28,6 +30,7 @@ dev = [
     "pre-commit",
     "mypy",
     "types-requests",
+    "types-PyYAML",
     "pandas-stubs",
 ]
 visualization = [
