@@ -34,7 +34,9 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Instances and tables](#instances-and-tables)
     * [Queries](#queries)
     * [List fields](#list-fields)
+    * [Value conversion](#value-conversion)
     * [Download documents](#download-documents)
+    * [Custom instances](#custom-instances)
 
 * [Similar libraries for other languages](#similar-libraries-for-other-languages)
 * [Credits](#credits)
@@ -560,6 +562,18 @@ True
 
 Nested elements are kept as nested dicts, e.g. `record['dokument']['edokument']['version']['nr']`.
 
+Note that the records of this backend are normalized slightly differently than the ones of `goifer`: they keep one more level of nesting and list fields are always lists.
+
+### Value conversion
+
+The API returns everything as a string, the backend converts the values of a record:
+
+* values that look like an ISO date/time become a `datetime`, e.g. `'2019-05-06T00:00:00'`
+* `'true'` and `'false'` become a `bool`
+* elements marked as `nil` become `None`
+
+The conversion is based on the value, not on the type of the schema, which has one pitfall: a string of 8 digits (e.g. an ID like `'20240110'`) is a valid ISO date and is converted to a `datetime` on Python 3.11 and newer, but stays a string on older versions. If you rely on such a field, convert it yourself.
+
 ### Download documents
 
 Some tables return documents (`edokument`), for those a download URL and a filename are added automatically:
@@ -582,6 +596,29 @@ To build a download URL yourself, use the `file()` method of the backend:
 >>> member = backend.get_data('mitglieder', 'Name adj Marti and Vorname adj Res')[0]
 >>> backend.file('mitglieder', member['foto_id'], member['foto_version']['nr'], 'Original')
 'https://parlzhcdws.cmicloud.ch/parlzh2/cdws/Files/6bf54e3bdd24400d85e13169c3a5bbf8-1664/1/Original'
+```
+
+### Custom instances
+
+To query another host (e.g. an integration environment), pass a `url` to override the base URL of the instance:
+
+```python
+>>> from swissparlpy import GeverBackend
+>>> backend = GeverBackend(instance='city_zurich', url='https://www.integ.gemeinderat-zuerich.ch')
+```
+
+Other Gever instances can be used by passing a `config`, either as dict or as path to a YAML file (this requires `pyyaml`). See [`gever_config.py`](/swissparlpy/backends/gever_config.py) for the structure:
+
+```python
+>>> from swissparlpy import GeverBackend
+>>> config = {
+...     'my_instance': {
+...         'api_base': 'https://example.org',
+...         'files_api': {'path': '/api/files'},
+...         'indexes': {'geschaeft': {'path': '/api/geschaeft'}},
+...     }
+... }
+>>> backend = GeverBackend(instance='my_instance', config=config)
 ```
 
 ## Similar libraries for other languages
