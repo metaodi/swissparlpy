@@ -49,6 +49,66 @@ def person_memberships():
 
 
 @pytest.fixture
+def gever_wahlkreise():
+    """Gever search response of the canton (single page)"""
+    return fixture_content("gever_wahlkreise.xml")
+
+
+@pytest.fixture
+def gever_wahlkreise_schema():
+    """Gever schema of the table 'wahlkreise'"""
+    return fixture_content("gever_wahlkreise_schema.xml")
+
+
+@pytest.fixture
+def gever_mitglieder():
+    """Gever search response with single and multiple occurrence list fields"""
+    return fixture_content("gever_mitglieder.xml")
+
+
+@pytest.fixture
+def gever_mitglieder_schema():
+    """Gever schema of the table 'mitglieder' (with list fields)"""
+    return fixture_content("gever_mitglieder_schema.xml")
+
+
+@pytest.fixture
+def gever_geschaeft_schema():
+    """Gever schema of the table 'geschaeft'"""
+    return fixture_content("gever_geschaeft_schema.xml")
+
+
+@pytest.fixture
+def gever_geschaeft_page1():
+    """Gever search response of the city (page 1 of 2)"""
+    return fixture_content("gever_geschaeft_page1.xml")
+
+
+@pytest.fixture
+def gever_geschaeft_page2():
+    """Gever search response of the city (page 2 of 2)"""
+    return fixture_content("gever_geschaeft_page2.xml")
+
+
+@pytest.fixture
+def gever_ablaufschritte():
+    """Gever search response with a repeated element ('geschaeft')"""
+    return fixture_content("gever_ablaufschritte.xml")
+
+
+@pytest.fixture
+def gever_ablaufschritte_schema():
+    """Gever schema with a numeric 'maxOccurs'"""
+    return fixture_content("gever_ablaufschritte_schema.xml")
+
+
+@pytest.fixture
+def gever_sitzungendetail():
+    """Gever search response with a document (eDokument)"""
+    return fixture_content("gever_sitzungendetail.xml")
+
+
+@pytest.fixture
 def affairs_page1():
     """OpenParlData affairs data fixture (page 1)"""
     return fixture_content("affairs_1.json")
