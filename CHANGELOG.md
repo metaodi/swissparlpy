@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project follows [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Add support for the Gever (Geschäftsverwaltungssystem) APIs of the canton and the city of Zurich as a backend, based on [goifer](https://github.com/metaodi/goifer)
 
 ## [2.0.0] - 2026-07-30
 ### Changed
