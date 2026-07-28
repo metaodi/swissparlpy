@@ -7,7 +7,7 @@
 swissparlpy
 ===========
 
-This module provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss parliament](https://www.parlament.ch/en) and the [OpenParlData.ch](https://openparldata.ch) REST API.
+This module provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss parliament](https://www.parlament.ch/en), the [OpenParlData.ch](https://openparldata.ch) REST API and the Gever (Geschäftsverwaltungssystem) APIs of the [canton](https://www.kantonsrat.zh.ch) and the [city](https://www.gemeinderat-zuerich.ch) of Zurich.
 
 ## Table of Contents
 
@@ -30,6 +30,11 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [`limit` is a page size, not a cap](#limit-is-a-page-size-not-a-cap)
     * [Case sensitivity of `search_mode="exact"`](#case-sensitivity-of-search_modeexact)
     * [Get related data](#get-related-data)
+ * [Gever backend specific options](#gever-backend-specific-options)
+    * [Instances and tables](#instances-and-tables)
+    * [Queries](#queries)
+    * [List fields](#list-fields)
+    * [Download documents](#download-documents)
 
 * [Similar libraries for other languages](#similar-libraries-for-other-languages)
 * [Credits](#credits)
@@ -56,7 +61,7 @@ See the [`examples` directory](/examples) for more scripts.
 
 ### Backend Selection
 
-swissparlpy supports multiple data backends. By default, it uses the official OData API of parlament.ch, but you can also use the OpenParlData.ch REST API.
+swissparlpy supports multiple data backends. By default, it uses the official OData API of parlament.ch, but you can also use the OpenParlData.ch REST API or the Gever APIs of the canton and the city of Zurich.
 
 **Using the default OData (parlament.ch) backend:**
 
@@ -73,6 +78,17 @@ swissparlpy supports multiple data backends. By default, it uses the official OD
 >>> data = spp.get_data('cantons', backend='openparldata')
 ```
 
+**Using the Gever backend:**
+
+The Gever backend has two instances: `gever_canton_zurich` for the Kantonsrat of the canton of Zurich (`gever` is an alias for it) and `gever_city_zurich` for the Gemeinderat of the city of Zurich.
+
+```python
+>>> import swissparlpy as spp
+>>> tables = spp.get_tables(backend='gever_city_zurich')
+>>> data = spp.get_data('geschaeft', backend='gever_city_zurich')
+>>> data = spp.get_data('wahlkreise', backend='gever')  # canton of Zurich
+```
+
 **Using backends with SwissParlClient:**
 
 ```python
@@ -86,6 +102,10 @@ swissparlpy supports multiple data backends. By default, it uses the official OD
 >>> opd_client = SwissParlClient(backend="openparldata")
 >>> opd_client.get_tables()
 ['bodies', 'speeches', 'persons', 'groups', 'meetings', 'agendas', 'texts', 'votes', 'docs', 'affairs', 'votings', 'interests', 'events', 'external_links', 'contributors', 'person_images', 'memberships', 'access_badges']
+>>> # Gever backend (canton of Zurich)
+>>> gever_client = SwissParlClient(backend="gever_canton_zurich")
+>>> gever_client.get_tables()
+['behoerden', 'sitzungendetail', 'geschaeft', 'mitglieder', 'parteien', 'wahlkreise', 'direktion', 'geschaeftsart', 'gremiumtyp', 'krversand', 'ablaufschritte']
 ```
 
 All module-level functions (`get_tables()`, `get_variables()`, `get_overview()`, `get_glimpse()`, `get_data()`) support the `backend` parameter.
@@ -458,6 +478,110 @@ The OpenParlData-API returns related tables/entities for their data. E.g. if you
 2  6f42fed7-0dc6-4ed7-b655-b391ad828068  Gruppe Parlaments-IT (PIT)          Mitglied  committee_ad_hoc
 3  63898798-ac17-469f-bb21-5e562d76b1de  Gruppe Parlaments-IT (PIT)  Vizepräsident/in  committee_ad_hoc
 4  28d9ed41-e55c-4c55-a1f3-ab1300c25d52                     Büro NR  Stimmenzähler/in         committee
+```
+
+## Gever backend specific options
+
+The `GeverBackend` queries the Gever (Geschäftsverwaltungssystem) APIs of the canton and the city of Zurich.
+It is based on [goifer](https://github.com/metaodi/goifer), a standalone client for the same APIs.
+
+### Instances and tables
+
+There are two instances, each with its own set of tables (called _indexes_ in the API):
+
+```python
+>>> import swissparlpy as spp
+>>> spp.get_tables(backend='gever')  # canton of Zurich
+['behoerden', 'sitzungendetail', 'geschaeft', 'mitglieder', 'parteien', 'wahlkreise', 'direktion', 'geschaeftsart', 'gremiumtyp', 'krversand', 'ablaufschritte']
+>>> spp.get_tables(backend='gever_city_zurich')  # city of Zurich
+['geschaeft', 'dokument', 'departement', 'gremiumsuebersicht', 'gremium', 'gremiumstyp', 'geschaeftsart', 'partei', 'pendentbei', 'geschaeftvorstoesser', 'kontakt', 'behoerdenmandat', 'wohnkreis', 'wahlkreis', 'ablaufschritt', 'referendum', 'sitzung', 'ratspost']
+```
+
+Table names are lowercase, but the lookup is case-insensitive, so both of these work:
+
+```python
+>>> data = spp.get_data('geschaeft', backend='gever_city_zurich')
+>>> data = spp.get_data('Geschaeft', backend='gever_city_zurich')
+```
+
+`get_variables()` returns the fields of a table, based on the XSD schema of the API:
+
+```python
+>>> spp.get_variables('wahlkreise', backend='gever')
+['name', 'inaktiv', 'obj_guid', 'seq', 'idx']
+```
+
+### Queries
+
+The Gever API uses its own query syntax (CQL). Pass a query as `filter` to use it as-is:
+
+```python
+>>> import swissparlpy as spp
+>>> data = spp.get_data('wahlkreise', 'inaktiv = false', backend='gever')
+>>> data[0]
+{'obj_guid': 'dee39e1ccd4c40db82729b3d0762a302', 'seq': '2242344', 'idx': 'Wahlkreise', 'name': 'I      Zürich 1+2', 'inaktiv': False}
+```
+
+Keyword arguments are turned into a query, strings are matched with `adj`, numbers and booleans with `=`:
+
+```python
+>>> # searches for "name adj Marti and vorname adj Res"
+>>> data = spp.get_data('mitglieder', name='Marti', vorname='Res', backend='gever')
+```
+
+Without a filter, all records are queried (`seq > 0`). Callable filters (`spp.Filter`) are not supported by this backend.
+
+The number of records per request (default 500), the language and the first record can be set on the backend or per query:
+
+```python
+>>> import swissparlpy as spp
+>>> from swissparlpy import GeverBackend
+>>>
+>>> client = spp.SwissParlClient(backend=GeverBackend(instance='city_zurich', maximum_records=100))
+>>> data = client.get_data('geschaeft', maximum_records=10, start_record=20, lang='de-CH')
+```
+
+Just like the other backends, the result is iterable, indexable and sliceable, and further pages are loaded lazily.
+
+### List fields
+
+Elements the schema of a table declares as repeatable (`maxOccurs` of `unbounded` or greater than 1) are always returned as a list, even if a record contains only a single one of them.
+This keeps the records of a table consistent, which matters when converting them to a `DataFrame`:
+
+```python
+>>> import swissparlpy as spp
+>>> data = spp.get_data('mitglieder', backend='gever')
+>>> isinstance(data[0]['position'], list)  # a single position
+True
+>>> isinstance(data[1]['position'], list)  # several positions
+True
+>>> df = data.to_dataframe()
+```
+
+Nested elements are kept as nested dicts, e.g. `record['dokument']['edokument']['version']['nr']`.
+
+### Download documents
+
+Some tables return documents (`edokument`), for those a download URL and a filename are added automatically:
+
+```python
+>>> import swissparlpy as spp
+>>> meetings = spp.get_data('sitzungendetail', backend='gever')
+>>> doc = meetings[0]['dokument']['edokument']
+>>> doc['download_url']
+'https://parlzhcdws.cmicloud.ch/parlzh3/cdws/Files/9db1203429e04a39a233e56eab42feea-332/1/PDF'
+>>> doc['filename']
+'63. KR-Protokoll vom 9.7.2012, Nachmittag.pdf'
+```
+
+To build a download URL yourself, use the `file()` method of the backend:
+
+```python
+>>> from swissparlpy import GeverBackend
+>>> backend = GeverBackend(instance='canton_zurich')
+>>> member = backend.get_data('mitglieder', 'Name adj Marti and Vorname adj Res')[0]
+>>> backend.file('mitglieder', member['foto_id'], member['foto_version']['nr'], 'Original')
+'https://parlzhcdws.cmicloud.ch/parlzh2/cdws/Files/6bf54e3bdd24400d85e13169c3a5bbf8-1664/1/Original'
 ```
 
 ## Similar libraries for other languages
