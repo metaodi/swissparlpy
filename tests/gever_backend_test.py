@@ -88,9 +88,10 @@ class TestGeverBackendConfig:
         backend = GeverBackend(instance="city_zurich")
         tables = backend.get_tables()
 
-        assert len(tables) == 18, f"Table count {len(tables)} != 18"
+        assert len(tables) == 19, f"Table count {len(tables)} != 19"
         assert "geschaeft" in tables
         assert "ratspost" in tables
+        assert "wortmeldung" in tables
         assert tables == [t.lower() for t in tables], "tables are not lowercase"
 
     def test_default_instance_is_canton(self):
@@ -673,7 +674,7 @@ class TestGeverClient:
         add_xml_response(f"{CITY_GESCHAEFT_URL}/searchdetails", gever_geschaeft_page1)
 
         client = SwissParlClient(backend="gever_city_zurich")
-        assert len(client.get_tables()) == 18
+        assert len(client.get_tables()) == 19
         assert client.get_data("geschaeft")[0]["titel"] == (
             "Postulat zur Verkehrsberuhigung"
         )
