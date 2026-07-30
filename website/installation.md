@@ -17,7 +17,7 @@ nav_order: 2
 
 ## Requirements
 
-swissparlpy requires **Python 3.9 or higher**.
+swissparlpy requires **Python 3.10 or higher**.
 
 ---
 
