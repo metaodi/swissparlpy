@@ -496,7 +496,7 @@ There are two instances, each with its own set of tables (called _indexes_ in th
 >>> spp.get_tables(backend='gever')  # canton of Zurich
 ['behoerden', 'sitzungendetail', 'geschaeft', 'mitglieder', 'parteien', 'wahlkreise', 'direktion', 'geschaeftsart', 'gremiumtyp', 'krversand', 'ablaufschritte']
 >>> spp.get_tables(backend='gever_city_zurich')  # city of Zurich
-['geschaeft', 'dokument', 'departement', 'gremiumsuebersicht', 'gremium', 'gremiumstyp', 'geschaeftsart', 'partei', 'pendentbei', 'geschaeftvorstoesser', 'kontakt', 'behoerdenmandat', 'wohnkreis', 'wahlkreis', 'ablaufschritt', 'referendum', 'sitzung', 'ratspost']
+['ablaufschritt', 'abstimmung', 'behoerdenmandat', 'departement', 'dokument', 'geschaeft', 'geschaeftsart', 'gremiumdetail', 'gremiumstyp', 'gremiumsuebersicht', 'kontakt', 'partei', 'pendentbei', 'ratspost', 'referendum', 'sitzung', 'wahlkreis', 'wohnkreis', 'wortmeldung']
 ```
 
 Table names are lowercase, but the lookup is case-insensitive, so both of these work:
