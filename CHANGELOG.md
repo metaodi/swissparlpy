@@ -6,8 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [2.0.0] - 2026-07-30
 ### Changed
-- BC-Break: Python 3.10 is now required (Python 3.9 reached its end of life)
-- BC-Break: OpenParlData backend: `search_scope` and `search_mode` are no longer overridden, the API defaults (`metadata` and `partial`) apply. Pass `search_scope="all"` explicitly to search the full-text indexes (Issue #52)
+- **BC-Break**: Python 3.10 is now required (Python 3.9 reached its end of life)
+- **BC-Break**: OpenParlData backend: `search_scope` and `search_mode` are no longer overridden, the API defaults (`metadata` and `partial`) apply. Pass `search_scope="all"` explicitly to search the full-text indexes (Issue #52)
 - OpenParlData backend: an empty `search` parameter is no longer sent for unfiltered queries (Issue #52)
 - Improved `__repr__` of `ODataResponse` and `OpenParlDataResponse` and added more logging when parsing responses
 
