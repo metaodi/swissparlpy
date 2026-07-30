@@ -96,8 +96,18 @@ spp.get_variables('Party')
 import swissparlpy as spp
 
 # Fetch councillors with a filter
-councillors = spp.get_data('MemberCouncil', Language='DE', CantonAbbreviation='ZH', limit=10)
+councillors = spp.get_data('MemberCouncil', Language='DE', CantonAbbreviation='ZH')
+print(councillors.count)
 for c in councillors:
+    print(c['LastName'], c['FirstName'])
+```
+
+Every keyword argument of `get_data()` is used as a filter on the corresponding variable of the table.
+
+The result is iterable, indexable (`data[0]`, `data[-1]`) and supports [slicing](https://python-reference.readthedocs.io/en/latest/docs/brackets/slicing.html), so you can also work with a subset of the records only:
+
+```python
+for c in councillors[:5]:
     print(c['LastName'], c['FirstName'])
 ```
 
@@ -124,7 +134,6 @@ import pandas as pd
 data = spp.get_data('Party', Language='DE')
 df = pd.DataFrame(data)
 print(df.shape)
-# (17, 8)
 print(df.dtypes)
 ```
 
@@ -132,74 +141,126 @@ print(df.dtypes)
 
 ## Large Queries
 
-For large result sets, use the `limit` and `offset` parameters or iterate over pages manually using `get_data` with batched calls. swissparlpy handles server-side pagination transparently:
+swissparlpy handles server-side pagination transparently: records are only fetched from the API when you actually access them, so slicing a large result set only downloads the records you need.
 
 ```python
 import swissparlpy as spp
 
-# Download all votes in a session (can be large)
-votes = spp.get_data('Vote', Language='DE', IdSession='5101')
-print(len(votes))
+# Only the count is requested, no records are loaded yet
+votes = spp.get_data('Voting', Language='DE', IdSession=5101)
+print(votes.count)
+
+# Load the first 100 records only
+for vote in votes[:100]:
+    print(vote['LastName'], vote['DecisionText'])
 ```
 
 {: .note }
-Very large queries will emit a `ResultVeryLargeWarning`. Consider using `limit` to cap results during development.
+Very large queries emit a `ResultVeryLargeWarning`. During development, slice the result (e.g. `votes[:100]`) instead of iterating over all records.
+
+Very large tables (especially `Voting` and `Transcript`) may still result in server-side errors (500 Internal Server Error). In that case download the data in smaller batches, store the individual blocks and combine them afterwards – see [`download_votes_in_batches.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/download_votes_in_batches.py):
+
+```python
+import swissparlpy as spp
+import pandas as pd
+
+# Download the votes of the 50th legislative period session by session
+sessions50 = spp.get_data("Session", Language="DE", LegislativePeriodNumber=50)
+frames = []
+for session in sessions50:
+    data = spp.get_data("Voting", Language="DE", IdSession=session['ID'])
+    frames.append(data.to_dataframe())
+
+df_voting50 = pd.concat(frames)
+```
 
 ---
 
 ## OData Backend: Substrings
 
-Use `spp.Filter` (a callable) to filter by substring:
+To query for substrings, suffix the variable name with one of the following operators:
+
+| Suffix | Description |
+|--------|-------------|
+| `__startswith` | The value starts with the given string |
+| `__contains` | The value contains the given string |
 
 ```python
 import swissparlpy as spp
 
-# Find all councillors whose last name contains 'Müller'
-data = spp.get_data(
-    'MemberCouncil',
-    Language='DE',
-    LastName=spp.Filter('substringof', 'Müller')
-)
-for d in data:
-    print(d['LastName'], d['FirstName'])
+# Find all persons whose last name starts with 'Bal'
+persons = spp.get_data("Person", Language="DE", LastName__startswith='Bal')
+print(persons.count)
+# 12
+
+# Find all business items with 'CO2' in the title
+co2_business = spp.get_data("Business", Title__contains="CO2", Language="DE")
+print(co2_business.count)
+# 265
 ```
 
 ---
 
 ## OData Backend: Date Ranges
 
+To query for date ranges, suffix the variable name with a comparison operator and pass a `datetime` object:
+
+| Suffix | Description |
+|--------|-------------|
+| `__gt` | greater than |
+| `__gte` | greater than or equal |
+| `__lt` | less than |
+| `__lte` | less than or equal |
+
 ```python
 import swissparlpy as spp
 from datetime import datetime
 
-start = datetime(2020, 1, 1)
-end = datetime(2020, 12, 31)
-
-data = spp.get_data(
-    'Session',
-    Language='DE',
-    StartDate=spp.Filter('between', start, end)
+business = spp.get_data(
+    "Business",
+    Language="DE",
+    SubmissionDate__gt=datetime.fromisoformat('2019-09-30'),
+    SubmissionDate__lte=datetime.fromisoformat('2019-10-31')
 )
-for d in data:
-    print(d['SessionName'], d['StartDate'])
+print(business.count)
+# 22
 ```
 
 ---
 
 ## OData Backend: Advanced Filter
 
-For complex filter expressions, use the `filter` keyword with a raw OData filter string:
+**Text query**
+
+For complex filter expressions, use the `filter` keyword with a raw OData filter string. Operators like `eq`, `ne`, `lt`, `lte`, `gt`, `gte`, `startswith()` and `contains` are supported:
 
 ```python
 import swissparlpy as spp
 
-# Use a raw OData filter expression
-data = spp.get_data(
-    'Vote',
-    Language='DE',
-    filter="IdSession eq '5101' and PersonNumber eq 902"
+persons = spp.get_data(
+    "Person",
+    filter="(startswith(FirstName, 'Ste') or LastName eq 'Seiler') and Language eq 'DE'"
 )
-print(len(data))
+df = persons.to_dataframe()
+print(df[['FirstName', 'LastName']])
+```
+
+**Callable filter**
+
+The `filter` keyword also accepts a callable, which allows for more advanced filters. `spp.Filter` provides the `or_` and `and_` helpers:
+
+```python
+import swissparlpy as spp
+
+# filter by FirstName == 'Stefan' OR LastName == 'Seiler'
+def filter_by_name(ent):
+    return spp.Filter.or_(
+        ent.FirstName == 'Stefan',
+        ent.LastName == 'Seiler'
+    )
+
+df = spp.get_data("Person", filter=filter_by_name, Language='DE').to_dataframe()
+print(df[['FirstName', 'LastName']])
 ```
 
 ---
@@ -209,18 +270,46 @@ print(len(data))
 {: .note }
 Requires installation with `pip install swissparlpy[visualization]`.
 
+The `plot_voting()` function visualizes the voting results of the Swiss National Council according to the seating order. It expects the data of the `Voting` table of the OData backend.
+
 ```python
 import swissparlpy as spp
+import matplotlib.pyplot as plt
 
-votes = spp.get_data('Vote', Language='DE', IdVotingNumber=24189)
-spp.plot_voting(votes)
+# Get the voting data of one specific vote
+votes = spp.get_data("Voting", Language="DE", IdVote=23458)
+
+# Create the visualization with the default scoreboard theme
+fig = spp.plot_voting(votes, theme='scoreboard', result=True)
+plt.show()
 ```
-
-This produces a seat map of the Swiss National Council coloured by vote (yes / no / abstain).
 
 ![Voting visualization example with scoreboard](https://github.com/user-attachments/assets/314c178c-e281-43b0-84ac-d5da501e218b)
 
+The following themes are available:
+
+| Theme | Description |
+|-------|-------------|
+| `scoreboard` (default) | Imitates the council hall scoreboard (neon colors on black background) |
+| `sym1`, `sym2` | Colored symbols on light background |
+| `poly1`, `poly2`, `poly3` | Color-filled polygons with different edge styles |
+
+Parliamentary groups can be highlighted with the `highlight` parameter:
+
+```python
+fig = spp.plot_voting(
+    votes,
+    theme='poly1',
+    highlight={'ParlGroupCode': ["S"]},
+    result=True
+)
+plt.show()
+```
+
 ![Voting visualization example with poly1 and a highlighted group](https://github.com/user-attachments/assets/a11ecf2b-a966-4e21-b5ec-e99e60f06c89)
+
+{: .warning }
+The mapping from seats to persons is currently not historized, so "older" votes might not be displayed correctly. You can provide your own mapping with the `seats` parameter.
 
 ---
 
@@ -327,8 +416,10 @@ All public module-level functions:
 | Function | Description |
 |----------|-------------|
 | `spp.get_tables(backend='odata')` | Return a list of available table names |
-| `spp.get_variables(table, backend='odata')` | Return the variable names for a table |
-| `spp.get_overview(table, backend='odata')` | Print an overview of a table |
-| `spp.get_glimpse(table, backend='odata')` | Print a glimpse (first few rows) of a table |
-| `spp.get_data(table, backend='odata', **kwargs)` | Fetch data from a table with optional filters |
-| `spp.plot_voting(votes)` | Plot a National Council seat map for a vote |
+| `spp.get_variables(table, backend='odata')` | Return the variable names of a table |
+| `spp.get_overview(backend='odata')` | Return a dict of all tables and their variables |
+| `spp.get_glimpse(table, rows=5, backend='odata')` | Return the first `rows` records of a table |
+| `spp.get_data(table, filter=None, backend='odata', **kwargs)` | Fetch data from a table with optional filters |
+| `spp.plot_voting(votes, ...)` | Plot a National Council seat map for a vote (OData `Voting` data) |
+
+The same methods are available on a `spp.SwissParlClient` instance (without the `backend` parameter, which is passed to the constructor instead).

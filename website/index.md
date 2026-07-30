@@ -18,6 +18,9 @@ nav_order: 1
 
 ## Quick Start
 
+{: .note }
+Current release: **2.0.0** – requires Python 3.10 or higher. See the [changelog](https://github.com/metaodi/swissparlpy/blob/main/CHANGELOG.md) for all changes.
+
 ```bash
 pip install swissparlpy
 ```
@@ -31,9 +34,9 @@ print(tables[:5])
 # ['MemberParty', 'Party', 'Person', 'PersonAddress', 'PersonCommunication']
 
 # Get data from a table
-councillors = spp.get_data('MemberCouncil', Language='DE', limit=10)
-for c in councillors:
-    print(c['LastName'], c['FirstName'])
+councillors = spp.get_data('MemberCouncil', Language='DE', CantonAbbreviation='ZH')
+for c in councillors[:10]:
+    print(f"{c['FirstName']} {c['LastName']}")
 ```
 
 ---
