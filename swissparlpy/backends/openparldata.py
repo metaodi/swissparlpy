@@ -3,15 +3,43 @@
 import logging
 import requests
 import warnings
+from pprint import pformat
 from .base import BaseBackend, BaseResponse
 from .. import errors
-from typing import Optional, Union, Callable, Any
+from typing import Optional, Union, Callable, Any, Iterator
 from urllib.parse import urlparse, parse_qs
 
 log = logging.getLogger(__name__)
 
 OPENPARLDATA_URL = "https://api.openparldata.ch/"
 OPENPARLDATA_OPENAPI_URL = "https://api.openparldata.ch/openapi.json"
+
+# The only query parameter this backend overrides deliberately: the API defaults
+# to 'nested' multilingual objects, we ask for one flat column per language.
+# Everything else (limit, search_mode, search_scope, ...) uses the API defaults.
+DEFAULT_QUERY_PARAMS: dict[str, Any] = {"lang_format": "flat"}
+
+# Language parameters that are propagated to requests for related data
+LANG_PARAMS = ("lang_format", "lang", "lang_fallback")
+
+# Documented query parameters, used if the OpenAPI spec doesn't list any
+FALLBACK_QUERY_PARAMS = {
+    "offset",
+    "limit",
+    "expand",
+    "sort_by",
+    "search",
+    "search_mode",
+    "search_language",
+    "search_scope",
+    "fields",
+    "lang",
+    "lang_fallback",
+    "lang_format",
+    "hide_null",
+    "exclude_null",
+    "output_format",
+}
 
 
 class OpenParlDataBackend(BaseBackend):
@@ -26,6 +54,7 @@ class OpenParlDataBackend(BaseBackend):
             session = requests.Session()
         self.session = session
         self.cache: dict[str, list[str]] = {}
+        self.query_params: dict[str, set[str]] = {}
         self.openapi_url = url
         api_config = self._load_openapi_config(url)
         # use v1 of the API
@@ -38,6 +67,7 @@ class OpenParlDataBackend(BaseBackend):
 
         api_paths = []
         entities = set()
+        query_params: dict[str, set[str]] = {}
         for api_path, api_details in data["paths"].items():
             get_config = api_details.get("get", {})
             tags = get_config.get("tags", [])
@@ -47,6 +77,14 @@ class OpenParlDataBackend(BaseBackend):
             # check if the path corresponds to a table/resource endpoint
             if "List" in summary:
                 entities.update(tags)
+                # collect the documented query parameters of this endpoint
+                params = {
+                    param["name"]
+                    for param in get_config.get("parameters", [])
+                    if param.get("in") == "query" and "name" in param
+                }
+                for tag in tags:
+                    query_params.setdefault(tag, set()).update(params)
 
         api_config = {
             "base_url": data.get("servers", [{"url": OPENPARLDATA_URL}])[0]["url"],
@@ -55,6 +93,7 @@ class OpenParlDataBackend(BaseBackend):
         }
         # Initialize cache with empty variable lists
         self.cache = {table: [] for table in api_config["tables"]}
+        self.query_params = query_params
         return api_config
 
     def _http_get_request(
@@ -95,9 +134,10 @@ class OpenParlDataBackend(BaseBackend):
         if self.cache and table in self.cache and self.cache[table]:
             return self.cache[table]
 
-        # Try to get a single record to discover the schema
+        # Try to get a single record to discover the schema, using the same
+        # parameters as get_data() so the variables match the returned columns
         response = self._http_get_request(
-            f"{self.base_url}/{table}", params={"limit": 1}
+            f"{self.base_url}/{table}", params={"limit": 1, **DEFAULT_QUERY_PARAMS}
         )
         try:
             data = response.json()["data"][0]
@@ -111,9 +151,18 @@ class OpenParlDataBackend(BaseBackend):
                 f"Failed to get variables for table '{table}': {e}"
             ) from e
 
+    def get_query_params(self, table: str) -> set[str]:
+        """
+        Get the documented query parameters for a given table.
+        """
+        if not self.cache and not self.query_params:
+            self._load_openapi_config(self.openapi_url)
+
+        return self.query_params.get(table) or set(FALLBACK_QUERY_PARAMS)
+
     def get_glimpse(self, table: str, rows: int = 5) -> "OpenParlDataResponse":
         """Get a preview of the first N rows of a table"""
-        params = {"limit": rows}
+        params = {"limit": rows, **DEFAULT_QUERY_PARAMS}
         return OpenParlDataResponse(
             session=self.session,
             url=f"{self.base_url}/{table}",
@@ -132,15 +181,7 @@ class OpenParlDataBackend(BaseBackend):
             )
         variables = self.get_variables(table)
 
-        params = {
-            "lang_format": "flat",
-            "lang": "en",
-            "lang_fallback": "de",
-            "search_mode": "partial",
-            "search_scope": "all",
-        }
-
-        params["search"] = ""
+        params: dict[str, Any] = dict(DEFAULT_QUERY_PARAMS)
 
         # Handle text filter
         if filter and isinstance(filter, str):
@@ -150,11 +191,12 @@ class OpenParlDataBackend(BaseBackend):
             log.warning("Callable filters are not supported for OpenParlData backend")
 
         # Convert kwargs to query parameters
+        known_params = set(variables) | self.get_query_params(table)
         for key, value in kwargs.items():
-            if (key not in variables) and (key not in params):
+            if key not in known_params:
                 log.warning(
                     f"Attribute '{key}' is not a variable "
-                    "or search param for table '{table}'"
+                    f"or query parameter for table '{table}'"
                 )
             params[key] = value
 
@@ -224,8 +266,9 @@ class OpenParlDataResponse(BaseResponse):
 
     def _parse_response(self, data: Any) -> None:
         """Parse API response and extract data"""
+        pagination = {}
         if isinstance(data, dict):
-            records = data["data"]
+            records = data.get("data", [])
             pagination = data.get("meta", {})
             self.count = pagination.get("total_records", len(records))
             self.next_url = pagination.get("next_page")
@@ -237,9 +280,15 @@ class OpenParlDataResponse(BaseResponse):
                 self._variables = list(records[0].keys())
 
         else:
+            log.debug(f"Response data is not a dict, got type: {type(data)}")
             records = []
             self.count = 0
             self.next_url = None
+
+        if not records:
+            log.debug("No records found in response data")
+        if not pagination:
+            log.debug("No pagination info found in response data")
 
         # Wrap each record in a proxy object
         for record in records:
@@ -270,9 +319,9 @@ class OpenParlDataResponse(BaseResponse):
         return self.count
 
     def __repr__(self) -> str:
-        return self.data.__repr__()
+        return pformat(self.data, width=80, sort_dicts=False)
 
-    def __iter__(self) -> Any:
+    def __iter__(self) -> Iterator["OpenParlDataProxy"]:
         """Iterate over all records, loading pages as needed"""
         i = 0
         while True:
@@ -302,7 +351,9 @@ class OpenParlDataResponse(BaseResponse):
             else:
                 break
 
-    def __getitem__(self, key: Union[int, slice]) -> object:
+    def __getitem__(
+        self, key: Union[int, slice]
+    ) -> "Union[OpenParlDataProxy, list[OpenParlDataProxy]]":
         if isinstance(key, slice):
             # Load enough data for the slice
             limit = max(key.start or 0, key.stop or self.count)
@@ -368,11 +419,16 @@ class OpenParlDataProxy(dict):
                 f"available links: {list(links.keys())}"
             )
 
-        params = {
-            "lang_format": self.parent.params.get("lang_format", "flat"),
-            "lang": self.parent.params.get("lang", "en"),
-            "lang_fallback": self.parent.params.get("lang_fallback", "de"),
-        }
+        # Inherit the language parameters of the parent request, but don't
+        # invent any that the parent didn't send
+        params: dict[str, Any] = dict(DEFAULT_QUERY_PARAMS)
+        params.update(
+            {
+                key: self.parent.params[key]
+                for key in LANG_PARAMS
+                if key in self.parent.params
+            }
+        )
 
         url = links[table]
         return OpenParlDataResponse(

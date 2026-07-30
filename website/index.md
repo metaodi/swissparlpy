@@ -1,20 +1,25 @@
 ---
-title: Home
+title: Python library for the Swiss Parliament API and OpenParlData.ch API
 layout: home
 nav_order: 1
 ---
 
 # swissparlpy
 
-[![PyPI Version](https://img.shields.io/pypi/v/swissparlpy)](https://pypi.org/project/swissparlpy/)
+[![PyPI Version](https://img.shields.io/pypi/v/swissparlpy?1)](https://pypi.org/project/swissparlpy/)
 [![Build Status](https://github.com/metaodi/swissparlpy/actions/workflows/build.yml/badge.svg)](https://github.com/metaodi/swissparlpy/actions/workflows/build.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 **swissparlpy** is a Python module that provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss Parliament](https://www.parlament.ch/en) and the [OpenParlData.ch](https://openparldata.ch) REST API.
 
+![swissparlpy]({{ "assets/images/swissparlpy_social.png" | relative_url }})
+
 ---
 
 ## Quick Start
+
+{: .note }
+Current release: **2.0.0** – requires Python 3.10 or higher. See the [changelog](https://github.com/metaodi/swissparlpy/blob/main/CHANGELOG.md) for all changes.
 
 ```bash
 pip install swissparlpy
@@ -29,9 +34,9 @@ print(tables[:5])
 # ['MemberParty', 'Party', 'Person', 'PersonAddress', 'PersonCommunication']
 
 # Get data from a table
-councillors = spp.get_data('MemberCouncil', Language='DE', limit=10)
-for c in councillors:
-    print(c['LastName'], c['FirstName'])
+councillors = spp.get_data('MemberCouncil', Language='DE', CantonAbbreviation='ZH')
+for c in councillors[:10]:
+    print(f"{c['FirstName']} {c['LastName']}")
 ```
 
 ---
@@ -56,7 +61,7 @@ Vizualization of voting results as scoreboard:
 ## Credits
 
 This library is inspired by the R package [swissparl](https://github.com/zumbov2/swissparl) by [David Zumbach](https://github.com/zumbov2).
-The idea for a Python version was triggered by [Ralph Straumann](https://twitter.com/rastrau) [asking on Twitter](https://twitter.com/rastrau/status/1441048778740432902).
+The idea for a Python version was triggered by [Ralph Straumann](https://twitter.com/rastrau) [asking on Twitter](https://web.archive.org/web/20210923211621/https://twitter.com/rastrau/status/1441048778740432902).
 
 ## Similar Libraries
 

@@ -2,6 +2,7 @@ swissparlpy.egg-info
 *.pyc
 *.swp
 .coverage
+__pycache__/
 pyenv
 .env
 dist/

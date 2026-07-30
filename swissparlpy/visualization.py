@@ -165,10 +165,11 @@ def plot_voting(  # noqa: C901
         raise ValueError(f"Missing required columns in votes: {missing_cols}")
 
     # Handle seats data
+    seats_df: "pd.DataFrame"
     if seats is None:
         # Try to import and get seats data
         try:
-            seats = client.get_data(
+            seats_df = client.get_data(
                 "SeatOrganisationNr", filter="Language eq 'DE'"
             ).to_dataframe()
         except Exception as e:
@@ -193,12 +194,14 @@ def plot_voting(  # noqa: C901
                     "the correct legislative period.",
                     errors.OutdatedDataWarning,
                 )
+    elif isinstance(seats, SwissParlResponse):
+        seats_df = seats.to_dataframe()
     else:
-        seats = pd.DataFrame(seats)
+        seats_df = pd.DataFrame(seats)
 
     # Check required columns in seats
     required_seat_cols = ["SeatNumber", "PersonNumber"]
-    missing_cols = [col for col in required_seat_cols if col not in seats.columns]
+    missing_cols = [col for col in required_seat_cols if col not in seats_df.columns]
     if missing_cols:
         raise ValueError(f"Missing required columns in seats: {missing_cols}")
 
@@ -208,7 +211,7 @@ def plot_voting(  # noqa: C901
     # Merge data
     # First merge seating plan with seats
     data = seating_plan.merge(
-        seats[["SeatNumber", "PersonNumber"]], on="SeatNumber", how="left"
+        seats_df[["SeatNumber", "PersonNumber"]], on="SeatNumber", how="left"
     )
 
     # Then merge with votes (keep all votes -> right join)

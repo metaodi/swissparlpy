@@ -27,7 +27,7 @@ The [`examples/`](https://github.com/metaodi/swissparlpy/tree/main/examples) dir
 | [`glimpse.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/glimpse.py) | Use `get_glimpse()` to preview a table |
 | [`list_all_tables_and_properties.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/list_all_tables_and_properties.py) | List all tables and their variables |
 | [`pagination.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/pagination.py) | Handling large result sets with pagination |
-| [`slice.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/slice.py) | Slicing results with `limit` and `offset` |
+| [`slice.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/slice.py) | Slicing and indexing a result set |
 | [`download_votes_in_batches.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/download_votes_in_batches.py) | Download all votes in batches |
 | [`visualize_voting.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/visualize_voting.py) | Plot a National Council seat map |
 | [`compare_backends.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/compare_backends.py) | Compare the OData and OpenParlData backends |
@@ -75,7 +75,9 @@ print(df[["id", "date_start", "text_content_de"]].head())
 
 ```python
 import swissparlpy as spp
+import matplotlib.pyplot as plt
 
-votes = spp.get_data('Vote', Language='DE', IdVotingNumber=24189)
-spp.plot_voting(votes)
+votes = spp.get_data('Voting', Language='DE', IdVote=23458)
+spp.plot_voting(votes, theme='scoreboard', result=True)
+plt.show()
 ```

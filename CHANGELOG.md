@@ -4,6 +4,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-30
+### Changed
+- **BC-Break**: Python 3.10 is now required (Python 3.9 reached its end of life)
+- **BC-Break**: OpenParlData backend: `search_scope` and `search_mode` are no longer overridden, the API defaults (`metadata` and `partial`) apply. Pass `search_scope="all"` explicitly to search the full-text indexes (Issue #52)
+- OpenParlData backend: an empty `search` parameter is no longer sent for unfiltered queries (Issue #52)
+- Improved `__repr__` of `ODataResponse` and `OpenParlDataResponse` and added more logging when parsing responses
+
+### Added
+- Add more tests for edge cases and previously uncovered code paths
+- Test Python 3.13 and 3.14 in the build matrix
+- Document in the README and on the website that `limit` is a page size (not a cap) and that `search_mode="exact"` is case-sensitive in practice
+
+### Fixed
+- OpenParlData backend: don't send `lang="en"` by default, which made tables like `bodies` appear empty (Issue #52)
+- OpenParlData backend: only warn about unknown query attributes, the documented query parameters (`limit`, `offset`, `sort_by`, `fields`, ...) no longer produce false positives (Issue #52)
+- OpenParlData backend: interpolate the table name in the unknown attribute warning (Issue #52)
+- OpenParlData backend: `get_variables()` and `get_glimpse()` now use the same language parameters as `get_data()`, so the variables match the returned columns
+- Fix type errors reported by mypy 2.x and pandas-stubs 3.x
+- Run the OData backend tests again: the file name did not match the pytest pattern, so they were never collected
+
 ## [1.0.0] - 2026-02-25
 ### Changed
 - BC-Break: Python 3.9 is now required
@@ -77,7 +97,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `Fixed` for any bug fixes.
 - `Security` to invite users to upgrade in case of vulnerabilities.
 
-[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/metaodi/swissparlpy/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/metaodi/swissparlpy/compare/v0.3.0...v1.0.0
 [0.3.0]: https://github.com/metaodi/swissparlpy/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/metaodi/swissparlpy/compare/v0.2.0...v0.2.1

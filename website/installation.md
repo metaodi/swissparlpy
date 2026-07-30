@@ -17,7 +17,7 @@ nav_order: 2
 
 ## Requirements
 
-swissparlpy requires **Python 3.9 or higher**.
+The current release of swissparlpy is **2.0.0** and it requires **Python 3.10 or higher**.
 
 ---
 
@@ -39,7 +39,7 @@ To enable the [voting visualization feature](usage#visualize-voting-results), in
 pip install swissparlpy[visualization]
 ```
 
-This installs additional dependencies (`matplotlib`, `Pillow`) needed for plotting seat maps.
+This installs additional dependencies (`matplotlib`, `pandas`) needed for plotting seat maps.
 
 ---
 

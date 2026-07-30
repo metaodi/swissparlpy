@@ -85,4 +85,5 @@ class SwissParlResponse(object):
             )
         # Convert backend response to dict list then to DataFrame
         data_list = self._backend_response.to_dict_list()
-        return pd.DataFrame(data_list)
+        df: "pd.DataFrame" = pd.DataFrame(data_list)
+        return df
