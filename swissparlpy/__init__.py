@@ -1,6 +1,6 @@
 """Client for Swiss parliament API"""
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __all__ = ["client", "errors", "visualization", "backends"]
 
 from .errors import SwissParlError  # noqa
