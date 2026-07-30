@@ -92,4 +92,5 @@ class BaseResponse(ABC):
                 "pandas is not installed. Install it with "
                 "'pip install pandas' to use to_dataframe()."
             )
-        return pd.DataFrame(self.to_dict_list())
+        df: "pd.DataFrame" = pd.DataFrame(self.to_dict_list())
+        return df

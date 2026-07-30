@@ -56,7 +56,9 @@ filterwarnings = [
 addopts = "--cov=swissparlpy"
 
 [tool.mypy]
-python_version = "3.9"
+# no explicit python_version: mypy 2.x does not support a target of 3.9
+# anymore, so the version of the running interpreter is used (the CI runs
+# all supported versions)
 ignore_missing_imports = true
 disallow_untyped_defs = true
 check_untyped_defs = true
