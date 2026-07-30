@@ -317,6 +317,8 @@ The mapping from seats to persons is currently not historized, so "older" votes 
 
 ### Search with the OpenParlData Backend
 
+Besides the variables of a table, every query parameter of the [OpenParlData API](https://api.openparldata.ch/documentation#/) (e.g. `limit`, `offset`, `sort_by`, `fields`, `search`, `lang`) can be passed as a keyword argument. swissparlpy only sets `lang_format="flat"` itself, all other parameters use the documented API defaults.
+
 ```python
 import swissparlpy as spp
 
@@ -338,6 +340,9 @@ print(df[['firstname', 'lastname', 'title']])
 
 **Full-text search:**
 
+{: .note }
+`search` only looks at the metadata by default (`search_scope="metadata"`). Pass `search_scope="all"` explicitly to search the full-text indexes, e.g. the text of a speech.
+
 ```python
 import swissparlpy as spp
 
@@ -357,7 +362,6 @@ print(df[["id", "person_id", "date_start", "text_content_de"]].head())
 <details markdown="1">
 <summary>Output</summary>
 ```
-"meeting_id", "date_start", "date_end", "text_content_de"]]       
           id body_key  person_id  meeting_id           date_start date_end                                    text_content_de
 0    1100333      351     4256.0        1262  2024-11-14T18:18:52     None  <p><b>Corina Liebi (JGLP)</b> für die PVS: Für...
 1    1100301      351     4191.0        1578  2024-05-30T22:24:34     None  <p><b>Ursina Anderegg (GB)</b> für die Fraktio...
@@ -374,6 +378,31 @@ print(df[["id", "person_id", "date_start", "text_content_de"]].head())
 [457 rows x 7 columns]
 ```
 </details>
+
+### `limit` is a Page Size, Not a Cap
+
+`limit` is passed straight to the API, where it controls the size of a single page (500 by default). The response follows the `next_page` links transparently, so iterating a result still yields *all* matching records, no matter which `limit` you set:
+
+```python
+import swissparlpy as spp
+
+opd_client = spp.SwissParlClient(backend="openparldata")
+response = opd_client.get_data("persons", limit=10)
+print(len(response))        # total number of records, taken from the first page
+# 26574
+print(len(list(response)))  # iterating loads every page
+# 26574
+```
+
+To only get a few records, use `get_glimpse()` or slice the response (`response[:10]`).
+
+{: .note }
+`len(response)` is the total record count reported by the API and is available after a single request, which makes it a cheap way to count records.
+
+### Case Sensitivity of `search_mode="exact"`
+
+{: .warning }
+While the API documents `search_mode="exact"` as a case-insensitive exact match, it behaves case-sensitively in practice: `search="Nationalrat"` returns results, while `search="nationalrat"` does not.
 
 ### Get Related Data
 
