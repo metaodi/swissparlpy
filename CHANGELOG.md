@@ -8,6 +8,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Added
 - Add more tests for edge cases and previously uncovered code paths
+- Document in the README that `limit` is a page size (not a cap) and that `search_mode="exact"` is case-sensitive in practice
+
+### Fixed
+- OpenParlData backend: don't send `lang="en"` by default, which made tables like `bodies` appear empty (Issue #52)
+- OpenParlData backend: only warn about unknown query attributes, the documented query parameters (`limit`, `offset`, `sort_by`, `fields`, ...) no longer produce false positives (Issue #52)
+- OpenParlData backend: interpolate the table name in the unknown attribute warning (Issue #52)
+- OpenParlData backend: `get_variables()` and `get_glimpse()` now use the same language parameters as `get_data()`, so the variables match the returned columns
+
+### Changed
+- OpenParlData backend: `search_scope` and `search_mode` are no longer overridden, the API defaults (`metadata` and `partial`) apply. Pass `search_scope="all"` explicitly to search the full-text indexes (Issue #52)
+- OpenParlData backend: an empty `search` parameter is no longer sent for unfiltered queries (Issue #52)
 
 ## [1.0.0] - 2026-02-25
 ### Changed

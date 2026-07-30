@@ -25,8 +25,11 @@ This module provides easy access to the data of the [OData webservice](https://w
     * [Advanced filter](#advanced-filter)
     * [Visualize voting results](#visualize-voting-results)
     * [API documentation](#documentation)
- * [OData backend specific options](#odata-backend-specific-options)
-    * [Search with the `OpenParlDataBackend`](#search-with-the-openparldatabackend)
+ * [OpenParlData backend specific options](#openparldata-backend-specific-options)
+    * [Search](#search)
+    * [`limit` is a page size, not a cap](#limit-is-a-page-size-not-a-cap)
+    * [Case sensitivity of `search_mode="exact"`](#case-sensitivity-of-search_modeexact)
+    * [Get related data](#get-related-data)
 
 * [Similar libraries for other languages](#similar-libraries-for-other-languages)
 * [Credits](#credits)
@@ -408,6 +411,33 @@ The OpenParlDataBackend has the ability to filter and search, all the parameters
 
 [457 rows x 7 columns]
 ```
+
+### `limit` is a page size, not a cap
+
+`limit` is passed straight to the API, where it controls the size of a single page (500 by default).
+The response follows the `next_page` links transparently, so iterating a result still yields *all*
+matching records, no matter what `limit` you set:
+
+```python
+>>> import swissparlpy as spp
+>>>
+>>> opd_client = spp.SwissParlClient(backend="openparldata")
+>>> response = opd_client.get_data("persons", limit=10)
+>>> len(response)  # total number of records, taken from the first page
+26574
+>>> len(list(response))  # iterating loads every page
+26574
+```
+
+To only get a few records, use `get_glimpse()` or slice the response (`response[:10]`).
+Note that `len(response)` is the total record count reported by the API and is available after a
+single request, which makes it a cheap way to count records.
+
+### Case sensitivity of `search_mode="exact"`
+
+While the API documents `search_mode="exact"` as a case-insensitive exact match, it behaves
+case-sensitively in practice, i.e. `search="Nationalrat"` returns results, while
+`search="nationalrat"` does not.
 
 ### Get related data
 

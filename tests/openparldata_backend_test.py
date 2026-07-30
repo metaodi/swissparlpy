@@ -1,10 +1,12 @@
 """Tests for OpenParlData backend"""
 
+import logging
 import pytest
 import responses
 from responses import matchers
 from unittest.mock import Mock
 from swissparlpy.backends.openparldata import (
+    FALLBACK_QUERY_PARAMS,
     OpenParlDataBackend,
     OpenParlDataResponse,
     OpenParlDataProxy,
@@ -212,7 +214,7 @@ class TestOpenParlDataBackend:
             responses.GET,
             f"{OPENPARLDATA_URL}/persons",
             json=pers_data,
-            match=[matchers.query_param_matcher({"limit": 1})],
+            match=[matchers.query_param_matcher({"limit": 1, "lang_format": "flat"})],
             status=200,
         )
 
@@ -625,6 +627,175 @@ class TestOpenParlDataBackend:
 
         assert isinstance(tables, list)
         assert len(tables) > 0
+
+
+class TestOpenParlDataQueryParams:
+    """Test the query parameters sent to the API (Issue #52)"""
+
+    def _mock_openapi(self, openapi_spec):
+        responses.add(
+            responses.GET,
+            OPENPARLDATA_OPENAPI_URL,
+            body=openapi_spec,
+            status=200,
+            content_type="application/json",
+        )
+
+    def _mock_variables(self, single_person):
+        return responses.add(
+            responses.GET,
+            f"{OPENPARLDATA_URL}/persons",
+            body=single_person,
+            match=[matchers.query_param_matcher({"limit": 1, "lang_format": "flat"})],
+            status=200,
+        )
+
+    def _mock_persons(self, params, strict_match=True):
+        return responses.add(
+            responses.GET,
+            f"{OPENPARLDATA_URL}/persons",
+            json={
+                "data": [{"id": 1, "firstname": "Stefan"}],
+                "meta": {"total_records": 1, "has_more": False},
+            },
+            match=[matchers.query_param_matcher(params, strict_match=strict_match)],
+            status=200,
+        )
+
+    @responses.activate
+    def test_default_params_are_only_lang_format(self, openapi_spec, single_person):
+        """No lang, lang_fallback, search, search_mode or search_scope is sent"""
+        self._mock_openapi(openapi_spec)
+        self._mock_variables(single_person)
+        data_resp = self._mock_persons({"lang_format": "flat"})
+
+        backend = OpenParlDataBackend()
+        response = backend.get_data("persons")
+
+        assert len(response) == 1
+        assert (
+            data_resp.call_count == 1
+        ), "Data endpoint should be called with 'lang_format' as only param"
+
+    @responses.activate
+    def test_string_filter_sets_search(self, openapi_spec, single_person):
+        """A string filter is passed as 'search', without a search scope override"""
+        self._mock_openapi(openapi_spec)
+        self._mock_variables(single_person)
+        data_resp = self._mock_persons({"lang_format": "flat", "search": "Müller"})
+
+        backend = OpenParlDataBackend()
+        backend.get_data("persons", "Müller")
+
+        assert data_resp.call_count == 1, "Search should be sent as 'search' param"
+
+    @responses.activate
+    def test_lang_can_be_set_by_caller(self, openapi_spec, single_person):
+        """The caller can still request a single language explicitly"""
+        self._mock_openapi(openapi_spec)
+        self._mock_variables(single_person)
+        data_resp = self._mock_persons({"lang_format": "flat", "lang": "de"})
+
+        backend = OpenParlDataBackend()
+        backend.get_data("persons", lang="de")
+
+        assert data_resp.call_count == 1, "lang should be forwarded to the API"
+
+    @responses.activate
+    def test_get_glimpse_uses_same_lang_params(self, openapi_spec, single_person):
+        """get_glimpse() uses the same language params as get_data()"""
+        self._mock_openapi(openapi_spec)
+        self._mock_variables(single_person)
+        glimpse_resp = self._mock_persons({"lang_format": "flat", "limit": 3})
+
+        backend = OpenParlDataBackend()
+        backend.get_glimpse("persons", rows=3)
+
+        assert glimpse_resp.call_count == 1, "Glimpse should send 'lang_format'"
+
+    @responses.activate
+    def test_no_warning_for_documented_query_params(
+        self, openapi_spec, single_person, caplog
+    ):
+        """Documented query params like 'limit' or 'sort_by' don't warn"""
+        self._mock_openapi(openapi_spec)
+        self._mock_variables(single_person)
+        self._mock_persons(
+            {"lang_format": "flat", "limit": 10, "sort_by": "-id"},
+        )
+
+        backend = OpenParlDataBackend()
+        with caplog.at_level(logging.WARNING):
+            backend.get_data("persons", limit=10, sort_by="-id")
+
+        assert caplog.text == "", f"Expected no warnings, got: {caplog.text}"
+
+    @responses.activate
+    def test_warning_for_unknown_attribute(self, openapi_spec, single_person, caplog):
+        """An unknown attribute warns and the table name is interpolated"""
+        self._mock_openapi(openapi_spec)
+        self._mock_variables(single_person)
+        self._mock_persons({"lang_format": "flat", "firstnam": "Stefan"})
+
+        backend = OpenParlDataBackend()
+        with caplog.at_level(logging.WARNING):
+            backend.get_data("persons", firstnam="Stefan")
+
+        assert "firstnam" in caplog.text, f"Expected a warning, got: {caplog.text}"
+        assert (
+            "for table 'persons'" in caplog.text
+        ), f"Table name should be interpolated, got: {caplog.text}"
+        assert "{table}" not in caplog.text, "Table name should not be a literal"
+
+    @responses.activate
+    def test_get_query_params_from_spec(self, openapi_spec):
+        """Query params are read from the OpenAPI spec"""
+        self._mock_openapi(openapi_spec)
+
+        backend = OpenParlDataBackend()
+        params = backend.get_query_params("persons")
+
+        assert "limit" in params
+        assert "sort_by" in params
+        assert "search_scope" in params
+
+    @responses.activate
+    def test_get_query_params_fallback(self, openapi_spec):
+        """Unknown tables fall back to the documented query params"""
+        self._mock_openapi(openapi_spec)
+
+        backend = OpenParlDataBackend()
+        params = backend.get_query_params("does_not_exist")
+
+        assert params == FALLBACK_QUERY_PARAMS
+
+    @responses.activate
+    def test_related_data_does_not_add_lang(
+        self, openapi_spec, single_person, person_memberships
+    ):
+        """Related data requests don't invent language params"""
+        self._mock_openapi(openapi_spec)
+        responses.add(
+            responses.GET,
+            f"{OPENPARLDATA_URL}/persons",
+            body=single_person,
+            status=200,
+        )
+        memberships_resp = responses.add(
+            responses.GET,
+            f"{OPENPARLDATA_URL}/persons/9527/memberships",
+            body=person_memberships,
+            match=[matchers.query_param_matcher({"lang_format": "flat"})],
+            status=200,
+        )
+
+        backend = OpenParlDataBackend()
+        person = cast(OpenParlDataProxy, backend.get_data("persons")[0])
+        person.get_related_data("memberships")
+
+        assert (
+            memberships_resp.call_count == 1
+        ), "Related data should be requested without a 'lang' param"
 
 
 class TestOpenParlDataBackendEdgeCases:
