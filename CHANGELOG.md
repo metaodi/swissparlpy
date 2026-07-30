@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project follows [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- BC-Break: Python 3.10 is now required (Python 3.9 reached its end of life)
+
 ### Added
 - Add more tests for edge cases and previously uncovered code paths
 
