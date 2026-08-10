@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Add support for the Gever (Geschäftsverwaltungssystem) APIs of the canton and the city of Zurich as a backend, based on [goifer](https://github.com/metaodi/goifer)
 - Gever backend: with a usable schema, records are now fully flattened at any depth (e.g. a `mitglieder` record's `person` -> `kontakt` wrapper), instead of only a curated set of hardcoded field names
 - Gever backend: detect repeatable fields whose schema declares `maxOccurs` on the wrapping `choice`/`sequence`/`all` instead of on the element itself, fixing inconsistent dict-vs-list shapes for such fields (e.g. `mitglieder`'s `Behoerdenmandat`/`Parteizugehoerigkeit`)
+- Gever backend: `GeverResponse.explode()` turns a list field into its own `DataFrame`, one row per item, with the parent record's `obj_guid` carried along as `parent_obj_guid` to join back
 
 ## [2.0.0] - 2026-07-30
 ### Changed

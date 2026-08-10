@@ -566,6 +566,24 @@ If the schema of a table cannot be loaded, there is no reliable way to tell a re
 
 Note that the records of this backend are normalized slightly differently than the ones of `goifer`: nesting is flattened based on the schema instead of goifer's fixed set of rules, and list fields are always lists.
 
+A list field like `behoerdenmandat` above stays as a list-of-dicts column when converted with `to_dataframe()`, which is often not what you want for further analysis. Use `explode()` to turn it into its own `DataFrame` instead, one row per item, with the parent record's `obj_guid` carried along as `parent_obj_guid` so it can be joined back:
+
+```python
+>>> import swissparlpy as spp
+>>> data = spp.get_data('mitglieder', backend='gever')
+>>> mandates = data.explode('behoerdenmandat')
+>>> mandates.columns.tolist()
+['parent_obj_guid', 'obj_guid', 'dauer_start', 'dauer_end', 'dauer', 'name']
+```
+
+Pass `parent_columns` to also carry other parent fields along (prefixed with `parent_`), to avoid a separate join for common cases:
+
+```python
+>>> mandates = data.explode('behoerdenmandat', parent_columns=['person_kontakt_vorname', 'person_kontakt_name'])
+```
+
+`explode()` raises a `SwissParlError` if the field is not one of the table's list fields. Without a schema, there's no way to know this ahead of time, so records where the field wasn't kept as a list (see above) are silently skipped instead.
+
 ### Value conversion
 
 The API returns everything as a string, the backend converts the values of a record:

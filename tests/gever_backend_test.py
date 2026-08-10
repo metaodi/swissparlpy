@@ -586,6 +586,104 @@ class TestGeverNestedWrapperFlattening:
         assert df["behoerdenmandat"].map(type).unique().tolist() == [list]
 
 
+class TestGeverExplode:
+    @responses.activate
+    def test_explode_one_row_per_item(
+        self, gever_mitglieder_nested_schema, gever_mitglieder_nested
+    ):
+        pd = pytest.importorskip("pandas")
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+        add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
+
+        backend = GeverBackend()
+        df = backend.get_data("mitglieder").explode("behoerdenmandat")
+
+        assert isinstance(df, pd.DataFrame)
+        # Peter has 1 mandate, Christian has 2 -> 3 rows total
+        assert len(df) == 3
+        assert df["name"].tolist() == ["Kantonsrat", "Fraktion SVP", "Kantonsrat"]
+
+    @responses.activate
+    def test_explode_includes_parent_foreign_key(
+        self, gever_mitglieder_nested_schema, gever_mitglieder_nested
+    ):
+        pytest.importorskip("pandas")
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+        add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
+
+        backend = GeverBackend()
+        records = backend.get_data("mitglieder")
+        df = records.explode("behoerdenmandat")
+
+        # parent_obj_guid does not collide with the child's own obj_guid
+        assert "parent_obj_guid" in df.columns
+        assert "obj_guid" in df.columns
+        assert df.iloc[0]["parent_obj_guid"] == records[0]["obj_guid"]
+        assert df.iloc[0]["obj_guid"] == records[0]["behoerdenmandat"][0]["obj_guid"]
+
+    @responses.activate
+    def test_explode_with_parent_columns(
+        self, gever_mitglieder_nested_schema, gever_mitglieder_nested
+    ):
+        pytest.importorskip("pandas")
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+        add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
+
+        backend = GeverBackend()
+        df = backend.get_data("mitglieder").explode(
+            "behoerdenmandat", parent_columns=["person_kontakt_vorname"]
+        )
+
+        assert df["parent_person_kontakt_vorname"].tolist() == [
+            "Peter",
+            "Christian",
+            "Christian",
+        ]
+
+    @responses.activate
+    def test_explode_unknown_list_field_raises(
+        self, gever_mitglieder_nested_schema, gever_mitglieder_nested
+    ):
+        pytest.importorskip("pandas")
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+        add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
+
+        backend = GeverBackend()
+        result = backend.get_data("mitglieder")
+
+        with pytest.raises(errors.SwissParlError):
+            result.explode("funktion")
+
+    @responses.activate
+    def test_explode_without_schema_uses_runtime_shape(self, gever_ablaufschritte):
+        pytest.importorskip("pandas")
+        add_xml_response(f"{ABLAUF_URL}/schema", "error", status=500)
+        add_xml_response(f"{ABLAUF_URL}/searchdetails", gever_ablaufschritte)
+
+        backend = GeverBackend()
+        df = backend.get_data("ablaufschritte").explode("geschaeft")
+
+        # without a schema, a single 'geschaeft' is merged into its record
+        # rather than kept as a list (see TestGeverNormalizationFallback), so
+        # only the record with several ends up in the exploded result
+        assert len(df) == 2
+        assert df["nr"].tolist() == ["KR-Nr. 2/2024", "KR-Nr. 3/2024"]
+
+    @responses.activate
+    def test_explode_requires_pandas(
+        self, gever_mitglieder_nested_schema, gever_mitglieder_nested, monkeypatch
+    ):
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+        add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
+        monkeypatch.setattr("swissparlpy.backends.gever.PANDAS_AVAILABLE", False)
+
+        backend = GeverBackend()
+        result = backend.get_data("mitglieder")
+
+        with pytest.raises(ImportError):
+            result.explode("behoerdenmandat")
+
+
 class TestGeverPagination:
     def _add_city_responses(self, schema, page1, page2):
         add_xml_response(f"{CITY_GESCHAEFT_URL}/schema", schema)

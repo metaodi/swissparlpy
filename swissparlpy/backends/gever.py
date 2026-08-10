@@ -24,6 +24,13 @@ from .base import BaseBackend, BaseResponse
 from .gever_config import DEFAULT_NAMESPACES, INSTANCES
 from .. import errors
 
+try:
+    import pandas as pd
+
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+
 log = logging.getLogger(__name__)
 
 DEFAULT_INSTANCE = "canton_zurich"
@@ -814,3 +821,56 @@ class GeverResponse(BaseResponse):
         """Convert all data to a list of dictionaries"""
         self._load_until(self.count)
         return list(self)
+
+    def explode(
+        self, field: str, parent_columns: Optional[list[str]] = None
+    ) -> "pd.DataFrame":
+        """Explode a repeatable field into its own DataFrame
+
+        A list field (see the "Nested and list fields" documentation) holds
+        one-to-many data embedded in the record, e.g. a `mitglieder`
+        record's `behoerdenmandat`. This turns it into its own DataFrame,
+        one row per item, with the parent record's `obj_guid` included as
+        `parent_obj_guid` so the rows can be joined back. Pass
+        `parent_columns` to carry additional parent fields along (prefixed
+        with `parent_`), e.g. to keep a member's name on each mandate row
+        without a separate join.
+        """
+        if not PANDAS_AVAILABLE:
+            raise ImportError(
+                "pandas is not installed. Install it with "
+                "'pip install pandas' to use explode()."
+            )
+
+        field = _clean_name(field)
+        if self.has_schema and field not in self.list_fields:
+            raise errors.SwissParlError(
+                f"'{field}' is not a list field of table '{self.table}', "
+                f"available list fields: {sorted(self.list_fields)}"
+            )
+
+        rows: list[dict[str, Any]] = []
+        for record in self.to_dict_list():
+            items = record.get(field)
+            if not items:
+                continue
+            if not isinstance(items, list):
+                raise errors.SwissParlError(
+                    f"'{field}' is not a list in this record "
+                    f"(got {type(items).__name__}), cannot explode it"
+                )
+
+            parent = {"parent_obj_guid": record.get("obj_guid")}
+            parent.update(
+                {f"parent_{col}": record.get(col) for col in parent_columns or []}
+            )
+            for item in items:
+                row = dict(parent)
+                if isinstance(item, dict):
+                    row.update(item)
+                else:
+                    row[field] = item
+                rows.append(row)
+
+        df: "pd.DataFrame" = pd.DataFrame(rows)
+        return df
