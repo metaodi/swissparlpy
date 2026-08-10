@@ -73,6 +73,18 @@ def gever_mitglieder_schema():
 
 
 @pytest.fixture
+def gever_mitglieder_nested():
+    """Gever search response modeled after the real Person/Kontakt nesting"""
+    return fixture_content("gever_mitglieder_nested.xml")
+
+
+@pytest.fixture
+def gever_mitglieder_nested_schema():
+    """Gever schema with maxOccurs on a wrapping choice, not the element"""
+    return fixture_content("gever_mitglieder_nested_schema.xml")
+
+
+@pytest.fixture
 def gever_geschaeft_schema():
     """Gever schema of the table 'geschaeft'"""
     return fixture_content("gever_geschaeft_schema.xml")

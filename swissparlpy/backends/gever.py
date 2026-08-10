@@ -31,7 +31,9 @@ DEFAULT_QUERY = "seq > 0"
 DEFAULT_LANGUAGE = "de-CH"
 DEFAULT_MAXIMUM_RECORDS = 500
 
-# Keep one level of nesting intact, deeper structures are flattened
+# Used only when no schema is available (see GeverResponse.has_schema):
+# without a schema there is no reliable way to tell a repeatable field from
+# a single-occurrence wrapper, so nesting is kept intact by default.
 MAX_FLATTEN_DEPTH = 1
 
 # Fields that are flattened additionally if the schema does not declare
@@ -337,11 +339,26 @@ class GeverBackend(BaseBackend):
         return elements
 
     def _collect_list_fields(self, node: Any, list_fields: set[str]) -> None:
-        """Recursively collect all fields of a schema that can occur repeatedly"""
+        """Recursively collect all fields of a schema that can occur repeatedly
+
+        A field is repeatable either because its own element declares a
+        `maxOccurs`, or because it is the (only) element of a `sequence`,
+        `all` or `choice` container that declares the `maxOccurs` instead
+        (the CMI CDWS APIs commonly wrap a repeatable element in a choice
+        like ``<xsd:choice maxOccurs="unbounded"><xsd:element .../></xsd:choice>``).
+        """
         if isinstance(node, dict):
             name = node.get("name")
             if isinstance(name, str) and _is_multi_occurrence(node.get("maxoccurs")):
                 list_fields.add(name.lower())
+
+            if _is_multi_occurrence(node.get("maxoccurs")):
+                for element in _as_list(node.get("element")):
+                    if isinstance(element, dict) and isinstance(
+                        element.get("name"), str
+                    ):
+                        list_fields.add(element["name"].lower())
+
             for value in node.values():
                 self._collect_list_fields(value, list_fields)
         elif isinstance(node, list):
@@ -353,8 +370,15 @@ class GeverBackend(BaseBackend):
         self._load_schema(table)
         return self.cache[str(table).lower()]
 
-    def _get_schema_info(self, table: str) -> tuple[list[str], set[str]]:
-        """Get variables and list fields, without failing on schema errors"""
+    def _get_schema_info(self, table: str) -> tuple[list[str], set[str], bool]:
+        """Get variables and list fields, without failing on schema errors
+
+        The third value tells whether a schema could actually be loaded: with
+        a schema, `list_fields` is trusted to be complete, so every other
+        nested field can be safely flattened; without one, nesting is kept
+        as-is (except for the ``SPECIAL_FLATTEN_KEYS`` fallback) since there
+        is no reliable way to tell a repeatable field from a wrapper.
+        """
         key = str(table).lower()
         try:
             self._load_schema(table)
@@ -365,8 +389,8 @@ class GeverBackend(BaseBackend):
                 f"Could not load the schema of table '{table}': {e}. "
                 "Records are returned without schema based normalization."
             )
-            return [], set()
-        return self.cache[key], self.list_fields[key]
+            return [], set(), False
+        return self.cache[key], self.list_fields[key], True
 
     def _build_query(
         self, filter: Union[str, Callable, None], kwargs: dict[str, Any]
@@ -410,7 +434,7 @@ class GeverBackend(BaseBackend):
         start_record = kwargs.pop("start_record", 1)
         lang = kwargs.pop("lang", self.lang)
 
-        variables, list_fields = self._get_schema_info(table)
+        variables, list_fields, has_schema = self._get_schema_info(table)
         for key in kwargs:
             if variables and key.lower() not in variables:
                 log.warning(f"Attribute '{key}' is not a variable of table '{table}'")
@@ -428,6 +452,7 @@ class GeverBackend(BaseBackend):
             table=str(table).lower(),
             variables=variables,
             list_fields=list_fields,
+            has_schema=has_schema,
             files_base=self._get_files_base(table),
             xmlparser=self.xmlparser,
         )
@@ -448,6 +473,7 @@ class GeverResponse(BaseResponse):
         table: str,
         variables: Optional[list[str]] = None,
         list_fields: Optional[set[str]] = None,
+        has_schema: bool = False,
         files_base: str = "",
         xmlparser: Optional[GeverXmlParser] = None,
     ) -> None:
@@ -457,6 +483,7 @@ class GeverResponse(BaseResponse):
         self._table = table
         self._variables = variables or []
         self.list_fields = list_fields or set()
+        self.has_schema = has_schema
         self.files_base = files_base
         self.xmlparser = xmlparser or GeverXmlParser()
 
@@ -624,19 +651,49 @@ class GeverResponse(BaseResponse):
             wrapped[key] = value
         return wrapped
 
+    @staticmethod
+    def _leaf_reducer(k1: Optional[str], k2: str) -> str:
+        if k1 is None or k2.lower() in k1.lower():
+            return k2
+        if k2 == "text":
+            return k1
+        return f"{k1}_{k2}"
+
+    def _flatten_fully(self, d: dict[str, Any]) -> dict[str, Any]:
+        """Flatten an already-cleaned dict at any depth
+
+        `flatten()` never descends into list values, so every list-valued
+        field left after flattening the dict itself is a genuinely
+        repeatable one (per the schema); each of its items gets the same
+        treatment recursively, so nesting inside list items is flattened
+        too (e.g. a ``dauer`` sub-structure inside a repeated element).
+        """
+        flat: dict[str, Any] = flatten(d, reducer=self._leaf_reducer)
+        for key, value in list(flat.items()):
+            if isinstance(value, list):
+                flat[key] = [
+                    self._flatten_fully(item) if isinstance(item, dict) else item
+                    for item in value
+                ]
+        return flat
+
     def _flat_dict(self, d: dict[str, Any]) -> dict[str, Any]:
-        """Flatten and clean a record"""
+        """Flatten and clean a record
 
-        def leaf_reducer(k1: Optional[str], k2: str) -> str:
-            if k1 is None or k2.lower() in k1.lower():
-                return k2
-            if k2 == "text":
-                return k1
-            return f"{k1}_{k2}"
-
+        With a schema, `list_fields` is trusted to be complete, so every
+        other nested field is a genuine single-occurrence wrapper (e.g. a
+        `mitglieder` record's `person` -> `kontakt`) and gets flattened in
+        full, however deep. Without a schema there is no reliable way to
+        tell a repeatable field from a wrapper, so nesting is kept as-is,
+        except for the curated `SPECIAL_FLATTEN_KEYS` fallback.
+        """
         d = self._wrap_list_fields(d)
+
+        if self.has_schema:
+            return self._flatten_fully(self._clean_dict(d))
+
         flat_data = flatten(
-            d, max_flatten_depth=MAX_FLATTEN_DEPTH, reducer=leaf_reducer
+            d, max_flatten_depth=MAX_FLATTEN_DEPTH, reducer=self._leaf_reducer
         )
         flat_data = self._clean_dict(flat_data)
 
@@ -655,7 +712,7 @@ class GeverResponse(BaseResponse):
                     flatten(
                         flat_data[k],
                         max_flatten_depth=MAX_FLATTEN_DEPTH,
-                        reducer=leaf_reducer,
+                        reducer=self._leaf_reducer,
                     )
                 )
                 del flat_data[k]

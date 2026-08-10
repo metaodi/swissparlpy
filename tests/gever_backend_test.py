@@ -498,6 +498,94 @@ class TestGeverListFields:
         assert df["position"].map(type).unique().tolist() == [list]
 
 
+class TestGeverNestedWrapperFlattening:
+    """Regression tests for the real `mitglieder` shape of the canton API
+
+    Unlike the flat `gever_mitglieder` fixture, the real API nests almost
+    all of a member's data under `Person` -> `Kontakt`, and declares
+    repeatable fields via `maxOccurs` on the wrapping `choice`/`sequence`
+    rather than on the element itself (see PR #51 discussion).
+    """
+
+    @responses.activate
+    def test_max_occurs_on_wrapping_choice_is_a_list_field(
+        self, gever_mitglieder_nested_schema
+    ):
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+
+        backend = GeverBackend()
+        backend.get_variables("mitglieder")
+
+        # 'Behoerdenmandat' only declares maxOccurs on the wrapping <choice>,
+        # not on the <element> itself
+        assert backend.list_fields["mitglieder"] == {"behoerdenmandat"}
+
+    @responses.activate
+    def test_single_occurrence_wrapper_is_flattened(
+        self, gever_mitglieder_nested_schema, gever_mitglieder_nested
+    ):
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+        add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
+
+        backend = GeverBackend()
+        first = backend.get_data("mitglieder")[0]
+
+        # 'person' -> 'kontakt' is a two-level single-occurrence wrapper and
+        # is fully reachable as top-level columns, not a nested dict
+        assert "person" not in first
+        assert first["person_kontakt_vorname"] == "Peter"
+        assert first["person_kontakt_name"] == "Abplanalp"
+
+    @responses.activate
+    def test_list_field_shape_is_consistent_across_records(
+        self, gever_mitglieder_nested_schema, gever_mitglieder_nested
+    ):
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+        add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
+
+        backend = GeverBackend()
+        records = backend.get_data("mitglieder").to_dict_list()
+
+        # record 0 has a single Behoerdenmandat, record 1 has two - both
+        # must come back as a list, not a dict vs. list of dicts
+        assert len(records[0]["behoerdenmandat"]) == 1
+        assert len(records[1]["behoerdenmandat"]) == 2
+        types = {type(record["behoerdenmandat"]) for record in records}
+        assert types == {list}
+
+    @responses.activate
+    def test_nested_structure_inside_list_items_is_flattened(
+        self, gever_mitglieder_nested_schema, gever_mitglieder_nested
+    ):
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+        add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
+
+        backend = GeverBackend()
+        first = backend.get_data("mitglieder")[0]
+        mandat = first["behoerdenmandat"][0]
+
+        # the 'Dauer' sub-structure inside each list item is flattened too
+        assert "dauer" not in mandat or not isinstance(mandat["dauer"], dict)
+        assert mandat["dauer_start"].year == 1991
+        assert mandat["name"] == "Kantonsrat"
+
+    @responses.activate
+    def test_to_dataframe_with_nested_wrapper(
+        self, gever_mitglieder_nested_schema, gever_mitglieder_nested
+    ):
+        pd = pytest.importorskip("pandas")
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+        add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
+
+        backend = GeverBackend()
+        df = backend.get_data("mitglieder").to_dataframe()
+
+        assert isinstance(df, pd.DataFrame)
+        assert "person_kontakt_vorname" in df.columns
+        assert "behoerdenmandat" in df.columns
+        assert df["behoerdenmandat"].map(type).unique().tolist() == [list]
+
+
 class TestGeverPagination:
     def _add_city_responses(self, schema, page1, page2):
         add_xml_response(f"{CITY_GESCHAEFT_URL}/schema", schema)

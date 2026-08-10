@@ -33,7 +33,7 @@ This module provides easy access to the data of the [OData webservice](https://w
  * [Gever backend specific options](#gever-backend-specific-options)
     * [Instances and tables](#instances-and-tables)
     * [Queries](#queries)
-    * [List fields](#list-fields)
+    * [Nested and list fields](#nested-and-list-fields)
     * [Value conversion](#value-conversion)
     * [Download documents](#download-documents)
     * [Custom instances](#custom-instances)
@@ -545,9 +545,9 @@ The number of records per request (default 500), the language and the first reco
 
 Just like the other backends, the result is iterable, indexable and sliceable, and further pages are loaded lazily.
 
-### List fields
+### Nested and list fields
 
-Elements the schema of a table declares as repeatable (`maxOccurs` of `unbounded` or greater than 1) are always returned as a list, even if a record contains only a single one of them.
+Elements the schema of a table declares as repeatable (`maxOccurs` of `unbounded` or greater than 1, whether it is on the element itself or on a wrapping `sequence`/`choice`/`all`) are always returned as a list, even if a record contains only a single one of them.
 This keeps the records of a table consistent, which matters when converting them to a `DataFrame`:
 
 ```python
@@ -560,9 +560,11 @@ True
 >>> df = data.to_dataframe()
 ```
 
-Nested elements are kept as nested dicts, e.g. `record['dokument']['edokument']['version']['nr']`.
+As long as a table has a usable schema, every other nested element is flattened into the record, however deep, e.g. a `mitglieder` record's `Person` -> `Kontakt` wrapper becomes top-level `person_kontakt_*` fields rather than a nested dict. List fields themselves stay as a list, but each item in it is flattened the same way.
 
-Note that the records of this backend are normalized slightly differently than the ones of `goifer`: they keep one more level of nesting and list fields are always lists.
+If the schema of a table cannot be loaded, there is no reliable way to tell a repeatable field from a wrapper, so nesting is kept as-is instead, e.g. `record['dokument']['edokument']['version']['nr']`. A handful of known field names are still flattened in that case as a fallback.
+
+Note that the records of this backend are normalized slightly differently than the ones of `goifer`: nesting is flattened based on the schema instead of goifer's fixed set of rules, and list fields are always lists.
 
 ### Value conversion
 
@@ -576,7 +578,7 @@ The conversion is based on the value, not on the type of the schema, which has o
 
 ### Download documents
 
-Some tables return documents (`edokument`), for those a download URL and a filename are added automatically:
+Some tables return documents (`edokument`), for those a download URL and a filename are added automatically. Note that the exact path to `doc` below depends on whether a schema is available for the table, see [Nested and list fields](#nested-and-list-fields):
 
 ```python
 >>> import swissparlpy as spp
