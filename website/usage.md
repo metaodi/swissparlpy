@@ -17,12 +17,14 @@ nav_order: 3
 
 ## Backend Selection
 
-swissparlpy supports two data backends:
+swissparlpy supports multiple data backends:
 
 | Backend | Description |
 |---------|-------------|
 | `odata` (default) | Official OData API of [parlament.ch](https://ws.parlament.ch/odata.svc/) |
 | `openparldata` | REST API of [OpenParlData.ch](https://openparldata.ch) |
+| `gever` / `gever_canton_zurich` | Gever (Geschäftsverwaltungssystem) API of the Kantonsrat of the canton of Zurich |
+| `gever_city_zurich` | Gever API of the Gemeinderat of the city of Zurich |
 
 **Using the default OData backend:**
 
@@ -56,6 +58,18 @@ print(tables)
 ```
 </details>
 
+**Using the Gever backend:**
+
+The Gever backend has two instances: `gever_canton_zurich` for the Kantonsrat of the canton of Zurich (`gever` is an alias for it) and `gever_city_zurich` for the Gemeinderat of the city of Zurich.
+
+```python
+import swissparlpy as spp
+
+tables = spp.get_tables(backend='gever_city_zurich')
+data = spp.get_data('geschaeft', backend='gever_city_zurich')
+data = spp.get_data('wahlkreise', backend='gever')  # canton of Zurich
+```
+
 **Using the `SwissParlClient` class:**
 
 ```python
@@ -68,6 +82,10 @@ print(odata_client.get_tables())
 # OpenParlData backend
 opd_client = SwissParlClient(backend="openparldata")
 print(opd_client.get_tables())
+
+# Gever backend (canton of Zurich)
+gever_client = SwissParlClient(backend="gever_canton_zurich")
+print(gever_client.get_tables())
 ```
 
 All module-level functions (`get_tables()`, `get_variables()`, `get_overview()`, `get_glimpse()`, `get_data()`) accept a `backend` parameter.
@@ -438,6 +456,156 @@ print(member_df[["group_name_de", "role_name_de", "type_harmonized"]].head())
 
 ---
 
+## Gever Backend
+
+The `GeverBackend` queries the Gever (Geschäftsverwaltungssystem) APIs of the canton and the city of Zurich. It is based on [goifer](https://github.com/metaodi/goifer), a standalone client for the same APIs.
+
+### Instances and Tables
+
+There are two instances, each with its own set of tables (called *indexes* in the API):
+
+```python
+import swissparlpy as spp
+
+spp.get_tables(backend='gever')  # canton of Zurich
+spp.get_tables(backend='gever_city_zurich')  # city of Zurich
+```
+
+Table names are lowercase, but the lookup is case-insensitive, so both of these work:
+
+```python
+data = spp.get_data('geschaeft', backend='gever_city_zurich')
+data = spp.get_data('Geschaeft', backend='gever_city_zurich')
+```
+
+`get_variables()` returns the fields of a table, based on the XSD schema of the API:
+
+```python
+spp.get_variables('wahlkreise', backend='gever')
+# ['name', 'inaktiv', 'obj_guid', 'seq', 'idx']
+```
+
+### Queries
+
+The Gever API uses its own query syntax (CQL). Pass a query as `filter` to use it as-is:
+
+```python
+import swissparlpy as spp
+
+data = spp.get_data('wahlkreise', 'inaktiv = false', backend='gever')
+print(data[0])
+# {'obj_guid': 'dee39e1ccd4c40db82729b3d0762a302', 'seq': '2242344', 'idx': 'Wahlkreise', 'name': 'I      Zürich 1+2', 'inaktiv': False}
+```
+
+Keyword arguments are turned into a query, strings are matched with `adj`, numbers and booleans with `=`. String values are quoted and escaped automatically, so values with spaces work as well:
+
+```python
+# searches for 'name adj "Marti" and vorname adj "Res"'
+data = spp.get_data('mitglieder', name='Marti', vorname='Res', backend='gever')
+
+# searches for 'vorname adj "Hans Peter"'
+data = spp.get_data('mitglieder', vorname='Hans Peter', backend='gever')
+```
+
+{: .note }
+Without a filter, all records are queried (`seq > 0`). Callable filters (`spp.Filter`) are not supported by this backend.
+
+The number of records per request (default 500), the language and the first record can be set on the backend or per query:
+
+```python
+import swissparlpy as spp
+from swissparlpy import GeverBackend
+
+client = spp.SwissParlClient(backend=GeverBackend(instance='city_zurich', maximum_records=100))
+data = client.get_data('geschaeft', maximum_records=10, start_record=20, lang='de-CH')
+```
+
+Just like the other backends, the result is iterable, indexable and sliceable, and further pages are loaded lazily. `len(response)` is the total number of hits reported by the API, so iterating over a large table pages through all of it: use `get_glimpse()` (which never loads more than the rows it was asked for) or slice the response to get only a few records.
+
+### Nested and List Fields
+
+Elements the schema of a table declares as repeatable (`maxOccurs` of `unbounded` or greater than 1, whether it is on the element itself or on a wrapping `sequence`/`choice`/`all`) are always returned as a list, even if a record contains only a single one of them. This keeps the records of a table consistent, which matters when converting them to a `DataFrame`:
+
+```python
+import swissparlpy as spp
+
+data = spp.get_data('mitglieder', backend='gever')
+df = data.to_dataframe()
+```
+
+As long as a table has a usable schema, every other nested element is flattened into the record, however deep, e.g. a `mitglieder` record's `Person` -> `Kontakt` wrapper becomes top-level `person_kontakt_*` fields rather than a nested dict.
+
+A list field like `behoerdenmandate` stays as a list-of-dicts column when converted with `to_dataframe()`, which is often not what you want for further analysis. Use `explode()` to turn it into its own `DataFrame` instead, one row per item, with the parent record's `obj_guid` carried along as `parent_obj_guid` so it can be joined back:
+
+```python
+import swissparlpy as spp
+
+data = spp.get_data('mitglieder', backend='gever')
+mandates = data.explode('behoerdenmandate')
+print(mandates.columns.tolist())
+# ['parent_obj_guid', 'obj_guid', 'dauer_start', 'dauer_end', 'dauer', 'gremiumtyp', 'name', 'kurzname', 'funktion']
+```
+
+The name of the list field is enough, even if it is nested (the mandates above are in `person_kontakt_behoerdenmandate`); the full column name works as well. Pass `parent_columns` to also carry other parent fields along (prefixed with `parent_`), to avoid a separate join for common cases:
+
+```python
+mandates = data.explode('behoerdenmandate', parent_columns=['person_kontakt_vorname', 'person_kontakt_name'])
+```
+
+### Download Documents
+
+Some tables return documents (`edokument`), for those a download URL and a filename are added automatically:
+
+```python
+import swissparlpy as spp
+
+meetings = spp.get_data('sitzungendetail', backend='gever')
+doc = meetings[0]['sitzungsdokumente'][0]
+print(doc['edokument_download_url'])
+# 'https://parlzhcdws.cmicloud.ch/parlzh3/cdws/Files/9db1203429e04a39a233e56eab42feea-332/1/PDF'
+print(doc['edokument_filename'])
+# '63. KR-Protokoll vom 9.7.2012, Nachmittag.pdf'
+```
+
+To build a download URL yourself, use the `file()` method of the backend:
+
+```python
+from swissparlpy import GeverBackend
+
+backend = GeverBackend(instance='canton_zurich')
+member = backend.get_data('mitglieder', 'Name adj Marti and Vorname adj Res')[0]
+print(backend.file('mitglieder', member['foto_id'], member['foto_version']['nr'], 'Original'))
+```
+
+### Custom Instances
+
+To query another host (e.g. an integration environment), pass a `url` to override the base URL of the instance:
+
+```python
+from swissparlpy import GeverBackend
+
+backend = GeverBackend(instance='city_zurich', url='https://www.integ.gemeinderat-zuerich.ch')
+```
+
+Other Gever instances can be used by passing a `config`, either as dict or as path to a YAML file (this requires `pyyaml`). See [`gever_config.py`](https://github.com/metaodi/swissparlpy/blob/main/swissparlpy/backends/gever_config.py) for the structure:
+
+```python
+from swissparlpy import GeverBackend
+
+config = {
+    'my_instance': {
+        'api_base': 'https://example.org',
+        'files_api': {'path': '/api/files'},
+        'indexes': {'geschaeft': {'path': '/api/geschaeft'}},
+    }
+}
+backend = GeverBackend(instance='my_instance', config=config)
+```
+
+See [`gever_backend.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/gever_backend.py) for a full walkthrough of the Gever backend.
+
+---
+
 ## API Reference
 
 All public module-level functions:
@@ -452,3 +620,5 @@ All public module-level functions:
 | `spp.plot_voting(votes, ...)` | Plot a National Council seat map for a vote (OData `Voting` data) |
 
 The same methods are available on a `spp.SwissParlClient` instance (without the `backend` parameter, which is passed to the constructor instead).
+
+`spp.GeverBackend(instance, maximum_records=500, url=None, config=None)` builds a Gever backend instance directly, e.g. to use non-default settings, a custom instance, or the `file()` method to build document download URLs.
