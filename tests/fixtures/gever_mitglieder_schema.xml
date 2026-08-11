@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.cmiag.ch/cdws/Mitglieder" elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:annotation>
+    <xsd:documentation>
+      <searchfield type="SearchFieldText" Name="Name" BoostFactor="1" Nrs="5"/>
+      <searchfield type="SearchFieldText" Name="Vorname" BoostFactor="1" Nrs="6"/>
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType name="Position">
+    <xsd:sequence>
+      <xsd:element name="Name" type="xsd:string"/>
+      <xsd:element name="Gremium" type="xsd:string" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Kontakt">
+    <xsd:sequence>
+      <xsd:element name="Typ" type="xsd:string"/>
+      <xsd:element name="Wert" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Mitglied">
+    <xsd:sequence>
+      <xsd:element name="Name" type="xsd:string"/>
+      <xsd:element name="Vorname" type="xsd:string"/>
+      <xsd:element name="Partei" type="xsd:string" nillable="true"/>
+      <xsd:element name="Eintritt" type="xsd:dateTime" nillable="true"/>
+      <xsd:element name="Position" type="Position" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="Kontakt" type="Kontakt" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="OBJ_GUID" type="xsd:string" use="required"/>
+    <xsd:attribute name="SEQ" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDX" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:element name="Mitglied" type="Mitglied"/>
+</xsd:schema>

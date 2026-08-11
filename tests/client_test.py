@@ -170,6 +170,31 @@ class TestClient(SwissParlTestCase):
                 # Restore original value
                 client_module.PANDAS_AVAILABLE = original_pandas_available
 
+    @responses.activate
+    def test_explode_without_nested_fields(self, metadata, business_page1):
+        """Test that explode() fails clearly on a backend without nesting"""
+        with responses.RequestsMock() as rsps:
+            rsps.add(
+                responses.GET,
+                f"{SERVICE_URL}/$metadata",
+                content_type="text/xml",
+                body=metadata,
+                status=200,
+            )
+            rsps.add(
+                responses.GET,
+                f"{SERVICE_URL}/Business?%24filter=Language+eq+%27DE%27&%24inlinecount=allpages",  # noqa
+                content_type="text/xml",
+                body=business_page1,
+                status=200,
+            )
+
+            client = SwissParlClient()
+            business = client.get_data("Business", Language="DE")
+
+            with pytest.raises(errors.SwissParlError, match="nothing to explode"):
+                business.explode("Title")
+
     def test_timeout_http_status_408(self):
         """Test that HTTP 408 status code is treated as a timeout"""
         # Create a mock entity request

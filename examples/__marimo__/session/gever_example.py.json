@@ -1,0 +1,40 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.23.16",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "d2248f8c8f8fe6d1ddf334a9eeb3d2ee",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "726980290002ae19e6d85bdd90b85d37",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"example-of-using-swissparlpy-with-the-gever-backend\">Example of using swissparlpy with the Gever backend</h1>\n<span class=\"paragraph\">This example demonstrates how to query the Gever\n(Geschaeftsverwaltungssystem) APIs of the canton of Zurich (Kantonsrat)\nand the city of Zurich (Gemeinderat).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "6fb68864ce155db32fcd54a541cba8bc",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": null,
+      "outputs": [],
+      "console": []
+    }
+  ]
+}

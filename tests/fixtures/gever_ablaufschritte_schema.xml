@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.cmiag.ch/cdws/Ablaufschritte" elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:complexType name="Geschaeft">
+    <xsd:sequence>
+      <xsd:element name="Nr" type="xsd:string"/>
+      <xsd:element name="Titel" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Ablaufschritt">
+    <xsd:sequence>
+      <xsd:element name="Schritt" type="xsd:string"/>
+      <xsd:element name="Geschaeft" type="Geschaeft" minOccurs="0" maxOccurs="5"/>
+    </xsd:sequence>
+    <xsd:attribute name="OBJ_GUID" type="xsd:string" use="required"/>
+    <xsd:attribute name="SEQ" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDX" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:element name="Ablaufschritt" type="Ablaufschritt"/>
+</xsd:schema>
