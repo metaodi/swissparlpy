@@ -1,5 +1,5 @@
 ---
-title: Python library for the Swiss Parliament API and OpenParlData.ch API
+title: Python library for the Swiss Parliament API, OpenParlData.ch API & Gever Canton and City of Zurich
 layout: home
 nav_order: 1
 ---
