@@ -1,5 +1,6 @@
 import logging
 import requests
+from . import errors
 from .backends import ODataBackend, OpenParlDataBackend, GeverBackend
 from .backends import BaseBackend, BaseResponse
 from typing import Optional, Union, Callable, Any, Literal
@@ -103,4 +104,21 @@ class SwissParlResponse(object):
         # Convert backend response to dict list then to DataFrame
         data_list = self._backend_response.to_dict_list()
         df: "pd.DataFrame" = pd.DataFrame(data_list)
+        return df
+
+    def explode(
+        self, field: str, parent_columns: Optional[list[str]] = None
+    ) -> "pd.DataFrame":
+        """Explode a repeatable field into its own DataFrame
+
+        Only backends with nested records support this, i.e. the Gever
+        backend (see `GeverResponse.explode`).
+        """
+        explode = getattr(self._backend_response, "explode", None)
+        if explode is None:
+            raise errors.SwissParlError(
+                f"{type(self._backend_response).__name__} does not have "
+                "nested fields, so there is nothing to explode."
+            )
+        df: "pd.DataFrame" = explode(field, parent_columns)
         return df

@@ -103,6 +103,23 @@ def gever_geschaeft_page2():
 
 
 @pytest.fixture
+def gever_geschaeft_departemente_schema():
+    """Gever schema with several containers of the same element
+
+    'Departement' is held by both 'FederfuehrendesDepartement' and
+    'MitbeteiligteDepartemente', 'Gremium' by both 'VorberatendeKommission'
+    and 'Federfuehrung'.
+    """
+    return fixture_content("gever_geschaeft_departemente_schema.xml")
+
+
+@pytest.fixture
+def gever_geschaeft_departemente():
+    """Gever search response matching the departemente schema"""
+    return fixture_content("gever_geschaeft_departemente.xml")
+
+
+@pytest.fixture
 def gever_ablaufschritte():
     """Gever search response with a repeated element ('geschaeft')"""
     return fixture_content("gever_ablaufschritte.xml")

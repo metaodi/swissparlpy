@@ -306,13 +306,32 @@ class TestGeverData:
             gever_mitglieder,
             match=[
                 matchers.query_param_matcher(
-                    {"q": "name adj Marti and vorname adj Res"}, strict_match=False
+                    {"q": 'name adj "Marti" and vorname adj "Res"'},
+                    strict_match=False,
                 )
             ],
         )
 
         backend = GeverBackend()
         assert len(backend.get_data("mitglieder", name="Marti", vorname="Res")) == 2
+
+    @responses.activate
+    def test_kwargs_with_spaces_and_quotes_are_escaped(
+        self, gever_mitglieder_schema, gever_mitglieder
+    ):
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_schema)
+        add_xml_response(
+            f"{MITGLIEDER_URL}/searchdetails",
+            gever_mitglieder,
+            match=[
+                matchers.query_param_matcher(
+                    {"q": 'vorname adj "Hans \\"Peter\\""'}, strict_match=False
+                )
+            ],
+        )
+
+        backend = GeverBackend()
+        assert len(backend.get_data("mitglieder", vorname='Hans "Peter"')) == 2
 
     @responses.activate
     def test_boolean_kwargs(self, gever_wahlkreise_schema, gever_wahlkreise):
@@ -518,7 +537,7 @@ class TestGeverNestedWrapperFlattening:
 
         # 'Behoerdenmandat' only declares maxOccurs on the wrapping <choice>,
         # not on the <element> itself
-        assert backend.list_fields["mitglieder"] == {"behoerdenmandat"}
+        assert backend.list_fields["mitglieder"] == {"behoerdenmandate"}
 
     @responses.activate
     def test_single_occurrence_wrapper_is_flattened(
@@ -548,9 +567,9 @@ class TestGeverNestedWrapperFlattening:
 
         # record 0 has a single Behoerdenmandat, record 1 has two - both
         # must come back as a list, not a dict vs. list of dicts
-        assert len(records[0]["behoerdenmandat"]) == 1
-        assert len(records[1]["behoerdenmandat"]) == 2
-        types = {type(record["behoerdenmandat"]) for record in records}
+        assert len(records[0]["person_kontakt_behoerdenmandate"]) == 1
+        assert len(records[1]["person_kontakt_behoerdenmandate"]) == 2
+        types = {type(record["person_kontakt_behoerdenmandate"]) for record in records}
         assert types == {list}
 
     @responses.activate
@@ -562,7 +581,7 @@ class TestGeverNestedWrapperFlattening:
 
         backend = GeverBackend()
         first = backend.get_data("mitglieder")[0]
-        mandat = first["behoerdenmandat"][0]
+        mandat = first["person_kontakt_behoerdenmandate"][0]
 
         # the 'Dauer' sub-structure inside each list item is flattened too
         assert "dauer" not in mandat or not isinstance(mandat["dauer"], dict)
@@ -582,8 +601,131 @@ class TestGeverNestedWrapperFlattening:
 
         assert isinstance(df, pd.DataFrame)
         assert "person_kontakt_vorname" in df.columns
-        assert "behoerdenmandat" in df.columns
-        assert df["behoerdenmandat"].map(type).unique().tolist() == [list]
+        assert "person_kontakt_behoerdenmandate" in df.columns
+        assert df["person_kontakt_behoerdenmandate"].map(type).unique().tolist() == [
+            list
+        ]
+
+
+class TestGeverContainers:
+    """Tests for containers that hold the same element more than once
+
+    The city's `geschaeft` holds a `Departement` below both
+    `FederfuehrendesDepartement` and `MitbeteiligteDepartemente`, so naming
+    those columns after the element they hold made them collide (issue: a
+    `ValueError: duplicated key 'departement'` while flattening).
+    """
+
+    def _add_responses(self, schema, search):
+        add_xml_response(f"{CITY_GESCHAEFT_URL}/schema", schema)
+        add_xml_response(f"{CITY_GESCHAEFT_URL}/searchdetails", search)
+
+    @responses.activate
+    def test_container_of_a_repeatable_element_is_the_list_field(
+        self, gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+    ):
+        self._add_responses(
+            gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+        )
+
+        backend = GeverBackend(instance="city_zurich")
+        backend.get_variables("geschaeft")
+
+        assert backend.list_fields["geschaeft"] == {
+            "mitbeteiligtedepartemente",
+            "traktanden",
+            "mitglieder",
+        }
+        assert backend.containers["geschaeft"] == {
+            "mitbeteiligtedepartemente": "departement",
+            "traktanden": "traktandum",
+            "mitglieder": "mitglied",
+        }
+
+    @responses.activate
+    def test_two_containers_of_the_same_element_do_not_collide(
+        self, gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+    ):
+        self._add_responses(
+            gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+        )
+
+        backend = GeverBackend(instance="city_zurich")
+        first = backend.get_data("geschaeft")[0]
+
+        # the repeatable container is unwrapped into a list of departments
+        assert [d["name"] for d in first["mitbeteiligtedepartemente"]] == [
+            "Sicherheitsdepartement (SID)",
+            "Finanzdepartement (FD)",
+        ]
+        # the single-occurrence container keeps its nesting as a prefix
+        assert first["federfuehrendesdepartement_departement_name"] == (
+            "Tiefbau- und Entsorgungsdepartement (TED)"
+        )
+        assert "departement" not in first
+
+    @responses.activate
+    def test_empty_container_is_an_empty_list(
+        self, gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+    ):
+        self._add_responses(
+            gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+        )
+
+        backend = GeverBackend(instance="city_zurich")
+        records = backend.get_data("geschaeft").to_dict_list()
+
+        types = {type(record["traktanden"]) for record in records}
+        assert types == {list}
+        assert [len(record["traktanden"]) for record in records] == [1, 2]
+        assert records[1]["traktanden"][0]["titel"] == "Postulat, Begruendung"
+
+    @responses.activate
+    def test_element_repeating_its_container_is_not_prefixed_twice(
+        self, gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+    ):
+        self._add_responses(
+            gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+        )
+
+        backend = GeverBackend(instance="city_zurich")
+        traktandum = backend.get_data("geschaeft")[0]["traktanden"][0]
+
+        # a 'Sitzung' inside a 'Sitzung' container stays a single 'sitzung'
+        assert traktandum["sitzung_titel"] == "142. Sitzung"
+
+    @responses.activate
+    def test_partial_name_match_keeps_the_container(
+        self, gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+    ):
+        self._add_responses(
+            gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+        )
+
+        backend = GeverBackend(instance="city_zurich")
+        first = backend.get_data("geschaeft")[0]
+
+        # 'End' of 'SitzungsEnde' only shares a part of the name of its
+        # parent, so it must not swallow it and become a plain 'end'
+        assert first["sitzungsende_end"].year == 2025
+        assert "end" not in first
+
+    @responses.activate
+    def test_to_dataframe(
+        self, gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+    ):
+        pd = pytest.importorskip("pandas")
+        self._add_responses(
+            gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+        )
+
+        backend = GeverBackend(instance="city_zurich")
+        df = backend.get_data("geschaeft").to_dataframe()
+
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 2
+        assert "mitbeteiligtedepartemente" in df.columns
+        assert "federfuehrendesdepartement_departement_name" in df.columns
 
 
 class TestGeverExplode:
@@ -596,7 +738,7 @@ class TestGeverExplode:
         add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
 
         backend = GeverBackend()
-        df = backend.get_data("mitglieder").explode("behoerdenmandat")
+        df = backend.get_data("mitglieder").explode("behoerdenmandate")
 
         assert isinstance(df, pd.DataFrame)
         # Peter has 1 mandate, Christian has 2 -> 3 rows total
@@ -613,13 +755,14 @@ class TestGeverExplode:
 
         backend = GeverBackend()
         records = backend.get_data("mitglieder")
-        df = records.explode("behoerdenmandat")
+        df = records.explode("behoerdenmandate")
 
         # parent_obj_guid does not collide with the child's own obj_guid
         assert "parent_obj_guid" in df.columns
         assert "obj_guid" in df.columns
+        mandates = records[0]["person_kontakt_behoerdenmandate"]
         assert df.iloc[0]["parent_obj_guid"] == records[0]["obj_guid"]
-        assert df.iloc[0]["obj_guid"] == records[0]["behoerdenmandat"][0]["obj_guid"]
+        assert df.iloc[0]["obj_guid"] == mandates[0]["obj_guid"]
 
     @responses.activate
     def test_explode_with_parent_columns(
@@ -631,7 +774,7 @@ class TestGeverExplode:
 
         backend = GeverBackend()
         df = backend.get_data("mitglieder").explode(
-            "behoerdenmandat", parent_columns=["person_kontakt_vorname"]
+            "behoerdenmandate", parent_columns=["person_kontakt_vorname"]
         )
 
         assert df["parent_person_kontakt_vorname"].tolist() == [
@@ -653,6 +796,64 @@ class TestGeverExplode:
 
         with pytest.raises(errors.SwissParlError):
             result.explode("funktion")
+
+    @responses.activate
+    def test_explode_accepts_the_full_column_name(
+        self, gever_mitglieder_nested_schema, gever_mitglieder_nested
+    ):
+        pytest.importorskip("pandas")
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+        add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
+
+        backend = GeverBackend()
+        result = backend.get_data("mitglieder")
+
+        # the list field is nested below 'Person' -> 'Kontakt', both the
+        # name of the container and the full column name work
+        short = result.explode("behoerdenmandate")
+        full = result.explode("person_kontakt_behoerdenmandate")
+        assert short.equals(full)
+
+    @responses.activate
+    def test_explode_ambiguous_field_raises(
+        self, gever_geschaeft_departemente_schema, gever_geschaeft_departemente
+    ):
+        pytest.importorskip("pandas")
+        add_xml_response(
+            f"{CITY_GESCHAEFT_URL}/schema", gever_geschaeft_departemente_schema
+        )
+        add_xml_response(
+            f"{CITY_GESCHAEFT_URL}/searchdetails", gever_geschaeft_departemente
+        )
+
+        backend = GeverBackend(instance="city_zurich")
+        result = backend.get_data("geschaeft")
+
+        # 'Mitglieder' is held by two different containers
+        with pytest.raises(errors.SwissParlError, match="ambiguous"):
+            result.explode("mitglieder")
+
+        df = result.explode("vorberatendekommission_gremium_mitglieder")
+        assert df["name"].tolist() == ["Anna Muster", "Beat Beispiel"]
+
+    @responses.activate
+    def test_explode_via_client(
+        self, gever_mitglieder_nested_schema, gever_mitglieder_nested
+    ):
+        pytest.importorskip("pandas")
+        add_xml_response(f"{MITGLIEDER_URL}/schema", gever_mitglieder_nested_schema)
+        add_xml_response(f"{MITGLIEDER_URL}/searchdetails", gever_mitglieder_nested)
+
+        df = spp.get_data("mitglieder", backend="gever").explode(
+            "behoerdenmandate", parent_columns=["person_kontakt_name"]
+        )
+
+        assert len(df) == 3
+        assert df["parent_person_kontakt_name"].tolist() == [
+            "Abplanalp",
+            "Achermann",
+            "Achermann",
+        ]
 
     @responses.activate
     def test_explode_without_schema_uses_runtime_shape(self, gever_ablaufschritte):
@@ -681,7 +882,7 @@ class TestGeverExplode:
         result = backend.get_data("mitglieder")
 
         with pytest.raises(ImportError):
-            result.explode("behoerdenmandat")
+            result.explode("behoerdenmandate")
 
 
 class TestGeverPagination:
@@ -697,6 +898,24 @@ class TestGeverPagination:
             page2,
             match=[matchers.query_param_matcher({"s": "3"}, strict_match=False)],
         )
+
+    @responses.activate
+    def test_glimpse_does_not_load_further_pages(
+        self, gever_geschaeft_schema, gever_geschaeft_page1, gever_geschaeft_page2
+    ):
+        self._add_city_responses(
+            gever_geschaeft_schema, gever_geschaeft_page1, gever_geschaeft_page2
+        )
+
+        backend = GeverBackend(instance="city_zurich")
+        result = backend.get_glimpse("geschaeft", rows=2)
+
+        # the count is still the total number of hits, but only the rows of
+        # the glimpse are ever loaded
+        assert len(result) == 3
+        assert len(list(result)) == 2
+        assert len(result.to_dict_list()) == 2
+        assert result._records_loaded_count == 2
 
     @responses.activate
     def test_iterate_over_pages(

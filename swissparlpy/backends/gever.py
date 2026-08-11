@@ -65,6 +65,17 @@ def _as_list(value: Any) -> list[Any]:
     return [value]
 
 
+def _quote_cql(value: Any) -> str:
+    """Quote a value as a CQL search term
+
+    The API rejects unquoted terms that contain whitespace with an HTTP 406,
+    so every string value is quoted; `"` and `\\` are escaped with a
+    backslash. Quoting a single word does not change the result.
+    """
+    escaped = str(value).replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"'
+
+
 def _is_multi_occurrence(max_occurs: Any) -> bool:
     """Check if a `maxOccurs` value of a schema means 'more than one'"""
     if max_occurs is None:
@@ -158,6 +169,7 @@ class GeverBackend(BaseBackend):
 
         self.cache: dict[str, list[str]] = {}
         self.list_fields: dict[str, set[str]] = {}
+        self.containers: dict[str, dict[str, str]] = {}
 
     def _load_config(
         self, config: Union[dict[str, Any], str, None], instance: str
@@ -270,16 +282,21 @@ class GeverBackend(BaseBackend):
 
         url = f"{self._get_index_url(table)}/schema"
         response = self._http_get_request(url)
-        variables, list_fields = self._parse_schema(response.content)
+        variables, list_fields, containers = self._parse_schema(response.content)
         self.cache[key] = variables
         self.list_fields[key] = list_fields
+        self.containers[key] = containers
 
-    def _parse_schema(self, content: bytes) -> tuple[list[str], set[str]]:
-        """Parse an XSD schema into a list of variables and a set of list fields
+    def _parse_schema(
+        self, content: bytes
+    ) -> tuple[list[str], set[str], dict[str, str]]:
+        """Parse an XSD schema into variables, list fields and containers
 
         A field is a list field if the schema declares it with a `maxOccurs`
         of `unbounded` or a number greater than 1. Those fields are always
         returned as a list, even if a record contains only one of them.
+        The containers map the name of a container element to the name of
+        the element it contains (see `_collect_structure`).
         """
         xml = self.xmlparser.parse(content)
         schema = self._normalize_keys(self.xmlparser.to_dict(xml))
@@ -289,8 +306,7 @@ class GeverBackend(BaseBackend):
         if len(keys) == 1 and isinstance(schema[keys[0]], dict):
             schema = schema[keys[0]]
 
-        list_fields: set[str] = set()
-        self._collect_list_fields(schema, list_fields)
+        list_fields, containers = self._collect_structure(schema)
 
         complex_type = self._get_root_complex_type(schema)
         variables = []
@@ -303,7 +319,7 @@ class GeverBackend(BaseBackend):
                 variables.append(attribute["name"].lower())
 
         # keep the order, but remove duplicates
-        return list(dict.fromkeys(variables)), list_fields
+        return list(dict.fromkeys(variables)), list_fields, containers
 
     def _normalize_keys(self, node: Any) -> Any:
         """Recursively strip namespaces of all keys and lowercase them"""
@@ -331,56 +347,133 @@ class GeverBackend(BaseBackend):
                     return complex_type
         return complex_types[0]
 
+    def _iter_schema_elements(
+        self, complex_type: dict[str, Any]
+    ) -> Iterator[tuple[dict[str, Any], dict[str, Any]]]:
+        """Yield all element definitions of a complexType with their group
+
+        The group is the `sequence`, `all` or `choice` an element is
+        declared in, since the CMI CDWS schemas often put the `maxOccurs`
+        on that group instead of on the element itself.
+        """
+        for group_key in ("sequence", "all", "choice"):
+            for group in _as_list(complex_type.get(group_key)):
+                if not isinstance(group, dict):
+                    continue
+                for element in _as_list(group.get("element")):
+                    if isinstance(element, dict):
+                        yield element, group
+
     def _get_schema_elements(
         self, complex_type: dict[str, Any]
     ) -> list[dict[str, Any]]:
         """Get all element definitions of a complexType"""
-        elements = []
-        for container_key in ("sequence", "all", "choice"):
-            for container in _as_list(complex_type.get(container_key)):
-                if not isinstance(container, dict):
-                    continue
-                for element in _as_list(container.get("element")):
-                    if isinstance(element, dict):
-                        elements.append(element)
-        return elements
+        return [element for element, _group in self._iter_schema_elements(complex_type)]
 
-    def _collect_list_fields(self, node: Any, list_fields: set[str]) -> None:
-        """Recursively collect all fields of a schema that can occur repeatedly
+    def _get_contained_element(
+        self, element: dict[str, Any]
+    ) -> Optional[tuple[dict[str, Any], dict[str, Any]]]:
+        """Return the single element a container element holds, if any
+
+        A container declares an inline complexType that holds exactly one
+        element and nothing else (no attributes, no further elements), e.g.
+        ``<xsd:element name="Traktanden"><xsd:complexType><xsd:choice
+        maxOccurs="unbounded"><xsd:element name="Traktandum" type="Traktandum"
+        /></xsd:choice></xsd:complexType></xsd:element>``.
+        """
+        complex_types = [
+            ct for ct in _as_list(element.get("complextype")) if isinstance(ct, dict)
+        ]
+        if len(complex_types) != 1:
+            return None
+        complex_type = complex_types[0]
+        if complex_type.get("attribute"):
+            return None
+
+        contained = list(self._iter_schema_elements(complex_type))
+        if len(contained) != 1:
+            return None
+        child, group = contained[0]
+        if not isinstance(child.get("name"), str):
+            return None
+        return child, group
+
+    def _collect_structure(
+        self, schema: dict[str, Any]
+    ) -> tuple[set[str], dict[str, str]]:
+        """Collect the list fields and the container elements of a schema
 
         A field is repeatable either because its own element declares a
-        `maxOccurs`, or because it is the (only) element of a `sequence`,
-        `all` or `choice` container that declares the `maxOccurs` instead
-        (the CMI CDWS APIs commonly wrap a repeatable element in a choice
-        like ``<xsd:choice maxOccurs="unbounded"><xsd:element .../></xsd:choice>``).
+        `maxOccurs`, or because the `sequence`, `all` or `choice` it is
+        declared in does.
+
+        A repeatable element is usually held by a container element that
+        holds nothing else (see `_get_contained_element`). Such a container
+        is unwrapped when a record is normalized (see
+        `GeverResponse._unwrap_containers`), so it is the *container* that
+        becomes the list field, not the element it holds: the same element
+        can be held by several containers, e.g. `Departement` below both
+        `FederfuehrendesDepartement` and `MitbeteiligteDepartemente`, and
+        naming both columns `departement` would make them collide.
+
+        Only containers of a repeatable element are unwrapped, a container
+        of a single element keeps its nesting and ends up as a prefix of
+        the column name, e.g. `person_kontakt_vorname`.
         """
-        if isinstance(node, dict):
-            name = node.get("name")
-            if isinstance(name, str) and _is_multi_occurrence(node.get("maxoccurs")):
-                list_fields.add(name.lower())
+        list_fields: set[str] = set()
+        containers: dict[str, str] = {}
+        for complex_type in _as_list(schema.get("complextype")):
+            if isinstance(complex_type, dict):
+                self._collect_complex_type(complex_type, list_fields, containers)
+        return list_fields, containers
 
-            if _is_multi_occurrence(node.get("maxoccurs")):
-                for element in _as_list(node.get("element")):
-                    if isinstance(element, dict) and isinstance(
-                        element.get("name"), str
-                    ):
-                        list_fields.add(element["name"].lower())
+    def _collect_complex_type(
+        self,
+        complex_type: dict[str, Any],
+        list_fields: set[str],
+        containers: dict[str, str],
+    ) -> None:
+        """Collect the list fields and containers of a single complexType"""
+        for element, group in self._iter_schema_elements(complex_type):
+            name = element.get("name")
+            if not isinstance(name, str):
+                continue
+            name = name.lower()
 
-            for value in node.values():
-                self._collect_list_fields(value, list_fields)
-        elif isinstance(node, list):
-            for value in node:
-                self._collect_list_fields(value, list_fields)
+            contained = self._get_contained_element(element)
+            if contained and self._is_repeatable(*contained):
+                child, _group = contained
+                containers[name] = str(child["name"]).lower()
+                list_fields.add(name)
+                continue
+
+            if self._is_repeatable(element, group):
+                list_fields.add(name)
+            # an inline complexType that is not unwrapped can hold elements
+            # of its own
+            for inline in _as_list(element.get("complextype")):
+                if isinstance(inline, dict):
+                    self._collect_complex_type(inline, list_fields, containers)
+
+    @staticmethod
+    def _is_repeatable(element: dict[str, Any], group: dict[str, Any]) -> bool:
+        """Check if an element or the group it is declared in is repeatable"""
+        return _is_multi_occurrence(element.get("maxoccurs")) or _is_multi_occurrence(
+            group.get("maxoccurs")
+        )
 
     def get_variables(self, table: str) -> list[str]:
         """Return the list of variables of a table, based on its schema"""
         self._load_schema(table)
         return self.cache[str(table).lower()]
 
-    def _get_schema_info(self, table: str) -> tuple[list[str], set[str], bool]:
-        """Get variables and list fields, without failing on schema errors
+    def _get_schema_info(
+        self, table: str
+    ) -> tuple[list[str], set[str], dict[str, str], bool]:
+        """Get variables, list fields and containers, without failing on
+        schema errors
 
-        The third value tells whether a schema could actually be loaded: with
+        The last value tells whether a schema could actually be loaded: with
         a schema, `list_fields` is trusted to be complete, so every other
         nested field can be safely flattened; without one, nesting is kept
         as-is (except for the ``SPECIAL_FLATTEN_KEYS`` fallback) since there
@@ -396,8 +489,8 @@ class GeverBackend(BaseBackend):
                 f"Could not load the schema of table '{table}': {e}. "
                 "Records are returned without schema based normalization."
             )
-            return [], set(), False
-        return self.cache[key], self.list_fields[key], True
+            return [], set(), {}, False
+        return self.cache[key], self.list_fields[key], self.containers[key], True
 
     def _build_query(
         self, filter: Union[str, Callable, None], kwargs: dict[str, Any]
@@ -422,7 +515,7 @@ class GeverBackend(BaseBackend):
             elif isinstance(value, (int, float)):
                 clauses.append(f"{key} = {value}")
             else:
-                clauses.append(f"{key} adj {value}")
+                clauses.append(f"{key} adj {_quote_cql(value)}")
 
         if not clauses:
             return DEFAULT_QUERY
@@ -434,14 +527,15 @@ class GeverBackend(BaseBackend):
         """Query a table with an optional CQL filter
 
         Keyword arguments are turned into a CQL query, e.g.
-        ``get_data('mitglieder', name='Marti')`` searches for ``name adj Marti``.
+        ``get_data('mitglieder', name='Marti')`` searches for ``name adj "Marti"``.
         A filter given as string is used as query as-is.
         """
         maximum_records = kwargs.pop("maximum_records", self.maximum_records)
         start_record = kwargs.pop("start_record", 1)
         lang = kwargs.pop("lang", self.lang)
+        limit = kwargs.pop("limit", None)
 
-        variables, list_fields, has_schema = self._get_schema_info(table)
+        variables, list_fields, containers, has_schema = self._get_schema_info(table)
         for key in kwargs:
             if variables and key.lower() not in variables:
                 log.warning(f"Attribute '{key}' is not a variable of table '{table}'")
@@ -459,14 +553,21 @@ class GeverBackend(BaseBackend):
             table=str(table).lower(),
             variables=variables,
             list_fields=list_fields,
+            containers=containers,
             has_schema=has_schema,
             files_base=self._get_files_base(table),
             xmlparser=self.xmlparser,
+            limit=limit,
         )
 
     def get_glimpse(self, table: str, rows: int = 5) -> "GeverResponse":
-        """Get a preview of the first N rows of a table"""
-        return self.get_data(table, maximum_records=rows)
+        """Get a preview of the first N rows of a table
+
+        Only those rows are ever loaded: a search reports the total number
+        of hits, so without a limit even a glimpse of a large table would
+        page through all of them as soon as it is iterated over.
+        """
+        return self.get_data(table, maximum_records=rows, limit=rows)
 
 
 class GeverResponse(BaseResponse):
@@ -480,9 +581,11 @@ class GeverResponse(BaseResponse):
         table: str,
         variables: Optional[list[str]] = None,
         list_fields: Optional[set[str]] = None,
+        containers: Optional[dict[str, str]] = None,
         has_schema: bool = False,
         files_base: str = "",
         xmlparser: Optional[GeverXmlParser] = None,
+        limit: Optional[int] = None,
     ) -> None:
         self.session = session
         self.url = url
@@ -490,7 +593,9 @@ class GeverResponse(BaseResponse):
         self._table = table
         self._variables = variables or []
         self.list_fields = list_fields or set()
+        self.containers = containers or {}
         self.has_schema = has_schema
+        self.limit = limit
         self.files_base = files_base
         self.xmlparser = xmlparser or GeverXmlParser()
 
@@ -542,6 +647,8 @@ class GeverResponse(BaseResponse):
         self._load_content(s=self.next_start_record)
 
     def _load_until(self, limit: int) -> None:
+        if self.limit is not None:
+            limit = min(limit, self.limit)
         while len(self.records) < limit and self.next_start_record is not None:
             try:
                 self._load_next_page()
@@ -638,6 +745,39 @@ class GeverResponse(BaseResponse):
             return ("", "")
         return (f"{self.files_base}/{file_id}/{nr}/{view}", filename)
 
+    def _unwrap_containers(self, data: Any) -> Any:
+        """Replace a container element with the element(s) it holds
+
+        A container like ``<MitbeteiligteDepartemente><Departement/>...``
+        exists only to hold its children, so the children are hoisted into
+        the container and `mitbeteiligtedepartemente` becomes the list of
+        departments itself. Keeping the name of the container (rather than
+        the name of the element it holds, as `_leaf_reducer` would) is what
+        keeps two containers of the same kind of element apart, e.g.
+        `federfuehrendesdepartement` and `mitbeteiligtedepartemente`.
+        """
+        if isinstance(data, list):
+            return [self._unwrap_containers(item) for item in data]
+        if not isinstance(data, dict):
+            return data
+
+        unwrapped = {}
+        for key, value in data.items():
+            value = self._unwrap_containers(value)
+            child = self.containers.get(_clean_name(key))
+            if child and isinstance(value, dict):
+                content = [v for k, v in value.items() if _clean_name(k) == child]
+                others = [
+                    k
+                    for k in value
+                    if not k.lower().startswith("xmlns") and _clean_name(k) != child
+                ]
+                # only unwrap a container that really holds nothing else
+                if not others:
+                    value = content[0] if content else None
+            unwrapped[key] = value
+        return unwrapped
+
     def _wrap_list_fields(self, data: Any) -> Any:
         """Wrap all fields the schema declares as repeatable into a list
 
@@ -660,9 +800,18 @@ class GeverResponse(BaseResponse):
 
     @staticmethod
     def _leaf_reducer(k1: Optional[str], k2: str) -> str:
-        if k1 is None or k2.lower() in k1.lower():
+        """Join the key of a parent and a child into a single column name
+
+        Only a child that repeats the name of its parent is dropped (e.g. a
+        `Sitzung` element inside a `Sitzung` wrapper), everything else is
+        joined: the same element name occurs below different parents, so
+        using the name of the child alone would make those columns collide.
+        """
+        if k1 is None:
             return k2
         if k2 == "text":
+            return k1
+        if k2.lower() == k1.lower().rsplit("_", 1)[-1]:
             return k1
         return f"{k1}_{k2}"
 
@@ -694,7 +843,7 @@ class GeverResponse(BaseResponse):
         tell a repeatable field from a wrapper, so nesting is kept as-is,
         except for the curated `SPECIAL_FLATTEN_KEYS` fallback.
         """
-        d = self._wrap_list_fields(d)
+        d = self._wrap_list_fields(self._unwrap_containers(d))
 
         if self.has_schema:
             return self._flatten_fully(self._clean_dict(d))
@@ -777,6 +926,8 @@ class GeverResponse(BaseResponse):
         """Iterate over all records, loading pages as needed"""
         i = 0
         while True:
+            if self.limit is not None and i >= self.limit:
+                break
             if i >= len(self.records):
                 if i > self.count:
                     warnings.warn(
@@ -822,6 +973,26 @@ class GeverResponse(BaseResponse):
         self._load_until(self.count)
         return list(self)
 
+    def _resolve_field(self, field: str, records: list[dict[str, Any]]) -> str:
+        """Find the column a list field ended up in
+
+        A list field keeps the name of its container element, prefixed with
+        the path it is nested under, e.g. the `behoerdenmandate` of the
+        canton's `mitglieder` end up in `person_kontakt_behoerdenmandate`.
+        Both the short and the full name are accepted.
+        """
+        keys = {key for record in records for key in record}
+        if field in keys:
+            return field
+
+        candidates = sorted(key for key in keys if key.endswith(f"_{field}"))
+        if len(candidates) > 1:
+            raise errors.SwissParlError(
+                f"'{field}' is ambiguous in table '{self.table}', "
+                f"use one of {candidates}"
+            )
+        return candidates[0] if candidates else field
+
     def explode(
         self, field: str, parent_columns: Optional[list[str]] = None
     ) -> "pd.DataFrame":
@@ -829,7 +1000,7 @@ class GeverResponse(BaseResponse):
 
         A list field (see the "Nested and list fields" documentation) holds
         one-to-many data embedded in the record, e.g. a `mitglieder`
-        record's `behoerdenmandat`. This turns it into its own DataFrame,
+        record's `behoerdenmandate`. This turns it into its own DataFrame,
         one row per item, with the parent record's `obj_guid` included as
         `parent_obj_guid` so the rows can be joined back. Pass
         `parent_columns` to carry additional parent fields along (prefixed
@@ -842,15 +1013,16 @@ class GeverResponse(BaseResponse):
                 "'pip install pandas' to use explode()."
             )
 
-        field = _clean_name(field)
-        if self.has_schema and field not in self.list_fields:
+        records = self.to_dict_list()
+        field = self._resolve_field(_clean_name(field), records)
+        if self.has_schema and field.rsplit("_", 1)[-1] not in self.list_fields:
             raise errors.SwissParlError(
                 f"'{field}' is not a list field of table '{self.table}', "
                 f"available list fields: {sorted(self.list_fields)}"
             )
 
         rows: list[dict[str, Any]] = []
-        for record in self.to_dict_list():
+        for record in records:
             items = record.get(field)
             if not items:
                 continue

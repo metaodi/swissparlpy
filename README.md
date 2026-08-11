@@ -527,8 +527,15 @@ The Gever API uses its own query syntax (CQL). Pass a query as `filter` to use i
 Keyword arguments are turned into a query, strings are matched with `adj`, numbers and booleans with `=`:
 
 ```python
->>> # searches for "name adj Marti and vorname adj Res"
+>>> # searches for 'name adj "Marti" and vorname adj "Res"'
 >>> data = spp.get_data('mitglieder', name='Marti', vorname='Res', backend='gever')
+```
+
+String values are quoted automatically, so values with spaces work as well (an unquoted term with a space is rejected by the API):
+
+```python
+>>> # searches for 'vorname adj "Hans Peter"'
+>>> data = spp.get_data('mitglieder', vorname='Hans Peter', backend='gever')
 ```
 
 Without a filter, all records are queried (`seq > 0`). Callable filters (`spp.Filter`) are not supported by this backend.
@@ -544,6 +551,7 @@ The number of records per request (default 500), the language and the first reco
 ```
 
 Just like the other backends, the result is iterable, indexable and sliceable, and further pages are loaded lazily.
+`len(response)` is the total number of hits reported by the API, so iterating over a large table pages through all of it: use `get_glimpse()` (which never loads more than the rows it was asked for) or slice the response to get only a few records.
 
 ### Nested and list fields
 
@@ -560,26 +568,30 @@ True
 >>> df = data.to_dataframe()
 ```
 
-As long as a table has a usable schema, every other nested element is flattened into the record, however deep, e.g. a `mitglieder` record's `Person` -> `Kontakt` wrapper becomes top-level `person_kontakt_*` fields rather than a nested dict. List fields themselves stay as a list, but each item in it is flattened the same way.
+A repeatable element is usually held by a container element that holds nothing else, e.g. `<MitbeteiligteDepartemente><Departement/>...</MitbeteiligteDepartemente>`. The list keeps the name of the *container*, not the name of the element it holds, because the same element can be held by several containers: a `geschaeft` of the city has a `Departement` below both `FederfuehrendesDepartement` and `MitbeteiligteDepartemente`, and naming both columns `departement` would make them collide.
+
+As long as a table has a usable schema, every other nested element is flattened into the record, however deep, e.g. a `mitglieder` record's `Person` -> `Kontakt` wrapper becomes top-level `person_kontakt_*` fields rather than a nested dict. That includes the container of a single (non-repeatable) element, so a member's mandates end up in `person_kontakt_behoerdenmandate` and the leading department of a business in `federfuehrendesdepartement_departement_name`. List fields themselves stay as a list, but each item in it is flattened the same way.
 
 If the schema of a table cannot be loaded, there is no reliable way to tell a repeatable field from a wrapper, so nesting is kept as-is instead, e.g. `record['dokument']['edokument']['version']['nr']`. A handful of known field names are still flattened in that case as a fallback.
 
 Note that the records of this backend are normalized slightly differently than the ones of `goifer`: nesting is flattened based on the schema instead of goifer's fixed set of rules, and list fields are always lists.
 
-A list field like `behoerdenmandat` above stays as a list-of-dicts column when converted with `to_dataframe()`, which is often not what you want for further analysis. Use `explode()` to turn it into its own `DataFrame` instead, one row per item, with the parent record's `obj_guid` carried along as `parent_obj_guid` so it can be joined back:
+A list field like `behoerdenmandate` above stays as a list-of-dicts column when converted with `to_dataframe()`, which is often not what you want for further analysis. Use `explode()` to turn it into its own `DataFrame` instead, one row per item, with the parent record's `obj_guid` carried along as `parent_obj_guid` so it can be joined back:
 
 ```python
 >>> import swissparlpy as spp
 >>> data = spp.get_data('mitglieder', backend='gever')
->>> mandates = data.explode('behoerdenmandat')
+>>> mandates = data.explode('behoerdenmandate')
 >>> mandates.columns.tolist()
-['parent_obj_guid', 'obj_guid', 'dauer_start', 'dauer_end', 'dauer', 'name']
+['parent_obj_guid', 'obj_guid', 'dauer_start', 'dauer_end', 'dauer', 'gremiumtyp', 'name', 'kurzname', 'funktion']
 ```
+
+The name of the list field is enough, even if it is nested (the mandates above are in `person_kontakt_behoerdenmandate`), the full column name works as well. If the same name is nested below several columns, `explode()` raises a `SwissParlError` that lists them.
 
 Pass `parent_columns` to also carry other parent fields along (prefixed with `parent_`), to avoid a separate join for common cases:
 
 ```python
->>> mandates = data.explode('behoerdenmandat', parent_columns=['person_kontakt_vorname', 'person_kontakt_name'])
+>>> mandates = data.explode('behoerdenmandate', parent_columns=['person_kontakt_vorname', 'person_kontakt_name'])
 ```
 
 `explode()` raises a `SwissParlError` if the field is not one of the table's list fields. Without a schema, there's no way to know this ahead of time, so records where the field wasn't kept as a list (see above) are silently skipped instead.
@@ -596,15 +608,15 @@ The conversion is based on the value, not on the type of the schema, which has o
 
 ### Download documents
 
-Some tables return documents (`edokument`), for those a download URL and a filename are added automatically. Note that the exact path to `doc` below depends on whether a schema is available for the table, see [Nested and list fields](#nested-and-list-fields):
+Some tables return documents (`edokument`), for those a download URL and a filename are added automatically. Note that the exact path to `doc` below depends on whether a schema is available for the table, see [Nested and list fields](#nested-and-list-fields): with a schema the documents are a list field of flattened records, without one the nesting is kept (`meetings[0]['dokument']['edokument']['download_url']`).
 
 ```python
 >>> import swissparlpy as spp
 >>> meetings = spp.get_data('sitzungendetail', backend='gever')
->>> doc = meetings[0]['dokument']['edokument']
->>> doc['download_url']
+>>> doc = meetings[0]['sitzungsdokumente'][0]
+>>> doc['edokument_download_url']
 'https://parlzhcdws.cmicloud.ch/parlzh3/cdws/Files/9db1203429e04a39a233e56eab42feea-332/1/PDF'
->>> doc['filename']
+>>> doc['edokument_filename']
 '63. KR-Protokoll vom 9.7.2012, Nachmittag.pdf'
 ```
 
