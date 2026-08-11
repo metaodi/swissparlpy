@@ -62,7 +62,9 @@ print(
 
 # Documents get a download URL and a filename
 print("\n=== Documents of a meeting ===")
-meetings = spp.get_data("sitzungendetail", obj_guid='44a6d9a9ba494fb88923d04d66255b7d', backend="gever")
+meetings = spp.get_data(
+    "sitzungendetail", obj_guid="44a6d9a9ba494fb88923d04d66255b7d", backend="gever"
+)
 log.debug(pformat(meetings[0]))
 documents = meetings.explode("sitzungsdokumente")
 print(documents.head()[["edokument_filename", "edokument_download_url"]])
