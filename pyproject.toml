@@ -32,6 +32,7 @@ dev = [
     "types-requests",
     "types-PyYAML",
     "pandas-stubs",
+    "marimo>=0.23.16",
 ]
 visualization = [
     "matplotlib>=3.0.0",

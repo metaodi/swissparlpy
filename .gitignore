@@ -13,3 +13,4 @@ website/_site/
 website/.jekyll-cache/
 website/.bundle/
 website/vendor/
+__marimo__/
