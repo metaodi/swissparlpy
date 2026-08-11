@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.cmiag.ch/cdws/geschaeft" elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:complexType name="Geschaeft">
+    <xsd:sequence>
+      <xsd:element name="Titel" type="xsd:string"/>
+      <xsd:element name="GeschaeftsArt" type="xsd:string" nillable="true"/>
+      <xsd:element name="Beginn" type="xsd:dateTime" nillable="true"/>
+    </xsd:sequence>
+    <xsd:attribute name="OBJ_GUID" type="xsd:string" use="required"/>
+    <xsd:attribute name="SEQ" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDX" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:element name="Geschaeft" type="Geschaeft"/>
+</xsd:schema>

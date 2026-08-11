@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.cmiag.ch/cdws/Wahlkreise" elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:annotation>
+    <xsd:documentation>
+      <searchfield type="SearchFieldBoolean" Name="inaktiv" BoostFactor="1" Nrs="6"/>
+      <searchfield type="SearchFieldText" Name="Name" BoostFactor="1" Nrs="5"/>
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:complexType name="Wahlkreis">
+    <xsd:sequence>
+      <xsd:element name="Name" type="xsd:string"/>
+      <xsd:element name="inaktiv" type="xsd:boolean" nillable="true"/>
+    </xsd:sequence>
+    <xsd:attribute name="OBJ_GUID" type="xsd:string" use="required"/>
+    <xsd:attribute name="SEQ" type="xsd:string" use="optional"/>
+    <xsd:attribute name="IDX" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+  <xsd:element name="Wahlkreis" type="Wahlkreis"/>
+</xsd:schema>

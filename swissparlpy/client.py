@@ -1,8 +1,24 @@
 import logging
 import requests
-from .backends import ODataBackend, OpenParlDataBackend
+from . import errors
+from .backends import ODataBackend, OpenParlDataBackend, GeverBackend
 from .backends import BaseBackend, BaseResponse
 from typing import Optional, Union, Callable, Any, Literal
+
+BackendName = Literal[
+    "odata",
+    "openparldata",
+    "gever",
+    "gever_canton_zurich",
+    "gever_city_zurich",
+]
+
+# maps a backend name to the Gever instance it uses
+GEVER_INSTANCES = {
+    "gever": "canton_zurich",
+    "gever_canton_zurich": "canton_zurich",
+    "gever_city_zurich": "city_zurich",
+}
 
 try:
     import pandas as pd
@@ -18,12 +34,14 @@ class SwissParlClient(object):
     def __init__(
         self,
         session: Optional[requests.Session] = None,
-        backend: Optional[Union[BaseBackend, Literal["odata", "openparldata"]]] = None,
+        backend: Optional[Union[BaseBackend, BackendName]] = None,
     ) -> None:
         if isinstance(backend, BaseBackend):
             self.backend = backend
         elif backend == "openparldata":
             self.backend = OpenParlDataBackend(session)
+        elif backend in GEVER_INSTANCES:
+            self.backend = GeverBackend(session, instance=GEVER_INSTANCES[str(backend)])
         else:
             # Default to OData backend for backward compatibility
             self.backend = ODataBackend(session)
@@ -86,4 +104,21 @@ class SwissParlResponse(object):
         # Convert backend response to dict list then to DataFrame
         data_list = self._backend_response.to_dict_list()
         df: "pd.DataFrame" = pd.DataFrame(data_list)
+        return df
+
+    def explode(
+        self, field: str, parent_columns: Optional[list[str]] = None
+    ) -> "pd.DataFrame":
+        """Explode a repeatable field into its own DataFrame
+
+        Only backends with nested records support this, i.e. the Gever
+        backend (see `GeverResponse.explode`).
+        """
+        explode = getattr(self._backend_response, "explode", None)
+        if explode is None:
+            raise errors.SwissParlError(
+                f"{type(self._backend_response).__name__} does not have "
+                "nested fields, so there is nothing to explode."
+            )
+        df: "pd.DataFrame" = explode(field, parent_columns)
         return df

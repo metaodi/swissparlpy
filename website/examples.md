@@ -32,6 +32,7 @@ The [`examples/`](https://github.com/metaodi/swissparlpy/tree/main/examples) dir
 | [`visualize_voting.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/visualize_voting.py) | Plot a National Council seat map |
 | [`compare_backends.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/compare_backends.py) | Compare the OData and OpenParlData backends |
 | [`openparldata_backend.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/openparldata_backend.py) | Using the OpenParlData backend |
+| [`gever_backend.py`](https://github.com/metaodi/swissparlpy/blob/main/examples/gever_backend.py) | Using the Gever backend of the canton and the city of Zurich |
 
 ---
 
@@ -69,6 +70,22 @@ response = opd_client.get_data(
 )
 df = response.to_dataframe()
 print(df[["id", "date_start", "text_content_de"]].head())
+```
+
+## Quick Example: Query the Gever Backend
+
+```python
+import swissparlpy as spp
+
+# Electoral districts of the canton of Zurich
+districts = spp.get_data('wahlkreise', 'inaktiv = false', backend='gever')
+for d in districts[:5]:
+    print(d['name'])
+
+# Search for a member and explode their mandates into a DataFrame
+members = spp.get_data('mitglieder', name='Marti', backend='gever')
+mandates = members.explode('behoerdenmandate')
+print(mandates.head())
 ```
 
 ## Quick Example: Plot Voting Results

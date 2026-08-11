@@ -4,6 +4,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-08-11
+### Added
+- Add support for the Gever (Geschäftsverwaltungssystem) APIs of the canton and the city of Zurich as a backend, based on [goifer](https://github.com/metaodi/goifer)
+- Gever backend: with a usable schema, records are now fully flattened at any depth (e.g. a `mitglieder` record's `person` -> `kontakt` wrapper), instead of only a curated set of hardcoded field names
+- Gever backend: detect repeatable fields whose schema declares `maxOccurs` on the wrapping `choice`/`sequence`/`all` instead of on the element itself, fixing inconsistent dict-vs-list shapes for such fields (e.g. `mitglieder`'s `Behoerdenmandat`/`Parteizugehoerigkeit`)
+- Gever backend: `GeverResponse.explode()` turns a list field into its own `DataFrame`, one row per item, with the parent record's `obj_guid` carried along as `parent_obj_guid` to join back
+- Gever backend: `explode()` is available on the result of the module level functions and `SwissParlClient` as well, not only on the backend response, and resolves a nested list field by its name (e.g. `behoerdenmandate` for `person_kontakt_behoerdenmandate`)
+- Gever backend: `get_glimpse()` only loads the rows it was asked for, instead of paging through the whole table as soon as the result is iterated over or converted to a `DataFrame`
+
+### Fixed
+- Gever backend: string values of keyword arguments are quoted and escaped in the generated CQL query, e.g. `get_data('mitglieder', vorname='Hans Peter')` searches for `vorname adj "Hans Peter"`. Before, a value with a space was rejected by the API with an HTTP 406
+- Gever backend: a record with two containers of the same element no longer fails with `ValueError: duplicated key`, e.g. the city's `geschaeft`, which holds a `Departement` below both `FederfuehrendesDepartement` and `MitbeteiligteDepartemente`. A list field now keeps the name of its container, so those columns are `federfuehrendesdepartement_departement_*` and `mitbeteiligtedepartemente` (**BC-Break** for list fields that were named after the element they hold, e.g. `behoerdenmandat` is now `person_kontakt_behoerdenmandate` and `dokument` of `sitzungendetail` is now `sitzungsdokumente`)
+- Gever backend: a nested element whose name is only a part of the name of its parent keeps that parent as a prefix, e.g. `End` of `SitzungsEnde` is `sitzungsende_end` instead of a plain `end` that collided with other columns
+
 ## [2.0.0] - 2026-07-30
 ### Changed
 - **BC-Break**: Python 3.10 is now required (Python 3.9 reached its end of life)
@@ -97,7 +111,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `Fixed` for any bug fixes.
 - `Security` to invite users to upgrade in case of vulnerabilities.
 
-[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/metaodi/swissparlpy/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/metaodi/swissparlpy/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/metaodi/swissparlpy/compare/v0.3.0...v1.0.0
 [0.3.0]: https://github.com/metaodi/swissparlpy/compare/v0.2.1...v0.3.0
