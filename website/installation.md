@@ -17,7 +17,7 @@ nav_order: 2
 
 ## Requirements
 
-The current release of swissparlpy is **2.0.0** and it requires **Python 3.10 or higher**.
+The current release of swissparlpy is **2.1.0** and it requires **Python 3.10 or higher**.
 
 ---
 

@@ -10,7 +10,7 @@ nav_order: 1
 [![Build Status](https://github.com/metaodi/swissparlpy/actions/workflows/build.yml/badge.svg)](https://github.com/metaodi/swissparlpy/actions/workflows/build.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-**swissparlpy** is a Python module that provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss Parliament](https://www.parlament.ch/en) and the [OpenParlData.ch](https://openparldata.ch) REST API.
+**swissparlpy** is a Python module that provides easy access to the data of the [OData webservice](https://ws.parlament.ch/odata.svc/) of the [Swiss Parliament](https://www.parlament.ch/en), the [OpenParlData.ch](https://openparldata.ch) REST API and the Gever (Geschäftsverwaltungssystem) APIs of the [canton](https://www.kantonsrat.zh.ch) and the [city](https://www.gemeinderat-zuerich.ch) of Zurich.
 
 ![swissparlpy]({{ "assets/images/swissparlpy_social.png" | relative_url }})
 
@@ -19,7 +19,7 @@ nav_order: 1
 ## Quick Start
 
 {: .note }
-Current release: **2.0.0** – requires Python 3.10 or higher. See the [changelog](https://github.com/metaodi/swissparlpy/blob/main/CHANGELOG.md) for all changes.
+Current release: **2.1.0** – requires Python 3.10 or higher. See the [changelog](https://github.com/metaodi/swissparlpy/blob/main/CHANGELOG.md) for all changes.
 
 ```bash
 pip install swissparlpy
@@ -43,7 +43,7 @@ for c in councillors[:10]:
 
 ## Features
 
-- **Multiple backends** – Use the official parlament.ch OData API or the OpenParlData.ch REST API
+- **Multiple backends** – Use the official parlament.ch OData API, the OpenParlData.ch REST API or the Gever APIs of the canton and the city of Zurich
 - **Simple API** – Intuitive functions to list tables, inspect variables, and query data
 - **Filtering** – Filter data by any field, substring, date range, or advanced OData filter expressions
 - **Pagination** – Automatically handles large result sets with server-side pagination
