@@ -315,6 +315,19 @@ df = pd.DataFrame(persons)
 print(df[['FirstName', 'LastName']])
 ```
 
+**Escaping values**
+
+A filter that is passed as a string is sent to the API as-is. A value containing an apostrophe ends its string literal early, which the service rejects with an HTTP 400, so such values have to be escaped with `escape_odata_string()`:
+
+```python
+import swissparlpy as spp
+
+keyword = spp.escape_odata_string("délit d'initié")  # délit d''initié
+business = spp.get_data("Business", Language="FR", filter=f"substringof('{keyword}',Title)")
+```
+
+Keyword arguments and `spp.Filter` don't need this, pyodata builds those literals itself. Escaping the apostrophes there was fixed upstream in [SAP/python-pyodata#313](https://github.com/SAP/python-pyodata/pull/313), which is not part of a pyodata release yet (as of 1.12.0).
+
 **Callable Filter**
 
 You can provide a callable as a filter which allows for more advanced filters.

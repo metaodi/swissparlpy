@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project follows [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- OData backend: `escape_odata_string()` escapes a value for a filter that is passed as a string, where an apostrophe otherwise ends the string literal early and the API answers with an HTTP 400, e.g. `Title eq 'délit d'initié'` (Issue #59)
 
 ## [2.1.0] - 2026-08-11
 ### Added

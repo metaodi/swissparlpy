@@ -9,6 +9,7 @@ from .client import SwissParlResponse  # noqa
 from .client import BackendName  # noqa
 from .backends import ODataBackend, OpenParlDataBackend, GeverBackend  # noqa
 from .backends import ODataResponse, OpenParlDataResponse  # noqa
+from .backends import escape_odata_string  # noqa
 from pyodata.v2.service import GetEntitySetFilter as Filter  # noqa
 from typing import Callable, Union, Any
 
