@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project follows [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.1.0] - 2026-08-11
 ### Added
 - Add support for the Gever (Geschäftsverwaltungssystem) APIs of the canton and the city of Zurich as a backend, based on [goifer](https://github.com/metaodi/goifer)
 - Gever backend: with a usable schema, records are now fully flattened at any depth (e.g. a `mitglieder` record's `person` -> `kontakt` wrapper), instead of only a curated set of hardcoded field names
@@ -109,7 +111,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `Fixed` for any bug fixes.
 - `Security` to invite users to upgrade in case of vulnerabilities.
 
-[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/metaodi/swissparlpy/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/metaodi/swissparlpy/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/metaodi/swissparlpy/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/metaodi/swissparlpy/compare/v0.3.0...v1.0.0
 [0.3.0]: https://github.com/metaodi/swissparlpy/compare/v0.2.1...v0.3.0
