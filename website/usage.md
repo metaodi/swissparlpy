@@ -280,7 +280,7 @@ print(business.count)
 ```
 
 {: .note }
-Keyword arguments and `spp.Filter` don't need this, pyodata builds those literals itself. Escaping the apostrophes there was fixed upstream in [SAP/python-pyodata#313](https://github.com/SAP/python-pyodata/pull/313), which is not part of a pyodata release yet (as of 1.12.0).
+Keyword arguments and `spp.Filter` are pyodata's job, it builds those literals itself, so don't escape those values yourself. That escaping was fixed upstream in [SAP/python-pyodata#313](https://github.com/SAP/python-pyodata/pull/313), which is not part of a pyodata release yet (as of 1.12.0), so until that release lands and the dependency is bumped, those paths can still fail on a value containing an apostrophe.
 
 **Callable filter**
 
