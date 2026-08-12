@@ -14,6 +14,20 @@ log = logging.getLogger(__name__)
 SERVICE_URL = "https://ws.parlament.ch/odata.svc/"
 
 
+def escape_odata_string(value: str) -> str:
+    """Escape a string value for a filter that is passed as a string
+
+    A string literal is delimited by single quotes, so an apostrophe inside
+    the value has to be doubled. Without that, the literal ends at the
+    apostrophe and the service rejects the query with an HTTP 400, e.g.
+    `Title eq 'délit d'initié'`.
+
+    A filter passed as a string is sent to the API as-is, so escaping its
+    values is up to the caller.
+    """
+    return value.replace("'", "''")
+
+
 class ODataBackend(BaseBackend):
     """Backend implementation for OData API"""
 

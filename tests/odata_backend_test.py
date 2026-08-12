@@ -1,8 +1,10 @@
 import pytest
 import responses
+from responses import matchers
 from unittest.mock import Mock
 from swissparlpy.backends.odata import ODataBackend
 from swissparlpy.backends.odata import ODataResponse
+from swissparlpy.backends.odata import escape_odata_string
 from swissparlpy import errors
 
 
@@ -302,3 +304,48 @@ class TestODataCaching:
         assert (
             len(responses.calls) == 1
         ), f"Metadata endpoint should only be called once, was called {len(responses.calls)} times"
+
+
+class TestEscapeODataString:
+    """Test escaping of values used in a filter passed as a string"""
+
+    def test_value_without_apostrophe_is_unchanged(self):
+        assert escape_odata_string("Seiler") == "Seiler"
+
+    def test_apostrophe_is_doubled(self):
+        assert escape_odata_string("délit d'initié") == "délit d''initié"
+
+    def test_every_apostrophe_is_doubled(self):
+        assert escape_odata_string("l'art de l'évasion") == "l''art de l''évasion"
+
+    def test_empty_string(self):
+        assert escape_odata_string("") == ""
+
+    @responses.activate
+    def test_escaped_value_is_sent_as_one_literal(self, metadata, business_page1):
+        """An escaped value stays within its literal in the request"""
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/$metadata",
+            content_type="text/xml",
+            body=metadata,
+            status=200,
+        )
+        title = escape_odata_string("délit d'initié")
+        responses.add(
+            responses.GET,
+            f"{SERVICE_URL}/Business",
+            content_type="text/xml",
+            body=business_page1,
+            status=200,
+            match=[
+                matchers.query_param_matcher(
+                    {"$filter": "Title eq 'délit d''initié'"}, strict_match=False
+                )
+            ],
+        )
+
+        backend = ODataBackend()
+        response = backend.get_data("Business", filter=f"Title eq '{title}'")
+
+        assert response.count > 0
